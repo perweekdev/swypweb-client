@@ -82,3 +82,11 @@ export function ChevronLeftIcon({ className }: IconProps) {
     </Icon>
   );
 }
+
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </Icon>
+  );
+}
