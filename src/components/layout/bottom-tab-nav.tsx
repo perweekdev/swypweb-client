@@ -3,13 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ROUTES } from '@constants/routes';
-import {
-  ChatIcon,
-  CollectionIcon,
-  ExchangeIcon,
-  HomeIcon,
-  UserIcon,
-} from '@components/icons';
+import { ChatIcon, CollectionIcon, ExchangeIcon, HomeIcon, UserIcon } from '@components/icons';
 
 const TABS = [
   { href: ROUTES.home, label: '홈', Icon: HomeIcon },

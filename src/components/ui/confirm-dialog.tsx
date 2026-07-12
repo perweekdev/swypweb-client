@@ -28,7 +28,12 @@ export function ConfirmDialog({
       role="dialog"
       aria-modal="true"
     >
-      <button type="button" aria-label="닫기" className="absolute inset-0 bg-black/40" onClick={onCancel} />
+      <button
+        type="button"
+        aria-label="닫기"
+        className="absolute inset-0 bg-black/40"
+        onClick={onCancel}
+      />
       <div className="relative z-10 w-full max-w-[320px] rounded-2xl bg-white px-5 py-6">
         <p className="text-center text-h3 text-secondary-900">{title}</p>
         {description && (

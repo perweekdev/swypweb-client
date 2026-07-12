@@ -7,7 +7,8 @@ type Size = 'sm' | 'lg';
 const VARIANT: Record<Variant, string> = {
   primary: 'bg-primary-900 text-white disabled:bg-primary-300',
   navy: 'bg-secondary-900 text-white disabled:bg-secondary-300',
-  outline: 'border border-secondary-100 bg-transparent text-secondary-900 disabled:text-secondary-300',
+  outline:
+    'border border-secondary-100 bg-transparent text-secondary-900 disabled:text-secondary-300',
 };
 
 // sm: 작은 액션 pill / lg: 하단 고정형 CTA (full width)
