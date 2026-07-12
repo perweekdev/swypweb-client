@@ -9,6 +9,7 @@ import { Toggle } from '@components/ui/toggle';
 import { ListRow } from '@components/ui/list-row';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { ChevronRightIcon, PlusIcon } from '@components/icons';
+import { ArtistAvatar } from '@components/my/artist-avatar';
 import { ROUTES } from '@constants/routes';
 import { mockInterestGroups, mockUser } from '@/mocks/my';
 
@@ -50,12 +51,7 @@ export function MemberMyPage() {
         <ul className="flex gap-4 overflow-x-auto px-5 pb-1 pt-3">
           {mockInterestGroups.map((group) => (
             <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-              <span
-                className="flex size-16 items-center justify-center rounded-full text-body1 text-white"
-                style={{ backgroundColor: group.color }}
-              >
-                {group.name.charAt(0)}
-              </span>
+              <ArtistAvatar name={group.name} color={group.color} />
               <span className="w-full truncate text-center text-body3 text-secondary-900">
                 {group.name}
               </span>
