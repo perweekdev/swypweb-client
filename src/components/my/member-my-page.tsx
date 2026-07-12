@@ -18,6 +18,7 @@ export function MemberMyPage() {
   const logout = useAuthStore((s) => s.logout);
   const [chatAlarm, setChatAlarm] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
 
   return (
     <>
@@ -93,8 +94,9 @@ export function MemberMyPage() {
           로그아웃
         </button>
         <span className="h-3 w-px bg-secondary-100" />
-        {/* TODO: 회원탈퇴 플로우 */}
-        <button type="button">회원탈퇴</button>
+        <button type="button" onClick={() => setWithdrawOpen(true)}>
+          회원탈퇴
+        </button>
       </div>
 
       <ConfirmDialog
@@ -104,6 +106,18 @@ export function MemberMyPage() {
         onCancel={() => setLogoutOpen(false)}
         onConfirm={() => {
           setLogoutOpen(false);
+          logout();
+        }}
+      />
+
+      <ConfirmDialog
+        open={withdrawOpen}
+        title="정말 탈퇴하실 건가요?"
+        confirmText="탈퇴"
+        onCancel={() => setWithdrawOpen(false)}
+        onConfirm={() => {
+          // TODO: 실제 회원탈퇴 API 연동 (현재는 로그아웃 처리)
+          setWithdrawOpen(false);
           logout();
         }}
       />
