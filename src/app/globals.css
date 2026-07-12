@@ -1,1 +1,123 @@
 @import 'tailwindcss';
+
+/**
+ * 디자인 토큰 (docs/designsystem.md 기준)
+ * Tailwind v4 CSS-first @theme. 여기서 정의한 토큰이 유틸리티 클래스로 생성된다.
+ *   색상  → bg-primary-900, text-secondary-500, border-red-100 ...
+ *   타이포 → text-h1, text-body2, text-button1 ... (size + line-height + weight 포함)
+ *   폰트  → font-sans (한글 Pretendard / 영문 Plus Jakarta Sans 자동 분기)
+ */
+@theme {
+  /* ── Font family ─────────────────────────────────────────────
+     Jakarta를 앞에 두어 영문/숫자는 Jakarta로, 글리프가 없는 한글은
+     다음 순위인 Pretendard로 자동 폴백된다. */
+  --font-sans:
+    var(--font-jakarta), 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Primary ───────────────────────────────────────────────── */
+  --color-primary-900: #7c3aed;
+  --color-primary-700: #9661f1;
+  --color-primary-500: #b089f4;
+  --color-primary-300: #cbb0f8;
+  --color-primary-100: #e5d8fb;
+  --color-primary-50: #f2ebfd;
+  --color-primary-10: #f8f5fe;
+
+  /* ── Secondary ─────────────────────────────────────────────── */
+  --color-secondary-900: #06153a;
+  --color-secondary-700: #384461;
+  --color-secondary-500: #6a7389;
+  --color-secondary-300: #9ba1b0;
+  --color-secondary-100: #cdd0d8;
+  --color-secondary-50: #e6e8eb;
+  --color-secondary-10: #f3f3f5;
+
+  /* ── Neutral (Gray) ────────────────────────────────────────── */
+  --color-gray-900: #1f1f1f;
+  --color-gray-700: #4d4d4d;
+  --color-gray-500: #808080;
+  --color-gray-300: #b3b3b3;
+  --color-gray-100: #e6e6e6;
+  --color-gray-50: #f2f2f2;
+  --color-gray-10: #f4f4f4;
+
+  /* ── Red (경고/에러) ───────────────────────────────────────── */
+  --color-red-900: #f7272b;
+  --color-red-700: #f95255;
+  --color-red-500: #fa7d80;
+  --color-red-300: #fca9aa;
+  --color-red-100: #fdd4d5;
+  --color-red-50: #fee9ea;
+  --color-red-10: #fff4f4;
+
+  /* ── Accent ────────────────────────────────────────────────── */
+  --color-accent: #3fedf6;
+
+  /* ── Gradient stops (bg-gradient-to-r from-gradient-from ...) ─ */
+  --color-gradient-from: #4816c7;
+  --color-gradient-via: #977dff;
+  --color-gradient-to: #ffccf2;
+
+  /* ── Background ────────────────────────────────────────────── */
+  --color-background: #fdfdfe;
+
+  /* ── Text (semantic) ───────────────────────────────────────── */
+  --color-text-strong: #06153a; /* 기본 본문/제목 */
+  --color-text-body: #6a7389; /* 보조 텍스트 */
+  --color-text-subtle: #9ba1b0; /* placeholder/비활성 */
+  --color-text-black: #000000;
+  --color-text-white: #ffffff;
+
+  /* ── Typography scale (weight / size / line-height 1.5) ──────
+     사용 예: <h1 className="text-h1">, <span className="text-body2"> */
+  --text-h1: 20px;
+  --text-h1--line-height: 1.5;
+  --text-h1--font-weight: 600;
+
+  --text-h2: 20px;
+  --text-h2--line-height: 1.5;
+  --text-h2--font-weight: 500;
+
+  --text-h3: 16px;
+  --text-h3--line-height: 1.5;
+  --text-h3--font-weight: 500;
+
+  --text-body1: 16px;
+  --text-body1--line-height: 1.5;
+  --text-body1--font-weight: 400;
+
+  --text-body2: 14px;
+  --text-body2--line-height: 1.5;
+  --text-body2--font-weight: 400;
+
+  --text-body3: 12px;
+  --text-body3--line-height: 1.5;
+  --text-body3--font-weight: 400;
+
+  --text-body4: 10px;
+  --text-body4--line-height: 1.5;
+  --text-body4--font-weight: 400;
+
+  --text-button1: 16px;
+  --text-button1--line-height: 1.5;
+  --text-button1--font-weight: 500;
+
+  --text-button2: 14px;
+  --text-button2--line-height: 1.5;
+  --text-button2--font-weight: 500;
+}
+
+/* ── Base ──────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-strong);
+    font-family: var(--font-sans);
+    /* 모바일 퍼스트: 텍스트 선택/탭 하이라이트 정리 */
+    -webkit-tap-highlight-color: transparent;
+  }
+}
