@@ -91,6 +91,26 @@ export function PlusIcon({ className }: IconProps) {
   );
 }
 
+/** 교환 방향 표시 (CHAT-002 매치 정보의 두 포카 사이) */
+export function SwapIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M3 8.5h18l-4-4" />
+      <path d="M21 15.5H3l4 4" />
+    </Icon>
+  );
+}
+
+/** 메시지 보내기 (종이비행기) */
+export function SendIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M21 3 10.5 13.5" />
+      <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3Z" />
+    </Icon>
+  );
+}
+
 export function CameraIcon({ className }: IconProps) {
   return (
     <Icon className={className}>
