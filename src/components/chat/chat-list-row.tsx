@@ -26,13 +26,13 @@ export function ChatListRow({ room }: { room: ChatRoomSummary }) {
               </span>
             )}
           </div>
-          <p className="line-clamp-2 whitespace-pre-line text-body3 text-secondary-300">
+          <p className="line-clamp-2 whitespace-pre-line text-body3 text-secondary-500">
             {room.lastMessage}
           </p>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <span className="text-body4 text-secondary-300">
+          <span className="text-body4 text-secondary-500">
             {formatRelativeTime(room.lastMessageAt, NOW)}
           </span>
           {room.unreadCount > 0 && (

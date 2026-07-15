@@ -15,8 +15,7 @@ export default function ChatPage() {
       {rooms.length === 0 ? (
         <ChatEmptyState />
       ) : (
-        // 구분선 #EEF0F2는 디자인 계측값. 디자인 시스템 색상표에 없다. (docs/dev-plan.md 참고)
-        <ul className="divide-y divide-[#EEF0F2] px-4">
+        <ul className="divide-y divide-secondary-50 px-4">
           {rooms.map((room) => (
             <ChatListRow key={room.id} room={room} />
           ))}
