@@ -91,6 +91,15 @@ export function PlusIcon({ className }: IconProps) {
   );
 }
 
+/** 선택 표시 (CHAT-004 포카 선택) */
+export function CheckIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </Icon>
+  );
+}
+
 /** 닫기 / 입력 지우기 */
 export function CloseIcon({ className }: IconProps) {
   return (
