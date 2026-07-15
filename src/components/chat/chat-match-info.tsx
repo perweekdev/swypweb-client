@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { SwapIcon } from '@components/icons';
+import { PhotocardMeta } from '@components/photocard/photocard-card';
 import { Button } from '@components/ui/button';
 import { CHAT_ROUTES } from '@constants/routes';
 import type { ExchangeStatus } from '@/types/chat.types';
@@ -16,10 +17,8 @@ function RepresentativeCard({ card }: { card: Photocard }) {
         role="img"
         aria-label={`${card.memberName} ${card.albumName} ${card.versionName}`}
       />
-      <div className="min-w-0 pt-1">
-        <p className="truncate text-body4 text-secondary-500">{card.memberName}</p>
-        <p className="truncate text-body3 text-secondary-900">{card.albumName}</p>
-        <p className="truncate text-body4 text-secondary-300">{card.versionName}</p>
+      <div className="min-w-0">
+        <PhotocardMeta card={card} />
       </div>
     </div>
   );
