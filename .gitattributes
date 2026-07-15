@@ -1,0 +1,20 @@
+# 개행문자(EOL) 정책 — LF로 통일
+#
+# 저장소에 저장되는 내용은 이미 전부 LF이지만, Windows에서 core.autocrlf=true로
+# 체크아웃하면 워킹트리가 CRLF가 된다. 그러면 prettier(endOfLine 기본값 'lf')의
+# 로컬 `pnpm format:check`가 모든 파일을 실패로 잡아서 신호로 쓸 수 없다.
+# (CI는 리눅스에서 LF로 체크아웃하므로 통과 → 로컬과 CI 결과가 어긋난다)
+#
+# 아래 설정으로 워킹트리까지 LF로 통일해 로컬 검사와 CI 결과를 일치시킨다.
+* text=auto eol=lf
+
+# 바이너리 — 개행 변환 금지
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.pdf binary

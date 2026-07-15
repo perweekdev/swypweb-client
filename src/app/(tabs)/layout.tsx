@@ -6,7 +6,8 @@ import { BottomTabNav } from '@components/layout/bottom-tab-nav';
 export default function TabsLayout({ children }: { children: ReactNode }) {
   return (
     <MobileFrame>
-      <main className="flex-1">{children}</main>
+      {/* flex 컬럼: 화면 전체를 채우는 빈 상태(CHAT-001 등)가 flex-1로 남은 높이를 쓸 수 있게 한다 */}
+      <main className="flex flex-1 flex-col">{children}</main>
       <BottomTabNav />
     </MobileFrame>
   );

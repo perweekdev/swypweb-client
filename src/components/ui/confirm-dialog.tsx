@@ -24,18 +24,19 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-8"
+      className="fixed inset-0 z-50 flex items-center justify-center px-10"
       role="dialog"
       aria-modal="true"
     >
       <button
         type="button"
         aria-label="닫기"
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-black/50"
         onClick={onCancel}
       />
-      <div className="relative z-10 w-full max-w-[320px] rounded-2xl bg-white px-5 py-6">
-        <p className="text-center text-h3 text-secondary-900">{title}</p>
+      {/* 계측: 다이얼로그 폭 293(좌우 여백 41), 배경은 흰색이 아니라 background 토큰 */}
+      <div className="relative z-10 w-full max-w-[295px] rounded-2xl bg-background px-5 py-6">
+        <p className="whitespace-pre-line text-center text-h3 text-secondary-900">{title}</p>
         {description && (
           <p className="mt-1.5 text-center text-body3 text-secondary-500">{description}</p>
         )}
