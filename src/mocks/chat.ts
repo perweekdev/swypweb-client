@@ -44,7 +44,8 @@ const simpleSet = (myColor: string, partnerColor: string): ExchangeSet => ({
 export const mockChatRooms: ChatRoom[] = [
   {
     id: '1',
-    partner: { nickname: '포카매치', avatarUrl: null, color: '#CDD0D8' },
+    // 디자인 CHAT-001 첫 행 — 프로필 사진 미등록(기본 아바타)
+    partner: { nickname: '포카매치', avatarUrl: null },
     unreadCount: 1,
     status: 'ongoing',
     exchangeSet: ireneForSeulgi,

@@ -17,8 +17,8 @@ export type MessageSender = 'me' | 'partner';
 export interface ChatPartner {
   nickname: string;
   avatarUrl: string | null;
-  /** 아바타 에셋 제공 전 placeholder 배경색 */
-  color: string;
+  /** 프로필 사진 에셋 제공 전 placeholder 색. 없으면 기본 아바타(사진 미등록) */
+  color?: string;
 }
 
 /** 채팅 메시지 */
