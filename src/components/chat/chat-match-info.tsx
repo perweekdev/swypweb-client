@@ -39,8 +39,8 @@ export function ChatMatchInfo({
   status: ExchangeStatus;
 }) {
   const { myCards, partnerCards } = exchangeSet;
-  // 스토리보드: "대표 교환 포카 사진 1장을 제외한 나머지 교환할 포카 장 수 표시"
-  const extraCount = myCards.length + partnerCards.length - 2;
+  // 구해요(원해요)로 등록한 포카 중 대표 1장을 뺀 나머지 장 수. 그래서 우측(구해요)에만 표시된다.
+  const extraCount = partnerCards.length - 1;
 
   return (
     <section className="border-b border-secondary-50 px-4 pt-3">

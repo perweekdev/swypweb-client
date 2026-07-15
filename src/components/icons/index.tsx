@@ -91,6 +91,15 @@ export function PlusIcon({ className }: IconProps) {
   );
 }
 
+/** 닫기 / 입력 지우기 */
+export function CloseIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </Icon>
+  );
+}
+
 /** 교환 방향 표시 (CHAT-002 매치 정보의 두 포카 사이) */
 export function SwapIcon({ className }: IconProps) {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PlusIcon, SendIcon } from '@components/icons';
+import { CloseIcon, PlusIcon, SendIcon } from '@components/icons';
 
 /**
  * CHAT-002 메시지 입력창.
@@ -22,13 +22,25 @@ export function ChatInputBar() {
         <PlusIcon className="size-6" />
       </button>
 
-      <input
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        placeholder="메세지 입력하기"
-        aria-label="메시지 입력"
-        className="h-10 min-w-0 flex-1 rounded-full bg-secondary-10 px-4 text-body2 text-secondary-900 outline-none placeholder:text-secondary-300"
-      />
+      <div className="relative min-w-0 flex-1">
+        <input
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          placeholder="메시지 입력하기"
+          aria-label="메시지 입력"
+          className="h-10 w-full rounded-full bg-secondary-10 pl-4 pr-9 text-body2 text-secondary-900 outline-none placeholder:text-secondary-300"
+        />
+        {canSend && (
+          <button
+            type="button"
+            aria-label="입력 지우기"
+            onClick={() => setText('')}
+            className="absolute right-3 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 text-white"
+          >
+            <CloseIcon className="size-2.5" />
+          </button>
+        )}
+      </div>
 
       <button
         type="button"
