@@ -129,6 +129,25 @@ export function SendIcon({ className }: IconProps) {
   );
 }
 
+/** 채워진 프로필 실루엣 (image-profile placeholder) */
+export function ProfileIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="9" r="4" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0Z" />
+    </svg>
+  );
+}
+
+/** 채워진 하트 (관심 그룹 배지) */
+export function HeartIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 20.5 4.2 12.9a4.6 4.6 0 0 1 6.5-6.5l1.3 1.3 1.3-1.3a4.6 4.6 0 0 1 6.5 6.5Z" />
+    </svg>
+  );
+}
+
 export function CameraIcon({ className }: IconProps) {
   return (
     <Icon className={className}>

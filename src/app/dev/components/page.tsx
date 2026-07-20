@@ -1,11 +1,18 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Button } from '@components/ui/button';
 import { CloseButton } from '@components/ui/close-button';
 import { IconButton } from '@components/ui/icon-button';
 import { LoginButton } from '@components/ui/login-button';
 import { TabButton } from '@components/ui/tab-button';
+import { Toggle } from '@components/ui/toggle';
+import { CheckCircle } from '@components/ui/check-circle';
+import { ImageCheck } from '@components/ui/image-check';
+import { StatusChip } from '@components/ui/status-chip';
+import { AllChip } from '@components/ui/all-chip';
+import { GroupLogo } from '@components/ui/group-logo';
+import { Avatar } from '@components/ui/avatar';
 import { ChevronLeftIcon } from '@components/icons';
 
 /**
@@ -33,6 +40,8 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export default function ComponentCatalogPage() {
+  const [toggleOn, setToggleOn] = useState(true);
+
   return (
     <main className="mx-auto max-w-[480px] px-5 py-6">
       <header className="pb-2">
@@ -128,6 +137,53 @@ export default function ComponentCatalogPage() {
               <ChevronLeftIcon className="size-4" />
             </IconButton>
           </span>
+        </Row>
+      </Section>
+
+      {/* ── 청크 2: 선택/상태/이미지 atoms ───────────────────── */}
+      <Section title="Toggle / CheckCircle / ImageCheck">
+        <Row label="Toggle (48×28)">
+          <Toggle checked={toggleOn} onChange={setToggleOn} ariaLabel="예시 토글" />
+          <Toggle checked={!toggleOn} onChange={(v) => setToggleOn(!v)} ariaLabel="예시 토글 2" />
+        </Row>
+        <Row label="CheckCircle — default / selected (control-checkbox-text)">
+          <CheckCircle checked={false} />
+          <CheckCircle checked />
+        </Row>
+        <Row label="ImageCheck — unselected / selected (control-checkbox-image)">
+          <ImageCheck selected={false} />
+          <ImageCheck selected />
+        </Row>
+      </Section>
+
+      <Section title="StatusChip / AllChip">
+        <Row label="StatusChip (chip-status)">
+          <StatusChip />
+        </Row>
+        <Row label="AllChip (image-all)">
+          <AllChip />
+        </Row>
+      </Section>
+
+      <Section title="GroupLogo (group-logo)">
+        <Row label="large — default / selected / add / favorited">
+          <GroupLogo size="lg" name="IVE" color="#F4A8C0" />
+          <GroupLogo size="lg" state="selected" name="aespa" color="#8B9DC3" />
+          <GroupLogo size="lg" state="add" />
+          <GroupLogo size="lg" name="Red Velvet" color="#C77DFF" favorited />
+        </Row>
+        <Row label="small — default / selected / add">
+          <GroupLogo size="sm" name="IVE" color="#F4A8C0" />
+          <GroupLogo size="sm" state="selected" name="ILLIT" color="#5BC0DE" />
+          <GroupLogo size="sm" state="add" />
+        </Row>
+      </Section>
+
+      <Section title="Avatar (image-profile)">
+        <Row label="placeholder / 사진 등록(색상)">
+          <Avatar />
+          <Avatar color="#B089F4" />
+          <Avatar className="size-16" />
         </Row>
       </Section>
     </main>
