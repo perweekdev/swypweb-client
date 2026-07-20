@@ -13,6 +13,10 @@ import { StatusChip } from '@components/ui/status-chip';
 import { AllChip } from '@components/ui/all-chip';
 import { GroupLogo } from '@components/ui/group-logo';
 import { Avatar } from '@components/ui/avatar';
+import { ChatBubble } from '@components/chat/chat-bubble';
+import { ChatInputBar } from '@components/chat/chat-input-bar';
+import { ChatListRow } from '@components/chat/chat-list-row';
+import { mockChatRoomSummaries } from '@/mocks/chat';
 import { ChevronLeftIcon } from '@components/icons';
 
 /**
@@ -185,6 +189,33 @@ export default function ComponentCatalogPage() {
           <Avatar color="#B089F4" />
           <Avatar className="size-16" />
         </Row>
+      </Section>
+
+      {/* ── 청크 3: 채팅 atoms/molecules ─────────────────────── */}
+      <Section title="ChatBubble (sender/receiver)">
+        <div className="space-y-2">
+          <div className="flex">
+            <ChatBubble variant="partner">안녕하세요 😊</ChatBubble>
+          </div>
+          <div className="flex justify-end">
+            <ChatBubble variant="mine">네, 안녕하세요!</ChatBubble>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="ChatInputBar (chat-input-status)">
+        <div className="rounded-xl border border-secondary-50">
+          <ChatInputBar />
+        </div>
+        <p className="text-body3 text-secondary-500">입력 시 X(지우기)·보내기 버튼이 활성화된다.</p>
+      </Section>
+
+      <Section title="ChatListRow (chat)">
+        <ul className="divide-y divide-secondary-50">
+          {mockChatRoomSummaries.slice(0, 3).map((room) => (
+            <ChatListRow key={room.id} room={room} />
+          ))}
+        </ul>
       </Section>
     </main>
   );
