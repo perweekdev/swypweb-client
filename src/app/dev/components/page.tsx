@@ -16,7 +16,12 @@ import { Avatar } from '@components/ui/avatar';
 import { ChatBubble } from '@components/chat/chat-bubble';
 import { ChatInputBar } from '@components/chat/chat-input-bar';
 import { ChatListRow } from '@components/chat/chat-list-row';
-import { mockChatRoomSummaries } from '@/mocks/chat';
+import { PhotocardCard } from '@components/photocard/photocard-card';
+import { SelectableCard } from '@components/photocard/selectable-card';
+import { DeletableCard } from '@components/photocard/deletable-card';
+import { CardSetInfo } from '@components/photocard/card-set-info';
+import { HaveSetCard } from '@components/photocard/have-set-card';
+import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
 import { ChevronLeftIcon } from '@components/icons';
 
 /**
@@ -45,6 +50,10 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 
 export default function ComponentCatalogPage() {
   const [toggleOn, setToggleOn] = useState(true);
+  const [pickedId, setPickedId] = useState<string | null>(null);
+
+  const { myCards: haveCards, partnerCards: wantCards } = mockChatRooms[0].exchangeSet;
+  const cards = [...haveCards, ...wantCards]; // 카탈로그용 3장 확보
 
   return (
     <main className="mx-auto max-w-[480px] px-5 py-6">
@@ -216,6 +225,58 @@ export default function ComponentCatalogPage() {
             <ChatListRow key={room.id} room={room} />
           ))}
         </ul>
+      </Section>
+
+      {/* ── 청크 4: 포카 카드 molecules ─────────────────────── */}
+      <Section title="PhotocardCard (박스 + 정보, 3열)">
+        <ul className="grid grid-cols-3 gap-2">
+          {cards.slice(0, 3).map((card) => (
+            <li key={card.id}>
+              <PhotocardCard card={card} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="SelectableCard (crad-selecting-status)">
+        <Row label="collected / not_collected / selected(클릭 토글)">
+          <div className="w-20">
+            <SelectableCard card={cards[0]} state="collected" />
+          </div>
+          <div className="w-20">
+            <SelectableCard card={cards[1]} state="not_collected" />
+          </div>
+          <div className="w-20">
+            <SelectableCard
+              card={cards[2]}
+              state={pickedId === cards[2].id ? 'selected' : 'collected'}
+              onClick={() => setPickedId((id) => (id === cards[2].id ? null : cards[2].id))}
+            />
+          </div>
+        </Row>
+      </Section>
+
+      <Section title="DeletableCard (card-set-deleting-card)">
+        <div className="w-20">
+          <DeletableCard card={cards[0]} />
+        </div>
+      </Section>
+
+      <Section title="CardSetInfo (card-set-info)">
+        <div className="max-w-[180px]">
+          <CardSetInfo card={cards[0]} extraCount={wantCards.length - 1} />
+        </div>
+      </Section>
+
+      <Section title="HaveSetCard (have-set-info · EX 오버레이)">
+        <Row label="있어요 / 구해요 + 외 N장">
+          <div className="w-28">
+            <HaveSetCard card={cards[0]} label="있어요" extraCount={cards.length - 1} />
+          </div>
+          <div className="w-28">
+            <HaveSetCard card={wantCards[0]} label="구해요" extraCount={wantCards.length - 1} />
+          </div>
+        </Row>
       </Section>
     </main>
   );
