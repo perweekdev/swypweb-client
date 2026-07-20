@@ -21,8 +21,16 @@ import { SelectableCard } from '@components/photocard/selectable-card';
 import { DeletableCard } from '@components/photocard/deletable-card';
 import { CardSetInfo } from '@components/photocard/card-set-info';
 import { HaveSetCard } from '@components/photocard/have-set-card';
+import { Subtitle } from '@components/ui/subtitle';
+import { SettingRow } from '@components/ui/setting-row';
+import { ViewSetAllLink } from '@components/ui/view-set-all-link';
+import { HaveWantTab } from '@components/ui/have-want-tab';
+import { CollectionAccordion } from '@components/ui/collection-accordion';
+import { TradingStatusSelect } from '@components/ui/trading-status-select';
+import { Header } from '@components/layout/header';
+import { BottomTabNav } from '@components/layout/bottom-tab-nav';
 import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
-import { ChevronLeftIcon } from '@components/icons';
+import { ChevronLeftIcon, MoreIcon } from '@components/icons';
 
 /**
  * 공용 컴포넌트 카탈로그 (개발 확인용).
@@ -51,6 +59,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export default function ComponentCatalogPage() {
   const [toggleOn, setToggleOn] = useState(true);
   const [pickedId, setPickedId] = useState<string | null>(null);
+  const [side, setSide] = useState<'have' | 'want'>('have');
 
   const { myCards: haveCards, partnerCards: wantCards } = mockChatRooms[0].exchangeSet;
   const cards = [...haveCards, ...wantCards]; // 카탈로그용 3장 확보
@@ -277,6 +286,66 @@ export default function ComponentCatalogPage() {
             <HaveSetCard card={wantCards[0]} label="구해요" extraCount={wantCards.length - 1} />
           </div>
         </Row>
+      </Section>
+
+      {/* ── 청크 5: 네비/폼 molecules ───────────────────────── */}
+      <Section title="Header (nav-bar) / BottomTabNav (tab-bar-mobile)">
+        <Row label="Header — 뒤로가기 + 타이틀 + ⋮">
+          <div className="w-full rounded-xl border border-secondary-50">
+            <Header
+              title="교환 포카 정보"
+              right={
+                <IconButton aria-label="더보기">
+                  <MoreIcon className="size-6" />
+                </IconButton>
+              }
+            />
+          </div>
+        </Row>
+        <Row label="BottomTabNav — active 채운 아이콘 / inactive secondary-500">
+          <div className="relative w-full overflow-hidden rounded-xl border border-secondary-50">
+            <BottomTabNav />
+          </div>
+        </Row>
+      </Section>
+
+      <Section title="Subtitle / ViewSetAllLink / TradingStatusSelect">
+        <Row label="Subtitle">
+          <Subtitle>내 교환 세트</Subtitle>
+        </Row>
+        <Row label="ViewSetAllLink (view-set-all)">
+          <ViewSetAllLink />
+        </Row>
+        <Row label="TradingStatusSelect (card-trading-status)">
+          <TradingStatusSelect status="교환중" />
+        </Row>
+      </Section>
+
+      <Section title="SettingRow (setting)">
+        <div className="divide-y divide-secondary-50">
+          <SettingRow label="개인정보 처리방침" onClick={() => {}} />
+          <SettingRow
+            label="채팅 알림"
+            right={<Toggle checked={toggleOn} onChange={setToggleOn} ariaLabel="채팅 알림" />}
+          />
+        </div>
+      </Section>
+
+      <Section title="HaveWantTab (have-want-tab)">
+        <HaveWantTab value={side} onChange={setSide} haveCount={9} wantCount={3} />
+      </Section>
+
+      <Section title="CollectionAccordion (collection-accordion)">
+        <div className="divide-y divide-secondary-50">
+          <CollectionAccordion title="앨범 이름 1" defaultOpen>
+            <p className="text-body3 text-secondary-500">
+              펼침 영역 — 컬렉션 카드 그리드 등이 들어간다.
+            </p>
+          </CollectionAccordion>
+          <CollectionAccordion title="앨범 이름 2">
+            <p className="text-body3 text-secondary-500">접힌 상태에서 클릭하면 펼쳐진다.</p>
+          </CollectionAccordion>
+        </div>
       </Section>
     </main>
   );
