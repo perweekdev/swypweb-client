@@ -40,11 +40,12 @@ export function ConfirmDialog({
         {description && (
           <p className="mt-1.5 text-center text-body3 text-secondary-500">{description}</p>
         )}
+        {/* set-delete-popup 계측: 버튼은 pill(취소 outline / 확인 primary) */}
         <div className="mt-5 flex gap-2">
-          <Button variant="outline" size="lg" className="flex-1" onClick={onCancel}>
+          <Button variant="outline" size="lg" shape="pill" className="flex-1" onClick={onCancel}>
             {cancelText}
           </Button>
-          <Button variant="primary" size="lg" className="flex-1" onClick={onConfirm}>
+          <Button variant="primary" size="lg" shape="pill" className="flex-1" onClick={onConfirm}>
             {confirmText}
           </Button>
         </div>

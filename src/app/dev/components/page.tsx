@@ -29,6 +29,11 @@ import { CollectionAccordion } from '@components/ui/collection-accordion';
 import { TradingStatusSelect } from '@components/ui/trading-status-select';
 import { Header } from '@components/layout/header';
 import { BottomTabNav } from '@components/layout/bottom-tab-nav';
+import { ConfirmDialog } from '@components/ui/confirm-dialog';
+import { ActionSheet } from '@components/common/action-sheet';
+import { Toast } from '@components/common/toast';
+import { ProgressBar } from '@components/common/progress-bar';
+import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
 import { ChevronLeftIcon, MoreIcon } from '@components/icons';
 
@@ -60,6 +65,9 @@ export default function ComponentCatalogPage() {
   const [toggleOn, setToggleOn] = useState(true);
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [side, setSide] = useState<'have' | 'want'>('have');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const { myCards: haveCards, partnerCards: wantCards } = mockChatRooms[0].exchangeSet;
   const cards = [...haveCards, ...wantCards]; // 카탈로그용 3장 확보
@@ -347,6 +355,51 @@ export default function ComponentCatalogPage() {
           </CollectionAccordion>
         </div>
       </Section>
+
+      {/* ── 청크 6: 오버레이/피드백 organisms ────────────────── */}
+      <Section title="Toast / ProgressBar">
+        <Row label="Toast (set-add-success)">
+          <Toast message="교환 세트가 등록되었어요!" />
+        </Row>
+        <Row label="ProgressBar (progress)">
+          <div className="w-full">
+            <ProgressBar label="Red Velvet" value={9} max={200} />
+          </div>
+        </Row>
+      </Section>
+
+      <Section title="ConfirmDialog / ActionSheet / LoginBottomSheet">
+        <Row label="열어서 확인">
+          <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+            ConfirmDialog
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setSheetOpen(true)}>
+            ActionSheet
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)}>
+            LoginBottomSheet
+          </Button>
+        </Row>
+      </Section>
+
+      <ConfirmDialog
+        open={dialogOpen}
+        title="포카 세트를 삭제할까요?"
+        description="포카 세트가 교환 리스트에서 삭제돼요."
+        confirmText="삭제"
+        onCancel={() => setDialogOpen(false)}
+        onConfirm={() => setDialogOpen(false)}
+      />
+      <ActionSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        actions={[
+          { label: '이미지로 저장하기', onClick: () => {} },
+          { label: '수정하기', onClick: () => {} },
+          { label: '삭제하기', onClick: () => {}, destructive: true },
+        ]}
+      />
+      <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </main>
   );
 }
