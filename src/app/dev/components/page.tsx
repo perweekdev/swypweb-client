@@ -34,8 +34,33 @@ import { ActionSheet } from '@components/common/action-sheet';
 import { Toast } from '@components/common/toast';
 import { ProgressBar } from '@components/common/progress-bar';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
+import { ChatMessageList } from '@components/chat/chat-message-list';
+import { SelectableCardGrid } from '@components/photocard/selectable-card-grid';
+import { DeletableCardGrid } from '@components/photocard/deletable-card-grid';
+import { ExchangeCardSections } from '@components/common/exchange-card-sections';
+import { ExchangeInfoHeader } from '@components/common/exchange-info-header';
+import { ExchangeSetFrame } from '@components/common/exchange-set-frame';
+import { UserProfile } from '@components/common/user-profile';
+import { GroupFilter } from '@components/common/group-filter';
+import { HomeFeedCard } from '@components/common/home-feed-card';
 import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
+import type { Photocard } from '@/types/photocard.types';
 import { ChevronLeftIcon, MoreIcon } from '@components/icons';
+
+const CARD_COLORS = ['#D8C3E8', '#B7D3C2', '#8FA98C', '#E8B4A0', '#A8C0E8', '#E8D4A0'];
+const demoCards: Photocard[] = CARD_COLORS.map((color, i) => ({
+  id: `demo-${i}`,
+  memberName: '멤버명',
+  albumName: '앨범명',
+  versionName: '버전명',
+  imageUrl: null,
+  color,
+}));
+const demoGroups = [
+  { id: 'ive', name: 'IVE', color: '#F4A8C0', favorited: true },
+  { id: 'aespa', name: 'aespa', color: '#1F1F1F' },
+  { id: 'illit', name: 'ILLIT', color: '#5BC0DE' },
+];
 
 /**
  * 공용 컴포넌트 카탈로그 (개발 확인용).
@@ -68,6 +93,15 @@ export default function ComponentCatalogPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [gridSel, setGridSel] = useState<Set<string>>(new Set([demoCards[0].id]));
+  const [groupVal, setGroupVal] = useState<string | null>(null);
+
+  const toggleGrid = (id: string) =>
+    setGridSel((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
 
   const { myCards: haveCards, partnerCards: wantCards } = mockChatRooms[0].exchangeSet;
   const cards = [...haveCards, ...wantCards]; // 카탈로그용 3장 확보
@@ -400,6 +434,75 @@ export default function ComponentCatalogPage() {
         ]}
       />
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
+
+      {/* ── 청크 7: 교환/그리드 organisms ────────────────────── */}
+      <Section title="ChatMessageList (chat_sender/receiver)">
+        <div className="rounded-xl border border-secondary-50">
+          <ChatMessageList
+            messages={mockChatRooms[0].messages}
+            partner={mockChatRooms[0].partner}
+          />
+        </div>
+      </Section>
+
+      <Section title="ExchangeInfoHeader (exchange-hint)">
+        <ExchangeInfoHeader exchangeSet={mockChatRooms[0].exchangeSet} />
+      </Section>
+
+      <Section title="ExchangeCardSections (exchange_info · CHAT-003)">
+        <ExchangeCardSections haveCards={demoCards.slice(0, 3)} wantCards={demoCards.slice(0, 6)} />
+      </Section>
+
+      <Section title="SelectableCardGrid (card-detail · CHAT-004)">
+        <SelectableCardGrid
+          cards={demoCards.slice(0, 3)}
+          selected={gridSel}
+          onToggle={toggleGrid}
+        />
+      </Section>
+
+      <Section title="DeletableCardGrid (set-cards-selected)">
+        <DeletableCardGrid cards={demoCards} max={10} />
+      </Section>
+
+      <Section title="ExchangeSetFrame (exchange-frame · EX)">
+        <div className="space-y-4">
+          <ExchangeSetFrame
+            have={{ card: demoCards[0], extraCount: 5 }}
+            want={{ card: demoCards[1], extraCount: 5 }}
+          />
+          <ExchangeSetFrame
+            variant="highlighted"
+            have={{ card: demoCards[2], extraCount: 5 }}
+            want={{ card: demoCards[3], extraCount: 5 }}
+          />
+        </div>
+      </Section>
+
+      <Section title="UserProfile (user-profile)">
+        <div className="space-y-4">
+          <UserProfile
+            name="포카요정"
+            avatarColor="#F4A8C0"
+            groups="레드벨벳 · 아이브"
+            variant="editable"
+          />
+          <UserProfile name="포카요정" avatarColor="#8FA98C" variant="offer" />
+        </div>
+      </Section>
+
+      <Section title="GroupFilter (group-filter · HOME/COL/EX)">
+        <GroupFilter groups={demoGroups} value={groupVal} onChange={setGroupVal} />
+      </Section>
+
+      <Section title="HomeFeedCard (home-feed-exchange-info · HOME)">
+        <HomeFeedCard
+          name="포카요정"
+          avatarColor="#A8C0E8"
+          haveCards={demoCards.slice(0, 3)}
+          wantCards={demoCards}
+        />
+      </Section>
     </main>
   );
 }
