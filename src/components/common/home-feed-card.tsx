@@ -12,9 +12,10 @@ function CardRow({ label, cards }: { label: string; cards: Photocard[] }) {
   return (
     <div>
       <p className="text-button2 text-secondary-900">{label}</p>
+      {/* 프레임 폭이 달라도 항상 5장 완전 노출 + 6번째 약간 잘림(가로 스크롤 힌트). gap 8px 기준 5.3장 폭 */}
       <ul className="mt-2 flex gap-2 overflow-x-auto">
         {cards.map((card) => (
-          <li key={card.id} className="w-20 shrink-0">
+          <li key={card.id} className="w-[calc(18.87%_-_7.55px)] shrink-0">
             <PhotocardImage card={card} />
           </li>
         ))}
