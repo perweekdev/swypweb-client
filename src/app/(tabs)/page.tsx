@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@store/auth-store';
+import { TabHeader } from '@components/layout/tab-header';
 import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
@@ -38,9 +39,7 @@ export default function HomePage() {
 
   return (
     <>
-      <header className="px-4 pb-2 pt-4">
-        <h1 className="text-h1 text-secondary-900">포카매치</h1>
-      </header>
+      <TabHeader title="포카매치" />
 
       <GroupFilter
         className="px-4 pb-3 pt-1"

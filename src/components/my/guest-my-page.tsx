@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@components/ui/button';
 import { SettingRow } from '@components/ui/setting-row';
+import { TabHeader } from '@components/layout/tab-header';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 
 /** MY-004 비회원 마이페이지 */
@@ -11,9 +12,7 @@ export function GuestMyPage() {
 
   return (
     <>
-      <header className="px-4 pb-2 pt-4">
-        <h1 className="text-h1 text-secondary-900">마이페이지</h1>
-      </header>
+      <TabHeader title="마이페이지" />
 
       <div className="flex items-center justify-between px-4 py-4">
         <p className="text-body1 text-secondary-900">로그인을 해주세요.</p>

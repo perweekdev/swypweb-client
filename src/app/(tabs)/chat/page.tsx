@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuthStore } from '@store/auth-store';
+import { TabHeader } from '@components/layout/tab-header';
 import { ChatEmptyState } from '@components/chat/chat-empty-state';
 import { ChatListRow } from '@components/chat/chat-list-row';
 import { mockChatRoomSummaries } from '@/mocks/chat';
@@ -13,9 +14,7 @@ export default function ChatPage() {
 
   return (
     <>
-      <header className="px-4 pb-2 pt-4">
-        <h1 className="text-h1 text-secondary-900">채팅</h1>
-      </header>
+      <TabHeader title="채팅" />
 
       {rooms.length === 0 ? (
         <ChatEmptyState />

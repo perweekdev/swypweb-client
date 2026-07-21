@@ -9,6 +9,7 @@ import { SettingRow } from '@components/ui/setting-row';
 import { GroupLogo } from '@components/ui/group-logo';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { UserProfile } from '@components/common/user-profile';
+import { TabHeader } from '@components/layout/tab-header';
 import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
 import { mockInterestGroups, mockUser } from '@/mocks/my';
@@ -23,9 +24,7 @@ export function MemberMyPage() {
 
   return (
     <>
-      <header className="px-4 pb-2 pt-4">
-        <h1 className="text-h1 text-secondary-900">마이페이지</h1>
-      </header>
+      <TabHeader title="마이페이지" />
 
       {/* 프로필 */}
       <UserProfile
