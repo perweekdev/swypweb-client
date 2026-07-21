@@ -75,6 +75,25 @@ export function ChevronRightIcon({ className }: IconProps) {
   );
 }
 
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="m6 9 6 6 6-6" />
+    </Icon>
+  );
+}
+
+/** 더보기 케밥 (nav-bar 우측 ⋮) */
+export function MoreIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="5" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="12" cy="19" r="1.6" />
+    </svg>
+  );
+}
+
 export function ChevronLeftIcon({ className }: IconProps) {
   return (
     <Icon className={className}>
@@ -126,6 +145,50 @@ export function SendIcon({ className }: IconProps) {
       <path d="M21 3 10.5 13.5" />
       <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3Z" />
     </Icon>
+  );
+}
+
+/** 하단 탭 active용 채운 아이콘 (tab-elements active) */
+export function HomeFilledIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M11.35 3.26a1 1 0 0 1 1.3 0l7.3 6.3a1 1 0 0 1 .35.76V19a1 1 0 0 1-1 1h-3.8a1 1 0 0 1-1-1v-4.2a1 1 0 0 0-1-1h-1.6a1 1 0 0 0-1 1V19a1 1 0 0 1-1 1H5.7a1 1 0 0 1-1-1v-8.68a1 1 0 0 1 .35-.76z" />
+    </svg>
+  );
+}
+
+export function CollectionFilledIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M6 4a2 2 0 0 1 2-2h9a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H8a2 2 0 0 1-2-2zm2 12.5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2z" />
+    </svg>
+  );
+}
+
+export function ChatFilledIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M5 4h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9.4L5 20V5a1 1 0 0 1 1-1z" />
+    </svg>
+  );
+}
+
+/** 채워진 프로필 실루엣 (image-profile placeholder, 마이 탭 active) */
+export function ProfileIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="9" r="4" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0Z" />
+    </svg>
+  );
+}
+
+/** 채워진 하트 (관심 그룹 배지) */
+export function HeartIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 20.5 4.2 12.9a4.6 4.6 0 0 1 6.5-6.5l1.3 1.3 1.3-1.3a4.6 4.6 0 0 1 6.5 6.5Z" />
+    </svg>
   );
 }
 

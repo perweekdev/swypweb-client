@@ -1,4 +1,5 @@
 import { Avatar } from '@components/ui/avatar';
+import { ChatBubble } from '@components/chat/chat-bubble';
 import type { ChatMessage, ChatPartner } from '@/types/chat.types';
 import { formatChatDate, formatChatTime, isSameChatDate } from '@utils/format-time';
 
@@ -51,13 +52,9 @@ export function ChatMessageList({
                 </span>
               )}
 
-              <p
-                className={`max-w-[72%] whitespace-pre-line rounded-2xl px-3.5 py-2.5 text-body2 ${
-                  isMine ? 'bg-primary-900 text-white' : 'bg-secondary-10 text-secondary-900'
-                }`}
-              >
+              <ChatBubble variant={isMine ? 'mine' : 'partner'} className="max-w-[72%]">
                 {message.text}
-              </p>
+              </ChatBubble>
 
               {!isMine && isGroupEnd && (
                 <span className="shrink-0 text-body4 text-secondary-300">

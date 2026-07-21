@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Header } from '@components/layout/header';
 import { Button } from '@components/ui/button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
-import { ArtistAvatar } from '@components/my/artist-avatar';
+import { GroupLogo } from '@components/ui/group-logo';
 import { mockInterestGroups } from '@/mocks/my';
 
 // MY-003 나의 관심그룹 (관리) — 등록된 그룹 목록 + 해제(확인 모달)
@@ -22,10 +22,10 @@ export default function MyGroupsPage() {
     <>
       <Header title="나의 관심그룹" />
 
-      <ul className="px-5">
+      <ul className="px-4">
         {groups.map((group) => (
           <li key={group.id} className="flex items-center gap-3 border-b border-secondary-50 py-3">
-            <ArtistAvatar name={group.name} color={group.color} className="size-10" />
+            <GroupLogo size="sm" name={group.name} color={group.color} />
             <span className="flex-1 text-body1 text-secondary-900">{group.name}</span>
             <Button variant="outline" size="sm" onClick={() => setPendingId(group.id)}>
               해제하기

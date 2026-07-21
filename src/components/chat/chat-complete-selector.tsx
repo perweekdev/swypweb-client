@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckIcon } from '@components/icons';
 import { Header } from '@components/layout/header';
-import { PhotocardCard } from '@components/photocard/photocard-card';
 import { Button } from '@components/ui/button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
+import { SelectableCardGrid } from '@components/photocard/selectable-card-grid';
 import { CHAT_ROUTES } from '@constants/routes';
 import type { ChatRoom } from '@/types/chat.types';
-import type { Photocard } from '@/types/photocard.types';
 
 /** 어떤 삭제 팝업을 띄울지 (스토리보드 CHAT-004 동작 정의) */
 type DeleteDialog = 'cards' | 'set';
@@ -26,68 +24,6 @@ const DIALOG_COPY = {
     confirmText: '세트 삭제하기',
   },
 } as const;
-
-/** 선택 가능한 포카 카드. 미선택은 반투명, 체크 표시는 항상 선명하다(계측). */
-function SelectableCard({
-  card,
-  selected,
-  onToggle,
-}: {
-  card: Photocard;
-  selected: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={selected}
-      className="relative block w-full text-left"
-    >
-      <div className={selected ? '' : 'opacity-50'}>
-        <PhotocardCard card={card} />
-      </div>
-      <span
-        className={`absolute right-2 top-2 flex size-5 items-center justify-center rounded-full text-white ${
-          selected ? 'bg-primary-900' : 'bg-gray-500'
-        }`}
-      >
-        <CheckIcon className="size-3" />
-      </span>
-    </button>
-  );
-}
-
-function CardSection({
-  label,
-  cards,
-  selected,
-  onToggle,
-  className = '',
-}: {
-  label: string;
-  cards: Photocard[];
-  selected: Set<string>;
-  onToggle: (id: string) => void;
-  className?: string;
-}) {
-  return (
-    <section className={className}>
-      <h2 className="text-button2 text-secondary-900">{label}</h2>
-      <ul className="mt-1.5 grid grid-cols-3 gap-2">
-        {cards.map((card) => (
-          <li key={card.id}>
-            <SelectableCard
-              card={card}
-              selected={selected.has(card.id)}
-              onToggle={() => onToggle(card.id)}
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
 
 const toggleIn = (set: Set<string>, id: string) => {
   const next = new Set(set);
@@ -142,20 +78,25 @@ export function ChatCompleteSelector({ room }: { room: ChatRoom }) {
           {'교환이 완료된 포카를\n선택하세요.'}
         </p>
 
-        <CardSection
-          label="내 포카"
-          cards={myCards}
-          selected={myPicked}
-          onToggle={(id) => setMyPicked((prev) => toggleIn(prev, id))}
-          className="mt-6"
-        />
-        <CardSection
-          label="상대방 포카"
-          cards={partnerCards}
-          selected={partnerPicked}
-          onToggle={(id) => setPartnerPicked((prev) => toggleIn(prev, id))}
-          className="mt-5"
-        />
+        <section className="mt-6">
+          <h2 className="text-button2 text-secondary-900">내 포카</h2>
+          <SelectableCardGrid
+            cards={myCards}
+            selected={myPicked}
+            onToggle={(id) => setMyPicked((prev) => toggleIn(prev, id))}
+            className="mt-1.5"
+          />
+        </section>
+
+        <section className="mt-5">
+          <h2 className="text-button2 text-secondary-900">상대방 포카</h2>
+          <SelectableCardGrid
+            cards={partnerCards}
+            selected={partnerPicked}
+            onToggle={(id) => setPartnerPicked((prev) => toggleIn(prev, id))}
+            className="mt-1.5"
+          />
+        </section>
       </div>
 
       {dialog && (

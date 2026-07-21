@@ -1,20 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@store/auth-store';
-import { Avatar } from '@components/ui/avatar';
-import { Button } from '@components/ui/button';
 import { Toggle } from '@components/ui/toggle';
-import { ListRow } from '@components/ui/list-row';
+import { SettingRow } from '@components/ui/setting-row';
+import { GroupLogo } from '@components/ui/group-logo';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
-import { ChevronRightIcon, PlusIcon } from '@components/icons';
-import { ArtistAvatar } from '@components/my/artist-avatar';
+import { UserProfile } from '@components/common/user-profile';
+import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
 import { mockInterestGroups, mockUser } from '@/mocks/my';
 
 /** MY-001 회원 마이페이지 */
 export function MemberMyPage() {
+  const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
   const [chatAlarm, setChatAlarm] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -22,24 +23,21 @@ export function MemberMyPage() {
 
   return (
     <>
-      <header className="px-5 pb-2 pt-4">
+      <header className="px-4 pb-2 pt-4">
         <h1 className="text-h1 text-secondary-900">마이페이지</h1>
       </header>
 
       {/* 프로필 */}
-      <div className="flex items-center gap-3 px-5 py-4">
-        <Avatar className="size-14" />
-        <span className="flex-1 text-h3 text-secondary-900">{mockUser.nickname}</span>
-        <Link href={ROUTES.myProfile}>
-          <Button variant="outline" size="sm">
-            프로필 편집하기
-          </Button>
-        </Link>
-      </div>
+      <UserProfile
+        name={mockUser.nickname}
+        variant="editable"
+        onAction={() => router.push(ROUTES.myProfile)}
+        className="px-4 py-4"
+      />
 
       {/* 관심 그룹 */}
       <section className="pt-3">
-        <div className="flex items-center justify-between px-5">
+        <div className="flex items-center justify-between px-4">
           <h2 className="text-body1 text-secondary-900">관심 그룹</h2>
           <Link
             href={ROUTES.myGroups}
@@ -49,22 +47,18 @@ export function MemberMyPage() {
             <ChevronRightIcon className="size-4" />
           </Link>
         </div>
-        <ul className="flex gap-4 overflow-x-auto px-5 pb-1 pt-3">
+        <ul className="flex gap-4 overflow-x-auto px-4 pb-1 pt-3">
           {mockInterestGroups.map((group) => (
             <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-              <ArtistAvatar name={group.name} color={group.color} />
+              <GroupLogo size="lg" name={group.name} color={group.color} />
               <span className="w-full truncate text-center text-body3 text-secondary-900">
                 {group.name}
               </span>
             </li>
           ))}
           <li className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-            <Link
-              href={ROUTES.myGroupsAdd}
-              className="flex size-16 items-center justify-center rounded-full border border-dashed border-secondary-300 text-secondary-300"
-              aria-label="관심 그룹 추가"
-            >
-              <PlusIcon className="size-6" />
+            <Link href={ROUTES.myGroupsAdd} aria-label="관심 그룹 추가">
+              <GroupLogo size="lg" state="add" />
             </Link>
             <span className="text-body3 text-secondary-500">추가하기</span>
           </li>
@@ -72,20 +66,20 @@ export function MemberMyPage() {
       </section>
 
       {/* 설정 */}
-      <section className="px-5 pt-6">
+      <section className="px-4 pt-6">
         <h2 className="text-body2 text-secondary-500">설정</h2>
-        <div className="flex items-center justify-between py-4">
-          <span className="text-body1 text-secondary-900">채팅 알림</span>
-          <Toggle checked={chatAlarm} onChange={setChatAlarm} ariaLabel="채팅 알림" />
-        </div>
+        <SettingRow
+          label="채팅 알림"
+          right={<Toggle checked={chatAlarm} onChange={setChatAlarm} ariaLabel="채팅 알림" />}
+        />
       </section>
 
       {/* 정보 */}
-      <section className="px-5">
+      <section className="px-4">
         <h2 className="text-body2 text-secondary-500">정보</h2>
         {/* TODO: 개인정보 처리방침 / 이용약관 화면 라우팅 */}
-        <ListRow label="개인정보 처리방침" />
-        <ListRow label="이용약관" />
+        <SettingRow label="개인정보 처리방침" onClick={() => {}} />
+        <SettingRow label="이용약관" onClick={() => {}} />
       </section>
 
       {/* 로그아웃 / 회원탈퇴 */}

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Avatar } from '@components/ui/avatar';
+import { StatusChip } from '@components/ui/status-chip';
 import { CHAT_ROUTES } from '@constants/routes';
 import { MOCK_NOW } from '@/mocks/chat';
 import type { ChatRoomSummary } from '@/types/chat.types';
@@ -20,11 +21,7 @@ export function ChatListRow({ room }: { room: ChatRoomSummary }) {
             <span className="truncate text-button2 text-secondary-900">
               {room.partner.nickname}
             </span>
-            {room.status === 'completed' && (
-              <span className="shrink-0 rounded-full bg-primary-100 px-2.5 text-body4 text-secondary-900">
-                교환완료
-              </span>
-            )}
+            {room.status === 'completed' && <StatusChip className="shrink-0" />}
           </div>
           <p className="line-clamp-2 whitespace-pre-line text-body3 text-secondary-500">
             {room.lastMessage}

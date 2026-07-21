@@ -17,12 +17,13 @@ export function Toggle({
       aria-checked={checked}
       aria-label={ariaLabel}
       onClick={() => onChange(!checked)}
-      className={`inline-flex h-6 w-11 items-center rounded-full px-0.5 transition-colors ${
+      className={`inline-flex h-7 w-12 items-center rounded-full px-0.5 transition-colors ${
         checked ? 'bg-primary-900' : 'bg-secondary-100'
       }`}
     >
+      {/* 계측: track 48×28, knob 24, ON 시 20px 슬라이드 */}
       <span
-        className={`size-5 rounded-full bg-white transition-transform ${
+        className={`size-6 rounded-full bg-white transition-transform ${
           checked ? 'translate-x-5' : 'translate-x-0'
         }`}
       />
