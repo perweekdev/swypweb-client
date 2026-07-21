@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { Button } from '@components/ui/button';
-import { ArtistAvatar } from '@components/my/artist-avatar';
+import { GroupLogo } from '@components/ui/group-logo';
 import { mockAllArtists } from '@/mocks/my';
 
 // MY-003 관심 그룹 추가 (그리드, 다중 선택)
@@ -31,7 +31,7 @@ export default function AddGroupPage() {
     <>
       <Header title="관심 그룹 추가" />
 
-      <div className="flex-1 overflow-y-auto px-5 pb-4 pt-2">
+      <div className="flex-1 overflow-y-auto px-4 pb-4 pt-2">
         <ul className="grid grid-cols-3 gap-x-4 gap-y-6">
           {mockAllArtists.map((artist) => {
             const isSelected = selected.has(artist.id);
@@ -43,11 +43,12 @@ export default function AddGroupPage() {
                   aria-pressed={isSelected}
                   className="flex w-full flex-col items-center gap-2"
                 >
-                  <ArtistAvatar
+                  <GroupLogo
+                    size="lg"
                     name={artist.name}
                     color={artist.color}
-                    className={`size-20 ${!isSelected && anySelected ? 'opacity-40' : ''}`}
-                    selected={isSelected}
+                    state={isSelected ? 'selected' : 'default'}
+                    className={!isSelected && anySelected ? 'opacity-40' : ''}
                   />
                   <span
                     className={`text-center text-body3 ${
@@ -67,7 +68,7 @@ export default function AddGroupPage() {
         </ul>
       </div>
 
-      <div className="p-5">
+      <div className="p-4">
         <Button size="lg" disabled={!anySelected} onClick={handleAdd}>
           추가하기
         </Button>

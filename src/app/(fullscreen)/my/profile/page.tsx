@@ -19,7 +19,7 @@ export default function ProfileEditPage() {
         </div>
       </div>
 
-      <div className="px-5 pt-8">
+      <div className="px-4 pt-8">
         <label className="text-body3 text-secondary-500">닉네임</label>
         <div className="mt-2 rounded-xl bg-secondary-10 px-4 py-3.5 text-body1 text-secondary-900">
           {mockUser.nickname}
