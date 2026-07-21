@@ -13,7 +13,7 @@ export function Header({ title, right }: { title: string; right?: ReactNode }) {
   const router = useRouter();
 
   return (
-    <header className="relative flex h-14 items-center px-2">
+    <header className="sticky top-0 z-20 flex h-14 items-center bg-background px-2">
       <IconButton aria-label="뒤로가기" area={48} onClick={() => router.back()}>
         <ChevronLeftIcon className="size-6" />
       </IconButton>

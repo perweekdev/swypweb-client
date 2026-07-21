@@ -9,10 +9,12 @@ import { HeartIcon, PlusIcon } from '@components/icons';
  *   favorited(❤) — 우상단 red-700 하트 배지 (관심 그룹 표시)
  */
 type State = 'default' | 'add' | 'selected';
-type Size = 'lg' | 'sm';
+type Size = 'lg' | 'md' | 'sm';
 
+// lg 관심그룹 추가 그리드(HOME-002) / md 홈 필터(HOME-001, ~48) / sm 관리 리스트(MY-003)
 const SIZE: Record<Size, string> = {
   lg: 'size-16',
+  md: 'size-12',
   sm: 'size-10',
 };
 

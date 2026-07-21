@@ -176,10 +176,9 @@ export default function ComponentCatalogPage() {
         </Row>
       </Section>
 
-      <Section title="LoginButton">
-        <div className="w-full space-y-3">
-          <LoginButton service="google" />
-          <LoginButton service="naver" />
+      <Section title="LoginButton (구글 전용)">
+        <div className="w-full">
+          <LoginButton />
         </div>
       </Section>
 

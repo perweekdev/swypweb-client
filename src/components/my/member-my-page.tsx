@@ -9,6 +9,8 @@ import { SettingRow } from '@components/ui/setting-row';
 import { GroupLogo } from '@components/ui/group-logo';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { UserProfile } from '@components/common/user-profile';
+import { TabHeader } from '@components/layout/tab-header';
+import { useDragScroll } from '@hooks/use-drag-scroll';
 import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
 import { mockInterestGroups, mockUser } from '@/mocks/my';
@@ -20,12 +22,11 @@ export function MemberMyPage() {
   const [chatAlarm, setChatAlarm] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const groupScrollRef = useDragScroll<HTMLUListElement>();
 
   return (
     <>
-      <header className="px-4 pb-2 pt-4">
-        <h1 className="text-h1 text-secondary-900">마이페이지</h1>
-      </header>
+      <TabHeader title="마이페이지" />
 
       {/* 프로필 */}
       <UserProfile
@@ -47,7 +48,10 @@ export function MemberMyPage() {
             <ChevronRightIcon className="size-4" />
           </Link>
         </div>
-        <ul className="flex gap-4 overflow-x-auto px-4 pb-1 pt-3">
+        <ul
+          ref={groupScrollRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pb-1 pt-3"
+        >
           {mockInterestGroups.map((group) => (
             <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
               <GroupLogo size="lg" name={group.name} color={group.color} />
