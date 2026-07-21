@@ -23,10 +23,7 @@ export function LoginBottomSheet({ open, onClose }: { open: boolean; onClose: ()
         </p>
       </div>
 
-      <div className="space-y-3">
-        <LoginButton service="google" onClick={handleMockLogin} />
-        <LoginButton service="naver" onClick={handleMockLogin} />
-      </div>
+      <LoginButton onClick={handleMockLogin} />
     </BottomSheet>
   );
 }
