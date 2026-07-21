@@ -1,6 +1,9 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { AllChip } from '@components/ui/all-chip';
 import { GroupLogo } from '@components/ui/group-logo';
+import { useDragScroll } from '@hooks/use-drag-scroll';
 
 /**
  * 아티스트 그룹 필터 (group-filter). 가로 스크롤: 추가하기 → 전체(ALL) → 아티스트 로고들.
@@ -22,6 +25,8 @@ export function GroupFilter({
   onAdd?: () => void;
   className?: string;
 }) {
+  const scrollRef = useDragScroll<HTMLDivElement>();
+
   const item = (key: string, label: string, node: ReactNode, onClick?: () => void) => (
     <button
       key={key}
@@ -35,7 +40,7 @@ export function GroupFilter({
   );
 
   return (
-    <div className={`flex gap-x-2.5 overflow-x-auto ${className}`}>
+    <div ref={scrollRef} className={`flex gap-x-2.5 overflow-x-auto scrollbar-hide ${className}`}>
       {item('add', '관심그룹 추가하기', <GroupLogo size="md" state="add" />, onAdd)}
       {item(
         'all',

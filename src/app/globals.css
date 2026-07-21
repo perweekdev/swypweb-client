@@ -107,10 +107,24 @@
   --text-button2--font-weight: 500;
 }
 
+/* 스크롤바 숨김 유틸 (가로 스크롤 컨테이너 등). 스크롤 동작은 유지되고 바만 감춘다. */
+@utility scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/legacy Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Edge */
+  }
+}
+
 /* ── Base ──────────────────────────────────────────────────────── */
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* 디자인엔 스크롤바가 없다 → 페이지 세로 스크롤바 숨김(휠/터치 스크롤은 그대로) */
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
   }
 
   body {
