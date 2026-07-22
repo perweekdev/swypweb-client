@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { ExchangeCardSections } from '@components/common/exchange-card-sections';
-import { PostDetailBar } from '@components/home/post-detail-bar';
+import { DetailActionBar } from '@components/common/detail-action-bar';
+import { POST_ROUTES } from '@constants/routes';
 import { findMockFeedPost, mockFeedPosts } from '@/mocks/home';
 
 export function generateStaticParams() {
@@ -20,11 +21,12 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
       <div className="flex-1 px-4 pb-4 pt-1">
         <ExchangeCardSections haveCards={post.haveCards} wantCards={post.wantCards} />
       </div>
-      <PostDetailBar
-        postId={post.id}
-        authorName={post.author.nickname}
-        authorAvatarColor={post.author.avatarColor}
-        authorGroups={post.author.groups}
+      <DetailActionBar
+        name={post.author.nickname}
+        avatarColor={post.author.avatarColor}
+        groups={post.author.groups}
+        label="교환할 포카 선택하기"
+        href={POST_ROUTES.select(post.id)}
       />
     </>
   );

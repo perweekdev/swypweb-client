@@ -43,6 +43,8 @@ import { ExchangeSetFrame } from '@components/common/exchange-set-frame';
 import { UserProfile } from '@components/common/user-profile';
 import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
+import { EmptyState } from '@components/common/empty-state';
+import { PhotocardRow } from '@components/photocard/photocard-row';
 import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
 import type { Photocard } from '@/types/photocard.types';
 import { ChevronLeftIcon, MoreIcon } from '@components/icons';
@@ -461,7 +463,12 @@ export default function ComponentCatalogPage() {
       </Section>
 
       <Section title="DeletableCardGrid (set-cards-selected)">
-        <DeletableCardGrid cards={demoCards} max={10} />
+        <Row label="grid — 컴포넌트 시안(6열)">
+          <DeletableCardGrid cards={demoCards} max={10} />
+        </Row>
+        <Row label="row — EX-007 선택 스트립(가로 스크롤)">
+          <DeletableCardGrid layout="row" cards={demoCards} max={10} />
+        </Row>
       </Section>
 
       <Section title="ExchangeSetFrame (exchange-frame · EX)">
@@ -491,7 +498,36 @@ export default function ComponentCatalogPage() {
       </Section>
 
       <Section title="GroupFilter (group-filter · HOME/COL/EX)">
-        <GroupFilter groups={demoGroups} value={groupVal} onChange={setGroupVal} />
+        <Row label="HOME-001 — 전체 칩 + 구분선">
+          <GroupFilter groups={demoGroups} value={groupVal} onChange={setGroupVal} />
+        </Row>
+        <Row label="EX-001 / COL-001 — 관심 그룹만, 전체 칩 없음">
+          <GroupFilter
+            groups={demoGroups}
+            value={groupVal}
+            onChange={setGroupVal}
+            addLabel="추가하기"
+            showAll={false}
+          />
+        </Row>
+      </Section>
+
+      <Section title="PhotocardRow (라벨 + 가로 드래그 스크롤 · HOME/EX)">
+        <PhotocardRow label={`있어요 ${demoCards.length}`} cards={demoCards} />
+      </Section>
+
+      <Section title="EmptyState (EX-001 / COL-001 빈 상태)">
+        <div className="flex min-h-[220px] flex-col">
+          <EmptyState
+            title="관심 그룹을 추가해보세요"
+            description="관심 그룹을 설정하고 카드를 교환해보세요"
+            action={
+              <Button variant="primary" size="md">
+                관심그룹 추가하기
+              </Button>
+            }
+          />
+        </div>
       </Section>
 
       <Section title="HomeFeedCard (home-feed-exchange-info · HOME)">

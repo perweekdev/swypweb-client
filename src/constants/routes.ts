@@ -15,7 +15,7 @@ export const ROUTES = {
   signup: '/signup',
   terms: '/terms',
   privacy: '/privacy',
-  /** 홈 플로팅 CTA '교환 등록하기' → EX 도메인(미설계). 현재 placeholder. */
+  /** EX-007 교환 세트 등록 (홈/내교환 플로팅 CTA '교환 등록하기') */
   exchangeRegister: '/exchange/register',
 } as const;
 
@@ -31,6 +31,23 @@ export const POST_ROUTES = {
   detail: (id: string) => `/posts/${id}`,
   /** HOME-004 교환할 포카 선택 */
   select: (id: string) => `/posts/${id}/select`,
+} as const;
+
+/**
+ * 내교환 하위 라우트 (EX-003 / 005 / 006 / 008).
+ * 자세한 규칙: docs/routing-conventions.md
+ */
+export const EXCHANGE_ROUTES = {
+  /** EX-003 나의 교환 세트 관리 */
+  sets: `${ROUTES.exchange}/sets`,
+  /** EX-004 나의 교환 세트 상세 — ⚠️ 디자인 미핸드오프, 경로만 예약 */
+  setDetail: (id: string) => `${ROUTES.exchange}/sets/${id}`,
+  /** EX-005 매칭 결과 상세 */
+  matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
+  /** EX-006 교환할 포카 선택 */
+  matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
+  /** EX-008 교환 세트 확인 */
+  registerConfirm: `${ROUTES.exchangeRegister}/confirm`,
 } as const;
 
 /** 채팅방 하위 라우트 (CHAT-002 / 003 / 004) */

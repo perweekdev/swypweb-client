@@ -30,7 +30,15 @@ export function UserProfile({
         {groups && <p className="truncate text-body3 text-secondary-500">{groups}</p>}
       </div>
       {variant !== 'info' && (
-        <Button variant="outline" size="sm" onClick={onAction}>
+        // 카드 전체가 클릭 가능한 화면(EX-001 매칭 리스트)에서 버튼만 눌리도록 전파를 막는다
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.();
+          }}
+        >
           {variant === 'offer' ? '제안하기' : '프로필 편집하기'}
         </Button>
       )}

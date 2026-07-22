@@ -1,19 +1,5 @@
-import type { Photocard } from '@/types/photocard.types';
 import type { FeedPost } from '@/types/home.types';
-
-// BE 연동 전 임시 목 데이터 (이미지 에셋 전 placeholder 색상 = 포카 사진 자리)
-const CARD_COLORS = ['#C9B7A3', '#8FA98C', '#B5C7D3', '#D9B8C4', '#A7A9BC', '#CBB89D'];
-
-function makeCards(prefix: string, count: number): Photocard[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `${prefix}-${i}`,
-    memberName: 'Member',
-    albumName: 'Album name',
-    versionName: 'Version name',
-    imageUrl: null,
-    color: CARD_COLORS[i % CARD_COLORS.length],
-  }));
-}
+import { makeCards } from '@/mocks/photocard';
 
 export const mockFeedPosts: FeedPost[] = [
   {

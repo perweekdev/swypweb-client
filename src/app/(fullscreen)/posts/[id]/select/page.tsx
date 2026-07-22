@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { PostSelectSelector } from '@components/home/post-select-selector';
+import { OfferCardSelector } from '@components/common/offer-card-selector';
 import { findMockFeedPost, mockFeedPosts } from '@/mocks/home';
 
 export function generateStaticParams() {
@@ -13,5 +13,5 @@ export default async function PostSelectPage({ params }: { params: Promise<{ id:
   if (!post) notFound();
 
   // mock: 내 포카/상대방 포카 그리드를 교환글의 두 카드 세트로 채운다(내 컬렉션 목 없음).
-  return <PostSelectSelector myCards={post.haveCards} partnerCards={post.wantCards} />;
+  return <OfferCardSelector myCards={post.haveCards} partnerCards={post.wantCards} />;
 }
