@@ -40,8 +40,12 @@ function PreviewRow({
   );
 }
 
-/** HOME-004 교환할 포카 선택 + 제안 확인 */
-export function PostSelectSelector({
+/**
+ * 교환할 포카 선택 + 제안 확인. **HOME-004 / EX-006이 같은 화면**이라 공유한다.
+ * 내 포카·상대방 포카를 각각 1장 이상 고르면 `완료`가 켜지고, 확인 시트에서 채팅으로 제안한다.
+ * 계측: 제목 20 semibold `#000000` 2줄 · `완료` 53×38 pill(비활성 secondary-100 / 활성 secondary-900).
+ */
+export function OfferCardSelector({
   myCards,
   partnerCards,
 }: {
@@ -81,7 +85,7 @@ export function PostSelectSelector({
       />
 
       <div className="px-4 pb-8">
-        <p className="whitespace-pre-line text-h3 text-black">
+        <p className="whitespace-pre-line text-h1 leading-tight text-black">
           {'교환할 내 포카와\n상대방 포카를 선택하세요'}
         </p>
 
