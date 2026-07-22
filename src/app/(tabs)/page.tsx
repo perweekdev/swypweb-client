@@ -7,7 +7,7 @@ import { TabHeader } from '@components/layout/tab-header';
 import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
-import { PlusIcon } from '@components/icons';
+import { FloatingCta } from '@components/common/floating-cta';
 import { ROUTES, POST_ROUTES } from '@constants/routes';
 import { mockFeedPosts } from '@/mocks/home';
 import { mockAllArtists, mockInterestGroups } from '@/mocks/my';
@@ -65,17 +65,10 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* 플로팅 CTA: 프레임 폭(max-w-420)에 맞춰 우측 하단, 탭바 위에 뜬다 */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[420px] justify-end px-4 pb-[calc(64px_+_env(safe-area-inset-bottom))]">
-        <button
-          type="button"
-          onClick={requireAuth(() => router.push(ROUTES.exchangeRegister))}
-          className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-primary-900 px-5 py-3.5 text-button1 text-white shadow-lg"
-        >
-          <PlusIcon className="size-5" />
-          교환 등록하기
-        </button>
-      </div>
+      <FloatingCta
+        label="교환 등록하기"
+        onClick={requireAuth(() => router.push(ROUTES.exchangeRegister))}
+      />
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

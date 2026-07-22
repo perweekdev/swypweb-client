@@ -32,6 +32,7 @@ export function HomeFeedCard({
   haveCards,
   wantCards,
   onOffer,
+  onClick,
   className = '',
 }: {
   name: string;
@@ -39,10 +40,12 @@ export function HomeFeedCard({
   haveCards: Photocard[];
   wantCards: Photocard[];
   onOffer?: () => void;
+  /** 카드 전체 클릭 (EX-001 매칭 결과 → EX-005 상세). '제안하기' 버튼은 전파를 막는다. */
+  onClick?: () => void;
   className?: string;
 }) {
   return (
-    <article className={className}>
+    <article className={className} onClick={onClick}>
       <UserProfile name={name} avatarColor={avatarColor} variant="offer" onAction={onOffer} />
       <div className="mt-3 space-y-3">
         <CardRow label={`있어요 ${haveCards.length}`} cards={haveCards} />
