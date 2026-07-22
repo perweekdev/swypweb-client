@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@store/auth-store';
+import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { TabHeader } from '@components/layout/tab-header';
 import { Button } from '@components/ui/button';
 import { Subtitle } from '@components/ui/subtitle';
@@ -13,6 +14,7 @@ import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { ExchangeSetFrame } from '@components/common/exchange-set-frame';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
+import { Toast } from '@components/common/toast';
 import { useDragScroll } from '@hooks/use-drag-scroll';
 import { ROUTES, EXCHANGE_ROUTES } from '@constants/routes';
 import { mockExchangeSets, mockMatchResults } from '@/mocks/exchange';
@@ -30,6 +32,14 @@ export default function ExchangePage() {
   );
   const [loginOpen, setLoginOpen] = useState(false);
   const setScrollRef = useDragScroll<HTMLUListElement>();
+  const { registeredSets, justRegistered, consumeRegistered } = useExchangeDraftStore();
+
+  // EX-008 등록 직후 진입하면 토스트를 3초간 노출한다(그동안 FAB이 위로 올라감)
+  useEffect(() => {
+    if (!justRegistered) return;
+    const timer = setTimeout(consumeRegistered, 3000);
+    return () => clearTimeout(timer);
+  }, [justRegistered, consumeRegistered]);
 
   const goAddGroup = () => {
     if (!isAuthenticated) setLoginOpen(true);
@@ -40,7 +50,8 @@ export default function ExchangePage() {
   const groups = isAuthenticated ? filterGroups : [];
 
   // TODO: 선택 그룹으로 세트/매칭 필터링 (그룹 태깅된 데이터/API 연동 후). 현재는 선택 상태만 유지.
-  const sets = mockExchangeSets;
+  // 이번 세션에 등록한 세트가 맨 앞(=최신)에 온다 — 첫 세트가 강조 테두리를 받는다(EX-008)
+  const sets = [...registeredSets, ...mockExchangeSets];
   const matches = mockMatchResults;
 
   if (groups.length === 0) {
@@ -128,8 +139,11 @@ export default function ExchangePage() {
         </section>
       )}
 
-      {/* TODO(E4): 교환 세트 등록 완료 시 '교환이 등록되었어요' 토스트를 FloatingCta의 below로 전달 */}
-      <FloatingCta label="교환 등록하기" onClick={() => router.push(ROUTES.exchangeRegister)} />
+      <FloatingCta
+        label="교환 등록하기"
+        onClick={() => router.push(ROUTES.exchangeRegister)}
+        below={justRegistered && <Toast message="교환이 등록되었어요!" />}
+      />
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
