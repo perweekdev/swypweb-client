@@ -40,7 +40,8 @@ export function BottomSheet({
         onClick={onClose}
       />
       <div className="relative z-10 w-full max-w-[420px] rounded-t-2xl bg-white px-5 pb-8 pt-3">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-secondary-100" />
+        {/* 핸들 계측: 61×5 gray-100 (EX-006 제안 확인 시트 · EX-003 액션 시트 공통) */}
+        <div className="mx-auto mb-4 h-[5px] w-[61px] rounded-full bg-gray-100" />
         {children}
       </div>
     </div>
