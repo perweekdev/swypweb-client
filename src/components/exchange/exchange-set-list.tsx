@@ -7,6 +7,7 @@ import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { ActionSheet } from '@components/common/action-sheet';
 import { PhotocardRow } from '@components/photocard/photocard-row';
 import { MoreIcon } from '@components/icons';
+import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import type { ExchangeSetSummary } from '@/types/exchange.types';
 
 /**
@@ -15,10 +16,14 @@ import type { ExchangeSetSummary } from '@/types/exchange.types';
  * 계측: 카드 61×98 gap 8 · 저장 버튼 full-width outline pill 42 · 세트 구분선은 화면 전체 폭.
  */
 export function ExchangeSetList({ initialSets }: { initialSets: ExchangeSetSummary[] }) {
-  // TODO: BE 연동 시 삭제 API + 목록 재조회로 교체 (현재는 로컬 상태)
-  const [sets, setSets] = useState(initialSets);
+  // TODO: BE 연동 시 목록 조회/삭제 API로 교체 (현재는 목 + 세션 등록분 + 로컬 삭제 상태)
+  const registeredSets = useExchangeDraftStore((s) => s.registeredSets);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [menuSetId, setMenuSetId] = useState<string | null>(null);
   const [deleteSetId, setDeleteSetId] = useState<string | null>(null);
+
+  // EX-001과 같은 순서: 이번 세션에 등록한 세트가 맨 앞
+  const sets = [...registeredSets, ...initialSets].filter((s) => !deletedIds.includes(s.id));
 
   return (
     <div className="flex-1 pb-4">
@@ -69,7 +74,7 @@ export function ExchangeSetList({ initialSets }: { initialSets: ExchangeSetSumma
         confirmText="삭제"
         onCancel={() => setDeleteSetId(null)}
         onConfirm={() => {
-          setSets((prev) => prev.filter((s) => s.id !== deleteSetId));
+          if (deleteSetId) setDeletedIds((prev) => [...prev, deleteSetId]);
           setDeleteSetId(null);
         }}
       />
