@@ -19,6 +19,8 @@ import { mockInterestGroups, mockUser } from '@/mocks/my';
 export function MemberMyPage() {
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
+  // 온보딩에서 받은 닉네임이 있으면 그것이 우선 (BE 연동 전까지 목이 기본값)
+  const nickname = useAuthStore((s) => s.nickname) ?? mockUser.nickname;
   const [chatAlarm, setChatAlarm] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -30,7 +32,7 @@ export function MemberMyPage() {
 
       {/* 프로필 */}
       <UserProfile
-        name={mockUser.nickname}
+        name={nickname}
         variant="editable"
         onAction={() => router.push(ROUTES.myProfile)}
         className="px-4 py-4"

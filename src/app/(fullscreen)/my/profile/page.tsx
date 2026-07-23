@@ -1,10 +1,16 @@
+'use client';
+
 import { Header } from '@components/layout/header';
 import { Avatar } from '@components/ui/avatar';
 import { CameraIcon } from '@components/icons';
+import { useAuthStore } from '@store/auth-store';
 import { mockUser } from '@/mocks/my';
 
 // MY-002 프로필 편집 — 기본(조회) 화면. 편집/저장 UI는 추후 별도.
 export default function ProfileEditPage() {
+  // 온보딩에서 받은 닉네임이 있으면 그것이 우선 (BE 연동 전까지 목이 기본값)
+  const nickname = useAuthStore((s) => s.nickname) ?? mockUser.nickname;
+
   return (
     <>
       <Header title="프로필 편집" />
@@ -22,7 +28,7 @@ export default function ProfileEditPage() {
       <div className="px-4 pt-8">
         <label className="text-body3 text-secondary-500">닉네임</label>
         <div className="mt-2 rounded-xl bg-secondary-10 px-4 py-3.5 text-body1 text-secondary-900">
-          {mockUser.nickname}
+          {nickname}
         </div>
       </div>
     </>
