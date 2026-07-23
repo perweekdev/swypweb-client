@@ -45,7 +45,10 @@ import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { EmptyState } from '@components/common/empty-state';
 import { PhotocardRow } from '@components/photocard/photocard-row';
+import { CollectionAlbumList } from '@components/collection/collection-album-list';
+import { PhotocardImage } from '@components/photocard/photocard-card';
 import { mockChatRoomSummaries, mockChatRooms } from '@/mocks/chat';
+import { mockCollectionAlbums } from '@/mocks/collection';
 import type { Photocard } from '@/types/photocard.types';
 import { ChevronLeftIcon, MoreIcon } from '@components/icons';
 
@@ -97,9 +100,20 @@ export default function ComponentCatalogPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [gridSel, setGridSel] = useState<Set<string>>(new Set([demoCards[0].id]));
   const [groupVal, setGroupVal] = useState<string | null>(null);
+  const demoAlbum = mockCollectionAlbums.slice(0, 1);
+  const [ownedSel, setOwnedSel] = useState<Set<string>>(
+    () => new Set(demoAlbum[0].versions[0].cards.slice(0, 3).map((c) => c.id))
+  );
 
   const toggleGrid = (id: string) =>
     setGridSel((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+
+  const toggleOwned = (id: string) =>
+    setOwnedSel((prev) => {
       const next = new Set(prev);
       if (!next.delete(id)) next.add(id);
       return next;
@@ -528,6 +542,54 @@ export default function ComponentCatalogPage() {
             }
           />
         </div>
+      </Section>
+
+      <Section title="CollectionAlbumList (아코디언 + 5열 그리드 · COL/EX-007)">
+        <Row label="조회 전용 — 보유 선명 / 미보유 딤 (COL-001)">
+          <CollectionAlbumList
+            className="w-full"
+            albums={demoAlbum}
+            renderCard={(card) => (
+              <PhotocardImage
+                card={card}
+                className={`aspect-[8/13] w-full ${ownedSel.has(card.id) ? '' : 'opacity-40'}`}
+              />
+            )}
+          />
+        </Row>
+        <Row label="선택 + 버전별 전체 선택 (COL-003 / EX-007)">
+          <CollectionAlbumList
+            className="w-full"
+            albums={demoAlbum}
+            renderVersionAction={(version) => {
+              const ids = version.cards.map((c) => c.id);
+              const allSelected = ids.every((id) => ownedSel.has(id));
+              return (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOwnedSel((prev) => {
+                      const next = new Set(prev);
+                      ids.forEach((id) => (allSelected ? next.delete(id) : next.add(id)));
+                      return next;
+                    })
+                  }
+                  className="flex items-center gap-1.5 text-body2 text-gray-700"
+                >
+                  <CheckCircle checked={allSelected} />
+                  전체 선택
+                </button>
+              );
+            }}
+            renderCard={(card) => (
+              <SelectableCard
+                card={card}
+                state={ownedSel.has(card.id) ? 'selected' : 'not_collected'}
+                onClick={() => toggleOwned(card.id)}
+              />
+            )}
+          />
+        </Row>
       </Section>
 
       <Section title="HomeFeedCard (home-feed-exchange-info · HOME)">
