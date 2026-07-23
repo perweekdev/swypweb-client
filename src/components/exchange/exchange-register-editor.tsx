@@ -11,7 +11,7 @@ import { DeletableCardGrid } from '@components/photocard/deletable-card-grid';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { EXCHANGE_ROUTES } from '@constants/routes';
 import { MAX_CARDS_PER_SIDE } from '@constants/exchange';
-import { mockCollectionAlbums, toCollectionCards } from '@/mocks/exchange';
+import { mockCollectionAlbums, toCollectionCards } from '@/mocks/collection';
 import type { ExchangeSide } from '@/types/exchange.types';
 
 /**

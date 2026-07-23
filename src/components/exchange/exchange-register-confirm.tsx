@@ -6,7 +6,7 @@ import { Button } from '@components/ui/button';
 import { ExchangeCardSections } from '@components/common/exchange-card-sections';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { ROUTES } from '@constants/routes';
-import { toCollectionCards } from '@/mocks/exchange';
+import { toCollectionCards } from '@/mocks/collection';
 
 /**
  * EX-008 교환 세트 확인. 등록 직전 있어요/구해요를 3열로 훑어보고 등록한다.

@@ -40,16 +40,5 @@ export interface MatchResult {
   wantCards: Photocard[];
 }
 
-/** 앨범 버전 (EX-007 'Photobook ver.' 등) — 포카 선택 그리드의 단위 */
-export interface CollectionVersion {
-  id: string;
-  name: string;
-  cards: Photocard[];
-}
-
-/** 앨범 (EX-007 아코디언 단위) */
-export interface CollectionAlbum {
-  id: string;
-  name: string;
-  versions: CollectionVersion[];
-}
+// EX-007 포카 선택 그리드가 쓰는 앨범/버전 타입은 컬렉션 도메인이 원본이다.
+// → `CollectionAlbum` / `CollectionVersion`은 `@/types/collection.types`에 있다.
