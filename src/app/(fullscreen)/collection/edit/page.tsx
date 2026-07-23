@@ -1,12 +1,11 @@
-import { Header } from '@components/layout/header';
-import { PlaceholderScreen } from '@components/layout/placeholder-screen';
+import { Suspense } from 'react';
+import { CollectionEditor } from '@components/collection/collection-editor';
 
-/** COL-003 컬렉션 편집 — 청크 C2에서 구현 (지금은 진입 경로만 확보) */
+/** COL-003 컬렉션 편집 (편집 대상 그룹은 `?group=` 쿼리로 받는다) */
 export default function CollectionEditPage() {
   return (
-    <>
-      <Header title="컬렉션 편집" />
-      <PlaceholderScreen title="컬렉션 편집" />
-    </>
+    <Suspense>
+      <CollectionEditor />
+    </Suspense>
   );
 }

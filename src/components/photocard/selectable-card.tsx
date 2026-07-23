@@ -37,7 +37,8 @@ export function SelectableCard({
           selected ? 'ring-2 ring-primary-900' : ''
         }`}
       />
-      {selected && <ImageCheck selected className="absolute right-1.5 top-1.5 size-6" />}
+      {/* 계측: 체크 배지 20px, 카드 우상단에서 5~6px 안쪽 (COL-003 · EX-007 동일) */}
+      {selected && <ImageCheck selected className="absolute right-1.5 top-1.5 size-5" />}
     </button>
   );
 }

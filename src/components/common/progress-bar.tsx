@@ -1,6 +1,7 @@
 /**
  * 진행 바 (progress). 상단 라벨 + 현재/최대 수, 하단 트랙.
- * 계측: 트랙 bg secondary-50, 채움 primary-900. 현재값 primary-900 / 최대값 secondary-300.
+ * 계측(COL-003): 라벨 16 medium secondary-900 · 값 16(현재값 primary-900 / 최대값 secondary-300)
+ * · 트랙 높이 6, bg secondary-50, 채움 primary-900, 좌우 여백 16.
  * 예: 컬렉션 보유 수(9/200).
  */
 export function ProgressBar({
@@ -19,8 +20,8 @@ export function ProgressBar({
   return (
     <div className={className}>
       <div className="mb-1.5 flex items-center justify-between">
-        {label && <span className="text-body2 text-secondary-900">{label}</span>}
-        <span className="ml-auto text-body2">
+        {label && <span className="text-h3 text-secondary-900">{label}</span>}
+        <span className="ml-auto text-body1">
           <span className="text-primary-900">{value}</span>
           <span className="text-secondary-300">/{max}</span>
         </span>
