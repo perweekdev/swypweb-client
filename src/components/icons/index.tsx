@@ -201,6 +201,16 @@ export function CameraIcon({ className }: IconProps) {
   );
 }
 
+/** 편집(연필) — COL-001 FAB '편집하기' */
+export function PencilIcon({ className }: IconProps) {
+  return (
+    <Icon className={className}>
+      <path d="M16.5 4.5a2.12 2.12 0 0 1 3 3L8 19l-4 1 1-4Z" />
+      <path d="m14.5 6.5 3 3" />
+    </Icon>
+  );
+}
+
 export function InfoIcon({ className }: IconProps) {
   return (
     <Icon className={className}>

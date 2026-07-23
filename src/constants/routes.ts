@@ -50,6 +50,16 @@ export const EXCHANGE_ROUTES = {
   registerConfirm: `${ROUTES.exchangeRegister}/confirm`,
 } as const;
 
+/**
+ * 컬렉션 하위 라우트 (COL-003).
+ * 편집 대상 그룹은 필터라 라우트가 아닌 **쿼리 파라미터**로 넘긴다(새로고침·뒤로가기 안전).
+ * 자세한 규칙: docs/routing-conventions.md
+ */
+export const COLLECTION_ROUTES = {
+  /** COL-003 컬렉션 편집 */
+  edit: (groupId: string) => `${ROUTES.collection}/edit?group=${encodeURIComponent(groupId)}`,
+} as const;
+
 /** 채팅방 하위 라우트 (CHAT-002 / 003 / 004) */
 export const CHAT_ROUTES = {
   /** CHAT-002 채팅방 */

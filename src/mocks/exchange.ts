@@ -1,6 +1,5 @@
-import type { Photocard } from '@/types/photocard.types';
-import type { CollectionAlbum, ExchangeSetSummary, MatchResult } from '@/types/exchange.types';
-import { CARD_COLORS, makeCards } from '@/mocks/photocard';
+import type { ExchangeSetSummary, MatchResult } from '@/types/exchange.types';
+import { makeCards } from '@/mocks/photocard';
 
 // BE 연동 전 임시 목 데이터 (EX-001·003·005·006·007·008)
 
@@ -56,48 +55,4 @@ export const mockMatchResults: MatchResult[] = [
 
 export const findMockMatchResult = (id: string) => mockMatchResults.find((m) => m.id === id);
 
-/**
- * 교환 세트 등록(EX-007)에서 고르는 포카 소스.
- * 실제로는 내 컬렉션(COL 도메인)에서 온다 — 컬렉션 연동 전까지 목으로 대체한다.
- */
-function makeVersionCards(albumId: string, versionId: string, name: string, count: number) {
-  return makeCards(`${albumId}-${versionId}`, count).map((card, i) => ({
-    ...card,
-    albumName: name,
-    versionName: versionId === 'photobook' ? 'Photobook ver.' : 'Poster ver.',
-    color: CARD_COLORS[(i + name.length) % CARD_COLORS.length],
-  }));
-}
-
-function makeAlbum(id: string, name: string): CollectionAlbum {
-  return {
-    id,
-    name,
-    versions: [
-      {
-        id: `${id}-photobook`,
-        name: 'Photobook ver.',
-        cards: makeVersionCards(id, 'photobook', name, 7),
-      },
-      { id: `${id}-poster`, name: 'Poster ver.', cards: makeVersionCards(id, 'poster', name, 7) },
-    ],
-  };
-}
-
-export const mockCollectionAlbums: CollectionAlbum[] = [
-  makeAlbum('cosmic', 'Cosmic'),
-  makeAlbum('chill-kill', 'Chill Kill'),
-];
-
-/** 앨범/버전 트리를 평탄화한 조회용 맵 (드래프트에 담긴 id → 포카) */
-const collectionCardMap = new Map<string, Photocard>(
-  mockCollectionAlbums.flatMap((album) =>
-    album.versions.flatMap((version) => version.cards.map((card) => [card.id, card] as const))
-  )
-);
-
-export const findMockCollectionCard = (id: string) => collectionCardMap.get(id);
-
-/** 선택 id 목록을 선택 순서대로 포카 배열로 변환 */
-export const toCollectionCards = (ids: string[]): Photocard[] =>
-  ids.map(findMockCollectionCard).filter((card): card is Photocard => card != null);
+// 교환 세트 등록(EX-007)에서 고르는 포카 소스는 컬렉션이 원본이다 → `@/mocks/collection` 참조.
