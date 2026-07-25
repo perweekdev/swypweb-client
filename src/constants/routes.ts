@@ -12,6 +12,10 @@ export const ROUTES = {
   myGroups: '/my/groups',
   myGroupsAdd: '/my/groups/add',
   login: '/login',
+  /** 구글 로그인 성공/온보딩 콜백 — 서버가 프래그먼트(#)로 토큰을 실어 보낸다 */
+  oauthCallback: '/oauth/callback',
+  /** 탈퇴 회원 콜백 — 서버가 이 경로로만 쿼리(?error=WITHDRAWN_USER)를 보낸다 */
+  loginCallback: '/login/callback',
   signup: '/signup',
   terms: '/terms',
   privacy: '/privacy',
@@ -23,12 +27,22 @@ export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
 
 /**
  * 홈 교환글 하위 라우트 (HOME-003 상세 / HOME-004 교환할 포카 선택).
- * ⚠️ 교환 API 리소스명 미확정 → 제안값 `/posts`. 확정 시 이 상수만 수정.
+ * `id`는 서버의 `tradeSetId`다. (경로명 `/posts`는 유지 — 화면 IA 기준)
  * 자세한 규칙: docs/routing-conventions.md
  */
 export const POST_ROUTES = {
-  /** HOME-003 교환글 상세 */
-  detail: (id: string) => `/posts/${id}`,
+  /**
+   * HOME-003 교환글 상세.
+   * ⚠️ 상세 API 응답에 작성자가 없어(api-reference §7.3) 피드에서 받은 값을 쿼리로 전달한다.
+   * 서버가 author 필드를 추가하면 이 파라미터는 제거한다.
+   */
+  detail: (id: string, nickname?: string, groups?: string) => {
+    const query = new URLSearchParams();
+    if (nickname) query.set('n', nickname);
+    if (groups) query.set('g', groups);
+    const suffix = query.size > 0 ? `?${query}` : '';
+    return `/posts/${id}${suffix}`;
+  },
   /** HOME-004 교환할 포카 선택 */
   select: (id: string) => `/posts/${id}/select`,
 } as const;
@@ -42,12 +56,23 @@ export const EXCHANGE_ROUTES = {
   sets: `${ROUTES.exchange}/sets`,
   /** EX-004 나의 교환 세트 상세 — ⚠️ 디자인 미핸드오프, 경로만 예약 */
   setDetail: (id: string) => `${ROUTES.exchange}/sets/${id}`,
-  /** EX-005 매칭 결과 상세 */
-  matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
+  /**
+   * EX-005 매칭 결과 상세.
+   * `id`는 **상대의 교환 세트 id**다. 상세 응답에 상대 정보가 없어 닉네임을 쿼리로 전달한다.
+   */
+  matchDetail: (id: string, nickname?: string) =>
+    nickname
+      ? `${ROUTES.exchange}/matches/${id}?n=${encodeURIComponent(nickname)}`
+      : `${ROUTES.exchange}/matches/${id}`,
   /** EX-006 교환할 포카 선택 */
   matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
-  /** EX-008 교환 세트 확인 */
-  registerConfirm: `${ROUTES.exchangeRegister}/confirm`,
+  /** EX-007 교환 세트 등록 — 등록 API가 그룹 단위라 대상 그룹을 쿼리로 넘긴다 */
+  register: (groupId: string) => `${ROUTES.exchangeRegister}?group=${encodeURIComponent(groupId)}`,
+  /** EX-008 교환 세트 확인 (등록 API가 그룹 단위라 그룹을 함께 넘긴다) */
+  registerConfirm: (groupId: string) =>
+    `${ROUTES.exchangeRegister}/confirm?group=${encodeURIComponent(groupId)}`,
+  /** EX-003 나의 교환 세트 관리 (그룹 단위 목록) */
+  setsOf: (groupId: string) => `${ROUTES.exchange}/sets?group=${encodeURIComponent(groupId)}`,
 } as const;
 
 /**

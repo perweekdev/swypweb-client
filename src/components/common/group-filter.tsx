@@ -13,7 +13,13 @@ import { useDragScroll } from '@hooks/use-drag-scroll';
  * `showAll`: HOME-001은 전체 아티스트 중에서 고르므로 '전체' 칩이 있고,
  * EX-001은 내 관심 그룹만 나열해 항상 한 그룹이 선택된 상태라 '전체' 칩이 없다(계측).
  */
-type Group = { id: string; name: string; color?: string; favorited?: boolean };
+type Group = {
+  id: string;
+  name: string;
+  color?: string;
+  logoUrl?: string | null;
+  favorited?: boolean;
+};
 
 export function GroupFilter({
   groups,
@@ -69,6 +75,7 @@ export function GroupFilter({
             size="md"
             name={g.name}
             color={g.color}
+            logoUrl={g.logoUrl}
             favorited={g.favorited}
             state={value === g.id ? 'selected' : 'default'}
           />,

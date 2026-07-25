@@ -1,12 +1,19 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { Button } from '@components/ui/button';
 import { ExchangeCardSections } from '@components/common/exchange-card-sections';
+import { useGroupCollectionTree } from '@hooks/use-collection';
+import { useCreateTradeSet } from '@hooks/use-trade-sets';
+import { isApiError } from '@lib/api-error';
+import { API_ERROR_CODES } from '@constants/api-error-codes';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { ROUTES } from '@constants/routes';
-import { toCollectionCards } from '@/mocks/collection';
+import type { Photocard } from '@/types/photocard.types';
+
+const PLACEHOLDER_COLOR = '#E6E8EB';
 
 /**
  * EX-008 교환 세트 확인. 등록 직전 있어요/구해요를 3열로 훑어보고 등록한다.
@@ -14,16 +21,67 @@ import { toCollectionCards } from '@/mocks/collection';
  */
 export function ExchangeRegisterConfirm() {
   const router = useRouter();
-  const { haveIds, wantIds, register } = useExchangeDraftStore();
+  const groupParam = useSearchParams().get('group');
+  const groupId = groupParam ? Number(groupParam) : null;
 
-  const haveCards = toCollectionCards(haveIds);
-  const wantCards = toCollectionCards(wantIds);
-  const canRegister = haveCards.length > 0 && wantCards.length > 0;
+  const { haveIds, wantIds, markRegistered } = useExchangeDraftStore();
+  const { data: tree } = useGroupCollectionTree(groupId);
+  const createTradeSet = useCreateTradeSet(groupId);
+  const [error, setError] = useState<string | null>(null);
 
-  const onRegister = () => {
-    // TODO: 실제 교환 세트 등록 API. 현재는 세션 한정으로 스토어에 담는다.
-    register({ id: `set-${Date.now()}`, haveCards, wantCards });
-    router.push(ROUTES.exchange);
+  const cardsById = useMemo(() => {
+    const index = new Map<string, Photocard>();
+    tree?.forEach((album) =>
+      album.versions.forEach((version) =>
+        version.cards.forEach((card) =>
+          index.set(String(card.photoCardId), {
+            id: String(card.photoCardId),
+            memberName: card.memberName,
+            albumName: album.name,
+            versionName: version.name,
+            imageUrl: card.imageUrl,
+            color: PLACEHOLDER_COLOR,
+          })
+        )
+      )
+    );
+    return index;
+  }, [tree]);
+
+  const pick = (ids: string[]) =>
+    ids.map((id) => cardsById.get(id)).filter((card): card is Photocard => card !== undefined);
+
+  const haveCards = pick(haveIds);
+  const wantCards = pick(wantIds);
+  const canRegister =
+    haveIds.length > 0 && wantIds.length > 0 && groupId !== null && !createTradeSet.isPending;
+
+  const onRegister = async () => {
+    if (!canRegister) return;
+    setError(null);
+
+    try {
+      await createTradeSet.mutateAsync({
+        haveCardIds: haveIds.map(Number),
+        wantCardIds: wantIds.map(Number),
+      });
+      markRegistered();
+      router.push(ROUTES.exchange);
+    } catch (caught) {
+      if (!isApiError(caught)) {
+        setError('잠시 후 다시 시도해주세요.');
+        return;
+      }
+      if (caught.code === API_ERROR_CODES.TRADE_SET_CARD_DUPLICATED) {
+        setError('이미 등록한 포카가 포함되어 있어요.');
+        return;
+      }
+      if (caught.code === API_ERROR_CODES.INVALID_TRADE_SET_CARD) {
+        setError('이 그룹에 속하지 않는 포카가 포함되어 있어요.');
+        return;
+      }
+      setError(caught.message);
+    }
   };
 
   return (
@@ -38,8 +96,9 @@ export function ExchangeRegisterConfirm() {
       </div>
 
       <div className="sticky bottom-0 bg-background px-4 pb-8 pt-3">
+        {error && <p className="mb-2 text-center text-body3 text-red-900">{error}</p>}
         <Button size="lg" disabled={!canRegister} onClick={onRegister}>
-          등록하기
+          {createTradeSet.isPending ? '등록 중...' : '등록하기'}
         </Button>
       </div>
     </>

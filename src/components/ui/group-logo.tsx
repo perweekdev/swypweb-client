@@ -1,7 +1,9 @@
+import Image from 'next/image';
 import { HeartIcon, PlusIcon } from '@components/icons';
 
 /**
- * 아티스트 그룹 로고 원 (group-logo). 로고 에셋 전 placeholder(색상 원 + 이니셜).
+ * 아티스트 그룹 로고 원 (group-logo).
+ * `logoUrl`이 있으면 실제 로고 이미지, 없으면 placeholder(색상 원 + 이니셜).
  * 계측: large 77 / small 50 (배지·링 여백 포함). state·favorited 조합:
  *   default  — 로고 원
  *   add      — 점선 원 + gray-500 ＋ (추가하기)
@@ -24,6 +26,7 @@ export function GroupLogo({
   favorited = false,
   name = '',
   color,
+  logoUrl,
   className = '',
 }: {
   state?: State;
@@ -31,6 +34,8 @@ export function GroupLogo({
   favorited?: boolean;
   name?: string;
   color?: string;
+  /** 서버 `groupImageUrl`. 있으면 색상 원 대신 실제 로고를 쓴다. */
+  logoUrl?: string | null;
   className?: string;
 }) {
   const dim = SIZE[size];
@@ -48,12 +53,16 @@ export function GroupLogo({
   return (
     <span className={`relative inline-flex ${dim} ${className}`}>
       <span
-        className={`flex size-full items-center justify-center overflow-hidden rounded-full text-body1 text-white ${
-          color ? '' : 'bg-secondary-50 text-secondary-500'
+        className={`relative flex size-full items-center justify-center overflow-hidden rounded-full text-body1 text-white ${
+          color && !logoUrl ? '' : 'bg-secondary-50 text-secondary-500'
         } ${state === 'selected' ? 'ring-2 ring-primary-900 ring-offset-2 ring-offset-background' : ''}`}
-        style={color ? { backgroundColor: color } : undefined}
+        style={color && !logoUrl ? { backgroundColor: color } : undefined}
       >
-        {name.charAt(0)}
+        {logoUrl ? (
+          <Image src={logoUrl} alt={name} fill sizes="77px" className="object-cover" />
+        ) : (
+          name.charAt(0)
+        )}
       </span>
       {favorited && <HeartIcon className="absolute -right-0.5 -top-0.5 size-4 text-red-700" />}
     </span>

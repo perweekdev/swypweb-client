@@ -40,4 +40,6 @@ jobs:
       - name: Build
         run: pnpm build
         env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          # 공개값(브라우저 번들에 인라인됨)이라 secret이 아니라 vars로 관리한다.
+          # 미설정 시에도 빌드가 깨지지 않도록 배포 서버 주소를 기본값으로 둔다.
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'https://api.phocamatch.shop/api/v1' }}

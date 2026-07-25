@@ -1,0 +1,36 @@
+'use client';
+
+import { useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { setUnauthorizedHandler } from '@lib/api-client';
+import { useAuthStore } from '@store/auth-store';
+import { ROUTES } from '@constants/routes';
+
+/**
+ * 인증 부트스트랩.
+ *  1. sessionStorage에 남아 있는 토큰을 스토어로 올린다(새로고침 복구).
+ *  2. api-client의 401 처리 훅을 등록한다.
+ *
+ * 리프레시 토큰이 없어(docs/api-reference.md §1.2) 401의 복구 경로는 재로그인뿐이다.
+ */
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    useAuthStore.getState().hydrate();
+  }, []);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      // 비로그인 상태에서 받은 401은 만료가 아니므로 화면을 옮기지 않는다.
+      if (!useAuthStore.getState().accessToken) return;
+      useAuthStore.getState().logout();
+      router.replace(`${ROUTES.login}?error=SESSION_EXPIRED`);
+    });
+
+    return () => setUnauthorizedHandler(null);
+  }, [router]);
+
+  return <>{children}</>;
+}

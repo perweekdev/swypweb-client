@@ -16,23 +16,31 @@ import { ExchangeSetFrame } from '@components/common/exchange-set-frame';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 import { Toast } from '@components/common/toast';
 import { useDragScroll } from '@hooks/use-drag-scroll';
+import { useInterestGroups } from '@hooks/use-groups';
+import { useMyTradeSets } from '@hooks/use-trade-sets';
+import { useMatches } from '@hooks/use-matches';
 import { ROUTES, EXCHANGE_ROUTES } from '@constants/routes';
-import { mockExchangeSets, mockMatchResults } from '@/mocks/exchange';
-import { mockInterestGroups } from '@/mocks/my';
-
-// EX-001 필터는 HOME-001과 달리 '전체'가 없고 **내 관심 그룹만** 나열한다(계측 + 스토리보드).
-const filterGroups = mockInterestGroups.map((g) => ({ id: g.id, name: g.name, color: g.color }));
 
 /** EX-001 교환 메인 (내 교환 세트 + 교환 가능한 상대) */
 export default function ExchangePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(
-    filterGroups[0]?.id ?? null // 항상 한 그룹이 선택된 상태 ('전체' 칩 없음)
-  );
+  const [pickedGroup, setPickedGroup] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const setScrollRef = useDragScroll<HTMLUListElement>();
-  const { registeredSets, justRegistered, consumeRegistered } = useExchangeDraftStore();
+  const { justRegistered, consumeRegistered } = useExchangeDraftStore();
+
+  // EX-001 필터는 HOME-001과 달리 '전체'가 없고 **내 관심 그룹만** 나열한다(계측 + 스토리보드).
+  const { data: interestGroups } = useInterestGroups();
+  const filterGroups = (interestGroups ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    color: g.color,
+    logoUrl: g.logoUrl,
+  }));
+  // 항상 한 그룹이 선택된 상태 ('전체' 칩 없음)
+  const selectedGroup = pickedGroup ?? filterGroups[0]?.id ?? null;
+  const { data: sets } = useMyTradeSets(selectedGroup ? Number(selectedGroup) : null);
 
   // EX-008 등록 직후 진입하면 토스트를 3초간 노출한다(그동안 FAB이 위로 올라감)
   useEffect(() => {
@@ -49,10 +57,11 @@ export default function ExchangePage() {
   // 비회원은 관심 그룹이 없는 상태로 본다 (memo: 비회원 기본 화면 = 관심 그룹 없음)
   const groups = isAuthenticated ? filterGroups : [];
 
-  // TODO: 선택 그룹으로 세트/매칭 필터링 (그룹 태깅된 데이터/API 연동 후). 현재는 선택 상태만 유지.
-  // 이번 세션에 등록한 세트가 맨 앞(=최신)에 온다 — 첫 세트가 강조 테두리를 받는다(EX-008)
-  const sets = [...registeredSets, ...mockExchangeSets];
-  const matches = mockMatchResults;
+  const mySets = sets ?? [];
+  // 매칭은 **교환 세트 단위**로 계산된다. 그룹에 세트가 여러 개면 가장 최근(첫) 세트 기준으로 보여준다.
+  // TODO: 세트 선택 UI(EX-004)가 나오면 사용자가 고른 세트로 바꾼다.
+  const { data: matchPages } = useMatches(mySets[0]?.id ?? null);
+  const matches = matchPages?.pages.flatMap((page) => page.items) ?? [];
 
   if (groups.length === 0) {
     return (
@@ -80,7 +89,7 @@ export default function ExchangePage() {
         className="px-4 pb-3 pt-1"
         groups={groups}
         value={selectedGroup}
-        onChange={setSelectedGroup}
+        onChange={(id) => setPickedGroup(id ?? selectedGroup)}
         onAdd={goAddGroup}
         addLabel="추가하기"
         showAll={false}
@@ -88,28 +97,32 @@ export default function ExchangePage() {
 
       <section className="pt-2">
         <div className="flex items-center justify-between px-4">
-          <Subtitle>내 교환 세트 {sets.length}</Subtitle>
-          {sets.length > 0 && (
-            <ViewSetAllLink label="전체 보기" onClick={() => router.push(EXCHANGE_ROUTES.sets)} />
+          <Subtitle>내 교환 세트 {mySets.length}</Subtitle>
+          {mySets.length > 0 && selectedGroup && (
+            <ViewSetAllLink
+              label="전체 보기"
+              onClick={() => router.push(EXCHANGE_ROUTES.setsOf(selectedGroup))}
+            />
           )}
         </div>
 
-        {sets.length === 0 ? (
+        {mySets.length === 0 ? (
           <EmptyState
             title="등록된 교환 세트가 없어요"
             description="세트를 등록하면 교환 상대를 매치해드려요"
           />
         ) : (
           <ul ref={setScrollRef} className="mt-2 flex gap-2 overflow-x-auto scrollbar-hide px-4">
-            {sets.map((set, i) => (
+            {mySets.map((set, i) => (
               <li key={set.id} className="shrink-0">
                 {/* TODO: 세트 선택 → EX-004 나의 교환 세트 상세 (디자인 미핸드오프) */}
-                {/* 최신(=첫 번째) 세트는 보라 테두리로 강조. 등록 직후 목록 맨 앞에 오므로 그대로 강조된다(EX-008) */}
+                {/* 최신(=첫 번째) 세트는 보라 테두리로 강조 (EX-008) */}
+                {/* 목록 API는 축별 대표 카드 1장만 준다 → 나머지는 +N으로 표기 */}
                 <ExchangeSetFrame
                   variant={i === 0 ? 'highlighted' : 'default'}
                   className="w-[276px]"
-                  have={{ card: set.haveCards[0], extraCount: set.haveCards.length - 1 }}
-                  want={{ card: set.wantCards[0], extraCount: set.wantCards.length - 1 }}
+                  have={{ card: set.haveRepresentative, extraCount: set.haveCount - 1 }}
+                  want={{ card: set.wantRepresentative, extraCount: set.wantCount - 1 }}
                 />
               </li>
             ))}
@@ -117,7 +130,7 @@ export default function ExchangePage() {
         )}
       </section>
 
-      {sets.length > 0 && (
+      {mySets.length > 0 && (
         <section className="pb-28">
           <div className="mx-4 mt-4 border-t border-secondary-50" />
           <Subtitle className="px-4 pt-4">교환 가능한 상대 {matches.length}</Subtitle>
@@ -127,11 +140,11 @@ export default function ExchangePage() {
               {i > 0 && <div className="mx-4 border-t border-secondary-50" />}
               <HomeFeedCard
                 className="cursor-pointer px-4 py-4"
-                name={match.partner.nickname}
-                avatarColor={match.partner.avatarColor}
+                name={match.nickname}
                 haveCards={match.haveCards}
                 wantCards={match.wantCards}
-                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id))}
+                // 상대 정보가 상세 응답에 없어(§7.3) 닉네임을 함께 넘긴다.
+                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id, match.nickname))}
                 onOffer={() => router.push(EXCHANGE_ROUTES.matchSelect(match.id))}
               />
             </div>
@@ -141,7 +154,7 @@ export default function ExchangePage() {
 
       <FloatingCta
         label="교환 등록하기"
-        onClick={() => router.push(ROUTES.exchangeRegister)}
+        onClick={() => selectedGroup && router.push(EXCHANGE_ROUTES.register(selectedGroup))}
         below={justRegistered && <Toast message="교환이 등록되었어요!" />}
       />
 

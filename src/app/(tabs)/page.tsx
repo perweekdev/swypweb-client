@@ -6,20 +6,12 @@ import { useAuthStore } from '@store/auth-store';
 import { TabHeader } from '@components/layout/tab-header';
 import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
+import { EmptyState } from '@components/common/empty-state';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 import { FloatingCta } from '@components/common/floating-cta';
+import { useHomeFeed, useInfiniteScrollSentinel } from '@hooks/use-home-feed';
+import { useAllGroups, useInterestGroups } from '@hooks/use-groups';
 import { ROUTES, POST_ROUTES } from '@constants/routes';
-import { mockFeedPosts } from '@/mocks/home';
-import { mockAllArtists, mockInterestGroups } from '@/mocks/my';
-
-// 관심(추가) 그룹은 하트 배지 표시 — mockInterestGroups를 관심 여부로 사용
-const favIds = new Set(mockInterestGroups.map((g) => g.id));
-const filterGroups = mockAllArtists.map((g) => ({
-  id: g.id,
-  name: g.name,
-  color: g.color,
-  favorited: favIds.has(g.id),
-}));
 
 /** HOME-001 홈 피드 (교환글 탐색 메인) */
 export default function HomePage() {
@@ -28,14 +20,32 @@ export default function HomePage() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
 
+  // 비로그인은 그룹 목록을 못 받으므로(인증 필요) 필터가 비어 '전체'만 보인다 — 의도된 동작.
+  const { data: allGroups } = useAllGroups();
+  const { data: interestGroups } = useInterestGroups();
+  const favoriteIds = new Set(interestGroups?.map((g) => g.id) ?? []);
+  const filterGroups = (allGroups ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    color: g.color,
+    logoUrl: g.logoUrl,
+    favorited: favoriteIds.has(g.id),
+  }));
+
+  const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useHomeFeed(
+    selectedGroup ? Number(selectedGroup) : undefined
+  );
+  const posts = data?.pages.flatMap((page) => page.items) ?? [];
+  const sentinelRef = useInfiniteScrollSentinel(
+    () => void fetchNextPage(),
+    hasNextPage && !isFetchingNextPage
+  );
+
   // 회원 전용 동작은 비회원이면 로그인 유도 시트를 띄운다 (IA: 관심그룹 추가/제안/채팅)
   const requireAuth = (action: () => void) => () => {
     if (!isAuthenticated) setLoginOpen(true);
     else action();
   };
-
-  // TODO: 선택 그룹으로 교환글 필터링 (그룹 태깅된 데이터/API 연동 후). 현재는 선택 상태만 유지.
-  const posts = mockFeedPosts;
 
   return (
     <>
@@ -49,6 +59,18 @@ export default function HomePage() {
         onAdd={requireAuth(() => router.push(ROUTES.myGroupsAdd))}
       />
 
+      {isPending && (
+        <p className="px-4 py-10 text-center text-body2 text-secondary-500">불러오는 중...</p>
+      )}
+
+      {isError && (
+        <EmptyState title="교환글을 불러오지 못했어요." description="잠시 후 다시 시도해주세요." />
+      )}
+
+      {!isPending && !isError && posts.length === 0 && (
+        <EmptyState title="아직 등록된 교환글이 없어요." description="첫 교환글을 등록해보세요!" />
+      )}
+
       <div className="pb-24">
         {posts.map((post, i) => (
           <div key={post.id}>
@@ -59,10 +81,17 @@ export default function HomePage() {
               avatarColor={post.author.avatarColor}
               haveCards={post.haveCards}
               wantCards={post.wantCards}
-              onOffer={requireAuth(() => router.push(POST_ROUTES.detail(post.id)))}
+              onOffer={requireAuth(() =>
+                // 상세 응답에 작성자가 없어(§7.3) 피드에서 받은 값을 넘긴다.
+                router.push(POST_ROUTES.detail(post.id, post.author.nickname, post.author.groups))
+              )}
             />
           </div>
         ))}
+        {hasNextPage && <div ref={sentinelRef} className="h-1" aria-hidden />}
+        {isFetchingNextPage && (
+          <p className="py-4 text-center text-body3 text-secondary-500">더 불러오는 중...</p>
+        )}
       </div>
 
       <FloatingCta
