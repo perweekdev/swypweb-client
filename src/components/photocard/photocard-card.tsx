@@ -1,9 +1,16 @@
+import Image from 'next/image';
 import type { Photocard } from '@/types/photocard.types';
 
+/** 이름 필드가 비어 있을 수 있다(홈 피드는 이미지 URL만 준다). */
+function cardLabel(card: Photocard): string {
+  const label = [card.memberName, card.albumName, card.versionName].filter(Boolean).join(' ');
+  return label || '포토카드';
+}
+
 /**
- * 포카 사진 자체 (뒤 박스 없음). 세로 비율 55:85, 이미지 에셋 전 색상 블록.
+ * 포카 사진 자체 (뒤 박스 없음). 세로 비율 55:85.
+ * imageUrl이 있으면 실제 이미지, 없으면 색상 블록(에셋 전 placeholder).
  * 선택/삭제 카드(SelectableCard·DeletableCard)와 오버레이 카드의 베이스.
- * 기본은 셀 너비를 채우는 55:85. className으로 고정 크기 지정 가능.
  */
 export function PhotocardImage({
   card,
@@ -12,13 +19,26 @@ export function PhotocardImage({
   card: Photocard;
   className?: string;
 }) {
+  if (card.imageUrl) {
+    return (
+      <div className={`relative overflow-hidden rounded-lg ${className}`}>
+        <Image
+          src={card.imageUrl}
+          alt={cardLabel(card)}
+          fill
+          sizes="(max-width: 420px) 20vw, 84px"
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
-    // TODO: imageUrl 제공 시 next/image로 교체
     <div
       className={`overflow-hidden rounded-lg ${className}`}
       style={{ backgroundColor: card.color }}
       role="img"
-      aria-label={`${card.memberName} ${card.albumName} ${card.versionName}`}
+      aria-label={cardLabel(card)}
     />
   );
 }

@@ -27,12 +27,22 @@ export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
 
 /**
  * 홈 교환글 하위 라우트 (HOME-003 상세 / HOME-004 교환할 포카 선택).
- * ⚠️ 교환 API 리소스명 미확정 → 제안값 `/posts`. 확정 시 이 상수만 수정.
+ * `id`는 서버의 `tradeSetId`다. (경로명 `/posts`는 유지 — 화면 IA 기준)
  * 자세한 규칙: docs/routing-conventions.md
  */
 export const POST_ROUTES = {
-  /** HOME-003 교환글 상세 */
-  detail: (id: string) => `/posts/${id}`,
+  /**
+   * HOME-003 교환글 상세.
+   * ⚠️ 상세 API 응답에 작성자가 없어(api-reference §7.3) 피드에서 받은 값을 쿼리로 전달한다.
+   * 서버가 author 필드를 추가하면 이 파라미터는 제거한다.
+   */
+  detail: (id: string, nickname?: string, groups?: string) => {
+    const query = new URLSearchParams();
+    if (nickname) query.set('n', nickname);
+    if (groups) query.set('g', groups);
+    const suffix = query.size > 0 ? `?${query}` : '';
+    return `/posts/${id}${suffix}`;
+  },
   /** HOME-004 교환할 포카 선택 */
   select: (id: string) => `/posts/${id}/select`,
 } as const;

@@ -8,4 +8,21 @@ export const queryKeys = {
     /** GET /users/me */
     me: () => [...queryKeys.users.all, 'me'] as const,
   },
+  groups: {
+    all: ['groups'] as const,
+    /** GET /users/groups */
+    list: () => [...queryKeys.groups.all, 'list'] as const,
+    /** GET /users/me/interest-groups */
+    interest: () => [...queryKeys.groups.all, 'interest'] as const,
+  },
+  home: {
+    all: ['home'] as const,
+    /** GET /home/trade-sets — groupId가 바뀌면 별도 캐시 */
+    feed: (groupId?: number) => [...queryKeys.home.all, 'feed', groupId ?? null] as const,
+  },
+  tradeSets: {
+    all: ['trade-sets'] as const,
+    /** GET /trade-sets/{id} */
+    detail: (id: string) => [...queryKeys.tradeSets.all, 'detail', id] as const,
+  },
 };
