@@ -12,6 +12,10 @@ export const ROUTES = {
   myGroups: '/my/groups',
   myGroupsAdd: '/my/groups/add',
   login: '/login',
+  /** 구글 로그인 성공/온보딩 콜백 — 서버가 프래그먼트(#)로 토큰을 실어 보낸다 */
+  oauthCallback: '/oauth/callback',
+  /** 탈퇴 회원 콜백 — 서버가 이 경로로만 쿼리(?error=WITHDRAWN_USER)를 보낸다 */
+  loginCallback: '/login/callback',
   signup: '/signup',
   terms: '/terms',
   privacy: '/privacy',

@@ -3,7 +3,11 @@
  *
  * ⚠️ not-found가 `RESOURCE_001`과 문자열 `"404"`로 혼재한다. 유효성 실패도
  * `VALIDATION_00x`와 문자열 `"400"`이 섞인다. 프론트에서 코드로 분기할 때는
- * 반드시 아래 헬퍼를 써서 두 경우를 모두 처리한다. (서버 통일 요청: be-request-list.md P2-2)
+ * 반드시 아래 헬퍼를 써서 두 경우를 모두 처리한다. (서버 통일 요청: be-request-list.md C-5)
+ *
+ * ⚠️ **HTTP status를 우선 신뢰할 것.** code와 status가 아예 어긋나는 케이스가 2건 있다.
+ *   - 재탈퇴: HTTP 409 / code `"403"`
+ *   - 홈 피드의 없는 groupId: HTTP 400 / code `RESOURCE_001`(보통 404용)
  */
 export const API_ERROR_CODES = {
   /** 404 — 그룹/앨범/버전/교환세트/채팅방 없음 */
@@ -13,6 +17,12 @@ export const API_ERROR_CODES = {
   /** 409 — 교환 세트 내 카드 중복 */
   TRADE_SET_CARD_DUPLICATED: 'RESOURCE_004',
 
+  /** 400 — 업로드한 프로필 이미지 파일이 비어 있음 */
+  EMPTY_IMAGE_FILE: 'VALIDATION_001',
+  /** 400 — 프로필 이미지 형식 오류(jpg/png 아님) */
+  INVALID_IMAGE_FORMAT: 'VALIDATION_004',
+  /** 413 — 프로필 이미지 5MB 초과 */
+  IMAGE_TOO_LARGE: 'VALIDATION_005',
   /** 400 — 유효하지 않은 포토카드 ID(컬렉션 저장) */
   INVALID_PHOTOCARD: 'VALIDATION_007',
   /** 400 — 유효하지 않은 교환 세트 카드 */
@@ -29,10 +39,15 @@ export const API_ERROR_CODES = {
   /** 403 — 채팅방 참여자 아님 */
   NOT_CHAT_ROOM_MEMBER: 'AUTH_007',
 
+  /** 500 — 프로필 이미지 S3 업로드 실패 */
+  IMAGE_UPLOAD_FAILED: 'SERVER_002',
+
   /** 404 — 일부 not-found가 이 문자열로 온다(사용자/약관/교환세트 상세) */
   LITERAL_NOT_FOUND: '404',
   /** 400 — 관심 그룹 ID 유효성 실패가 이 문자열로 온다 */
   LITERAL_BAD_REQUEST: '400',
+  /** ⚠️ HTTP는 **409** 인데 code만 이 값으로 온다 — 이미 탈퇴한 계정 재탈퇴 */
+  LITERAL_ALREADY_WITHDRAWN: '403',
 } as const;
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];

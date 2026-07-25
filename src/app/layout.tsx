@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+import { AuthProvider } from '@components/providers/auth-provider';
 import { QueryProvider } from '@components/providers/query-provider';
 import './globals.css';
 
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${jakarta.variable} h-full`}>
       <body className="flex min-h-full flex-col font-sans antialiased">
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
