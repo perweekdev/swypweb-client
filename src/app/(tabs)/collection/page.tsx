@@ -11,23 +11,29 @@ import { FloatingCta } from '@components/common/floating-cta';
 import { GroupFilter } from '@components/common/group-filter';
 import { Toast } from '@components/common/toast';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
-import { CollectionAlbumList } from '@components/collection/collection-album-list';
-import { PhotocardImage } from '@components/photocard/photocard-card';
+import { CollectionTree } from '@components/collection/collection-tree';
 import { PencilIcon } from '@components/icons';
+import { useInterestGroups } from '@hooks/use-groups';
 import { ROUTES, COLLECTION_ROUTES } from '@constants/routes';
-import { getCollectionAlbums } from '@/mocks/collection';
-import { mockInterestGroups } from '@/mocks/my';
-
-// COL-001 필터는 EX-001과 같다 — '전체' 칩 없이 내 관심 그룹만 나열한다(계측).
-const filterGroups = mockInterestGroups.map((g) => ({ id: g.id, name: g.name, color: g.color }));
 
 /** COL-001 컬렉션 메인 (그룹별 앨범 트리 + 보유 여부) */
 export default function CollectionPage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [selectedGroup, setSelectedGroup] = useState<string>(filterGroups[0]?.id ?? '');
+  const [pickedGroup, setPickedGroup] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
-  const { ownedByGroup, justSaved, consumeSaved } = useCollectionDraftStore();
+  const { justSaved, consumeSaved } = useCollectionDraftStore();
+
+  // COL-001 필터는 EX-001과 같다 — '전체' 칩 없이 내 관심 그룹만 나열한다(계측).
+  const { data: interestGroups } = useInterestGroups();
+  const filterGroups = (interestGroups ?? []).map((g) => ({
+    id: g.id,
+    name: g.name,
+    color: g.color,
+    logoUrl: g.logoUrl,
+  }));
+  // 선택 전에는 첫 관심 그룹을 보여준다(항상 한 그룹이 선택된 화면).
+  const selectedGroup = pickedGroup ?? filterGroups[0]?.id ?? '';
 
   // COL-003 편집 완료 직후 진입하면 토스트를 3초간 노출한다(그동안 편집하기 FAB이 위로 올라감)
   useEffect(() => {
@@ -62,9 +68,6 @@ export default function CollectionPage() {
     );
   }
 
-  const albums = getCollectionAlbums(selectedGroup);
-  const ownedIds = new Set(ownedByGroup[selectedGroup] ?? []);
-
   return (
     <>
       <TabHeader title="컬렉션" />
@@ -73,22 +76,15 @@ export default function CollectionPage() {
         className="px-4 pb-3 pt-1"
         groups={groups}
         value={selectedGroup}
-        onChange={(id) => setSelectedGroup(id ?? selectedGroup)}
+        onChange={(id) => setPickedGroup(id ?? selectedGroup)}
         onAdd={goAddGroup}
         addLabel="추가하기"
         showAll={false}
       />
 
-      <CollectionAlbumList
+      <CollectionTree
         className="flex-1 px-4 pb-28"
-        albums={albums}
-        // 조회 전용: 보유는 사진 그대로, 미보유는 딤 처리(선택 체크 없음)
-        renderCard={(card) => (
-          <PhotocardImage
-            card={card}
-            className={`aspect-[8/13] w-full ${ownedIds.has(card.id) ? '' : 'opacity-40'}`}
-          />
-        )}
+        groupId={selectedGroup ? Number(selectedGroup) : null}
       />
 
       <FloatingCta

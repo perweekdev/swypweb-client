@@ -15,6 +15,16 @@ export const queryKeys = {
     /** GET /users/me/interest-groups */
     interest: () => [...queryKeys.groups.all, 'interest'] as const,
   },
+  collections: {
+    all: ['collections'] as const,
+    /** 그룹의 앨범 목록 */
+    albums: (groupId: number) => [...queryKeys.collections.all, 'albums', groupId] as const,
+    /** 앨범의 버전 목록 */
+    versions: (albumId: number) => [...queryKeys.collections.all, 'versions', albumId] as const,
+    /** 버전의 포카 목록 */
+    photocards: (versionId: number) =>
+      [...queryKeys.collections.all, 'photocards', versionId] as const,
+  },
   home: {
     all: ['home'] as const,
     /** GET /home/trade-sets — groupId가 바뀌면 별도 캐시 */
