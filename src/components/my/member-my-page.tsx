@@ -16,7 +16,7 @@ import { TabHeader } from '@components/layout/tab-header';
 import { useDragScroll } from '@hooks/use-drag-scroll';
 import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
-import { mockInterestGroups } from '@/mocks/my';
+import { useInterestGroups } from '@hooks/use-groups';
 
 /** MY-001 회원 마이페이지 */
 export function MemberMyPage() {
@@ -24,6 +24,7 @@ export function MemberMyPage() {
   const logout = useAuthStore((s) => s.logout);
   const storedNickname = useAuthStore((s) => s.nickname);
   const { data: profile } = useMyProfile();
+  const { data: interestGroups } = useInterestGroups();
   // 조회 실패·로딩 중에는 세션에 남은 닉네임으로 degrade한다(화면을 비우지 않는다).
   const nickname = profile?.nickname ?? storedNickname ?? '';
   const [chatAlarm, setChatAlarm] = useState(true);
@@ -83,9 +84,9 @@ export function MemberMyPage() {
           ref={groupScrollRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pb-1 pt-3"
         >
-          {mockInterestGroups.map((group) => (
+          {interestGroups?.map((group) => (
             <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-              <GroupLogo size="lg" name={group.name} color={group.color} />
+              <GroupLogo size="lg" name={group.name} color={group.color} logoUrl={group.logoUrl} />
               <span className="w-full truncate text-center text-body3 text-secondary-900">
                 {group.name}
               </span>
