@@ -27,6 +27,11 @@ export const queryKeys = {
     /** COL-003 편집용 전체 트리 */
     tree: (groupId: number) => [...queryKeys.collections.all, 'tree', groupId] as const,
   },
+  matches: {
+    all: ['matches'] as const,
+    /** GET /trade-sets/{id}/matches */
+    list: (tradeSetId: string) => [...queryKeys.matches.all, 'list', tradeSetId] as const,
+  },
   home: {
     all: ['home'] as const,
     /** GET /home/trade-sets — groupId가 바뀌면 별도 캐시 */

@@ -56,8 +56,14 @@ export const EXCHANGE_ROUTES = {
   sets: `${ROUTES.exchange}/sets`,
   /** EX-004 나의 교환 세트 상세 — ⚠️ 디자인 미핸드오프, 경로만 예약 */
   setDetail: (id: string) => `${ROUTES.exchange}/sets/${id}`,
-  /** EX-005 매칭 결과 상세 */
-  matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
+  /**
+   * EX-005 매칭 결과 상세.
+   * `id`는 **상대의 교환 세트 id**다. 상세 응답에 상대 정보가 없어 닉네임을 쿼리로 전달한다.
+   */
+  matchDetail: (id: string, nickname?: string) =>
+    nickname
+      ? `${ROUTES.exchange}/matches/${id}?n=${encodeURIComponent(nickname)}`
+      : `${ROUTES.exchange}/matches/${id}`,
   /** EX-006 교환할 포카 선택 */
   matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
   /** EX-007 교환 세트 등록 — 등록 API가 그룹 단위라 대상 그룹을 쿼리로 넘긴다 */

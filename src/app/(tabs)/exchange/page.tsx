@@ -18,8 +18,8 @@ import { Toast } from '@components/common/toast';
 import { useDragScroll } from '@hooks/use-drag-scroll';
 import { useInterestGroups } from '@hooks/use-groups';
 import { useMyTradeSets } from '@hooks/use-trade-sets';
+import { useMatches } from '@hooks/use-matches';
 import { ROUTES, EXCHANGE_ROUTES } from '@constants/routes';
-import { mockMatchResults } from '@/mocks/exchange';
 
 /** EX-001 교환 메인 (내 교환 세트 + 교환 가능한 상대) */
 export default function ExchangePage() {
@@ -57,9 +57,11 @@ export default function ExchangePage() {
   // 비회원은 관심 그룹이 없는 상태로 본다 (memo: 비회원 기본 화면 = 관심 그룹 없음)
   const groups = isAuthenticated ? filterGroups : [];
 
-  // TODO(I8): 매칭은 추천 매칭 API 연동 시 교체한다.
-  const matches = mockMatchResults;
   const mySets = sets ?? [];
+  // 매칭은 **교환 세트 단위**로 계산된다. 그룹에 세트가 여러 개면 가장 최근(첫) 세트 기준으로 보여준다.
+  // TODO: 세트 선택 UI(EX-004)가 나오면 사용자가 고른 세트로 바꾼다.
+  const { data: matchPages } = useMatches(mySets[0]?.id ?? null);
+  const matches = matchPages?.pages.flatMap((page) => page.items) ?? [];
 
   if (groups.length === 0) {
     return (
@@ -138,11 +140,11 @@ export default function ExchangePage() {
               {i > 0 && <div className="mx-4 border-t border-secondary-50" />}
               <HomeFeedCard
                 className="cursor-pointer px-4 py-4"
-                name={match.partner.nickname}
-                avatarColor={match.partner.avatarColor}
+                name={match.nickname}
                 haveCards={match.haveCards}
                 wantCards={match.wantCards}
-                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id))}
+                // 상대 정보가 상세 응답에 없어(§7.3) 닉네임을 함께 넘긴다.
+                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id, match.nickname))}
                 onOffer={() => router.push(EXCHANGE_ROUTES.matchSelect(match.id))}
               />
             </div>
