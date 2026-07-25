@@ -77,29 +77,35 @@ export default function HomePage() {
       )}
 
       <div className="pb-24">
-        {posts.map((post, i) => (
-          <div key={post.id}>
-            {i > 0 && <div className="mx-4 border-t border-secondary-50" />}
-            <HomeFeedCard
-              className="px-4 py-4"
-              name={post.author.nickname}
-              avatarColor={post.author.avatarColor}
-              haveCards={post.haveCards}
-              wantCards={post.wantCards}
-              isMine={myUserId !== null && post.author.id === myUserId}
-              onOffer={requireAuth(() =>
-                // 상세 응답에 작성자가 없어(§7.3) 피드에서 받은 값을 넘긴다.
-                router.push(
-                  POST_ROUTES.detail(post.id, {
-                    nickname: post.author.nickname,
-                    groups: post.author.groups,
-                    authorId: post.author.id,
-                  })
-                )
-              )}
-            />
-          </div>
-        ))}
+        {posts.map((post, i) => {
+          // 상세 응답에 작성자가 없어(§7.3) 피드에서 받은 값을 쿼리로 넘긴다.
+          const openDetail = requireAuth(() =>
+            router.push(
+              POST_ROUTES.detail(post.id, {
+                nickname: post.author.nickname,
+                groups: post.author.groups,
+                authorId: post.author.id,
+              })
+            )
+          );
+
+          return (
+            <div key={post.id}>
+              {i > 0 && <div className="mx-4 border-t border-secondary-50" />}
+              <HomeFeedCard
+                className="cursor-pointer px-4 py-4"
+                name={post.author.nickname}
+                avatarColor={post.author.avatarColor}
+                haveCards={post.haveCards}
+                wantCards={post.wantCards}
+                isMine={myUserId !== null && post.author.id === myUserId}
+                // 내 글은 '제안하기'가 없으므로 카드 자체를 눌러 상세로 들어간다.
+                onClick={openDetail}
+                onOffer={openDetail}
+              />
+            </div>
+          );
+        })}
         {hasNextPage && <div ref={sentinelRef} className="h-1" aria-hidden />}
         {isFetchingNextPage && (
           <p className="py-4 text-center text-body3 text-secondary-500">더 불러오는 중...</p>
