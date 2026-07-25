@@ -2,7 +2,7 @@ import Image from 'next/image';
 import type { Photocard } from '@/types/photocard.types';
 
 /** 이름 필드가 비어 있을 수 있다(홈 피드는 이미지 URL만 준다). */
-function cardLabel(card: Photocard): string {
+export function cardLabel(card: Photocard): string {
   const label = [card.memberName, card.albumName, card.versionName].filter(Boolean).join(' ');
   return label || '포토카드';
 }

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import { cardLabel } from '@components/photocard/photocard-card';
 import type { Photocard } from '@/types/photocard.types';
 
 /**
@@ -19,13 +21,22 @@ export function HaveSetCard({
 }) {
   return (
     <div className={`relative aspect-[108/120] overflow-hidden rounded-xl ${className}`}>
-      {/* TODO: imageUrl 제공 시 next/image로 교체 */}
-      <div
-        className="size-full"
-        style={{ backgroundColor: card.color }}
-        role="img"
-        aria-label={`${card.memberName} ${card.albumName} ${card.versionName}`}
-      />
+      {card.imageUrl ? (
+        <Image
+          src={card.imageUrl}
+          alt={cardLabel(card)}
+          fill
+          sizes="(max-width: 420px) 30vw, 108px"
+          className="object-cover"
+        />
+      ) : (
+        <div
+          className="size-full"
+          style={{ backgroundColor: card.color }}
+          role="img"
+          aria-label={cardLabel(card)}
+        />
+      )}
 
       <span className="absolute left-2 top-2 text-body3 font-medium text-white">{label}</span>
 
