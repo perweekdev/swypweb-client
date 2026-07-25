@@ -24,6 +24,8 @@ export const queryKeys = {
     /** 버전의 포카 목록 */
     photocards: (versionId: number) =>
       [...queryKeys.collections.all, 'photocards', versionId] as const,
+    /** COL-003 편집용 전체 트리 */
+    tree: (groupId: number) => [...queryKeys.collections.all, 'tree', groupId] as const,
   },
   home: {
     all: ['home'] as const,

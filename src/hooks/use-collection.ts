@@ -1,7 +1,13 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { getAlbums, getPhotocards, getVersions } from '@lib/api/collections';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  getAlbums,
+  getGroupCollectionTree,
+  getPhotocards,
+  getVersions,
+  saveOwnedPhotocards,
+} from '@lib/api/collections';
 import { queryKeys } from '@lib/query-keys';
 import { useAuthStore } from '@store/auth-store';
 
@@ -46,5 +52,30 @@ export function useVersionPhotocards(versionId: number) {
     queryFn: () => getPhotocards(versionId),
     enabled: ready,
     throwOnError: false,
+  });
+}
+
+/**
+ * COL-003 편집용 전체 트리.
+ * 저장이 그룹 전체를 덮어쓰므로 편집 화면은 안 펼친 앨범까지 모두 알고 있어야 한다.
+ */
+export function useGroupCollectionTree(groupId: number | null) {
+  const ready = useAuthReady();
+
+  return useQuery({
+    queryKey: queryKeys.collections.tree(groupId ?? 0),
+    queryFn: () => getGroupCollectionTree(groupId as number),
+    enabled: ready && groupId !== null,
+    throwOnError: false,
+  });
+}
+
+/** 저장 성공 시 조회 트리(COL-001)까지 함께 갱신한다. */
+export function useSaveCollection(groupId: number | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (photoCardIds: number[]) => saveOwnedPhotocards(groupId as number, photoCardIds),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.collections.all }),
   });
 }

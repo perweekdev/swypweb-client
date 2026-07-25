@@ -54,6 +54,44 @@ export function getPhotocards(versionId: number) {
   >(`/users/collections/versions/${versionId}/photocards`);
 }
 
+export interface CollectionTreeVersion {
+  versionId: number;
+  name: string;
+  cards: CollectionPhotocard[];
+}
+
+export interface CollectionTreeAlbum {
+  albumId: number;
+  name: string;
+  versions: CollectionTreeVersion[];
+}
+
+/**
+ * 그룹의 **전체 트리**(앨범→버전→포카)를 한 번에 모은다.
+ *
+ * COL-003 편집 전용이다. 저장(6.4)이 **그룹 전체를 덮어쓰기** 때문에,
+ * 화면에 안 펼친 앨범의 보유분까지 알고 있지 않으면 저장 시 그 정보가 지워진다.
+ * (조회 화면 COL-001은 지연 로딩을 쓴다 — `components/collection/collection-tree`)
+ *
+ * 요청 수는 1 + 앨범수 + 버전수. 편집 진입 시 1회만 발생한다.
+ */
+export async function getGroupCollectionTree(groupId: number): Promise<CollectionTreeAlbum[]> {
+  const { albums } = await getAlbums(groupId);
+
+  return Promise.all(
+    albums.map(async (album) => {
+      const { versions } = await getVersions(album.albumId);
+      const withCards = await Promise.all(
+        versions.map(async (version) => {
+          const { photoCards } = await getPhotocards(version.versionId);
+          return { versionId: version.versionId, name: version.name, cards: photoCards };
+        })
+      );
+      return { albumId: album.albumId, name: album.name, versions: withCards };
+    })
+  );
+}
+
 /**
  * 6.4 그룹 단위 일괄 저장 — 보유 포카 id 집합을 **통째로 교체**한다.
  * 그룹 밖 포카 id가 섞이면 400 `VALIDATION_007`.
