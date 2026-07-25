@@ -7,7 +7,10 @@ import { Button } from '@components/ui/button';
 import { BottomSheet } from '@components/ui/bottom-sheet';
 import { SelectableCardGrid } from '@components/photocard/selectable-card-grid';
 import { PhotocardImage } from '@components/photocard/photocard-card';
-import { ROUTES } from '@constants/routes';
+import { useCreateChatRoom } from '@hooks/use-chat';
+import { isApiError } from '@lib/api-error';
+import { API_ERROR_CODES } from '@constants/api-error-codes';
+import { CHAT_ROUTES } from '@constants/routes';
 import type { Photocard } from '@/types/photocard.types';
 
 const toggleIn = (set: Set<string>, id: string) => {
@@ -46,25 +49,57 @@ function PreviewRow({
  * 계측: 제목 20 semibold `#000000` 2줄 · `완료` 53×38 pill(비활성 secondary-100 / 활성 secondary-900).
  */
 export function OfferCardSelector({
+  targetTradeSetId,
   myCards,
   partnerCards,
 }: {
+  /** 상대의 교환 세트 id — 제안 대상 */
+  targetTradeSetId: string;
   myCards: Photocard[];
   partnerCards: Photocard[];
 }) {
   const router = useRouter();
+  const createChatRoom = useCreateChatRoom();
   const [myPicked, setMyPicked] = useState<Set<string>>(new Set());
   const [partnerPicked, setPartnerPicked] = useState<Set<string>>(new Set());
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 스토리보드: 내 포카/상대방 포카 각각 1장 이상 선택 시 '완료' 활성화
   const canComplete = myPicked.size > 0 && partnerPicked.size > 0;
   const selectedMy = myCards.filter((c) => myPicked.has(c.id));
   const selectedPartner = partnerCards.filter((c) => partnerPicked.has(c.id));
 
-  const propose = () => {
-    // TODO: 실제 교환 제안 → 채팅방 생성 API(첫 메시지 전송 시 생성). 현재는 채팅 목록으로 이동(mock).
-    router.push(ROUTES.chat);
+  const propose = async () => {
+    if (createChatRoom.isPending) return;
+    setError(null);
+
+    try {
+      const { chatRoomId } = await createChatRoom.mutateAsync({
+        targetTradeSetId: Number(targetTradeSetId),
+        // 내가 **받을** 카드 = 상대방 포카 / 내가 **줄** 카드 = 내 포카
+        receiveCardIds: [...partnerPicked].map(Number),
+        giveCardIds: [...myPicked].map(Number),
+      });
+      router.replace(CHAT_ROUTES.room(String(chatRoomId)));
+    } catch (caught) {
+      if (!isApiError(caught)) {
+        setError('잠시 후 다시 시도해주세요.');
+        return;
+      }
+      if (caught.code === API_ERROR_CODES.SELF_TRADE_NOT_ALLOWED) {
+        setError('내가 등록한 교환 세트에는 제안할 수 없어요.');
+        return;
+      }
+      if (
+        caught.code === API_ERROR_CODES.INVALID_RECEIVE_CARD ||
+        caught.code === API_ERROR_CODES.INVALID_GIVE_CARD
+      ) {
+        setError('선택한 포카를 다시 확인해주세요.');
+        return;
+      }
+      setError(caught.message);
+    }
   };
 
   return (
@@ -114,8 +149,9 @@ export function OfferCardSelector({
         <h3 className="text-h1 text-secondary-900">제안할 포카를 확인해주세요</h3>
         <PreviewRow label="내 포카" cards={selectedMy} className="mt-4" />
         <PreviewRow label="상대방 포카" cards={selectedPartner} className="mt-4" />
-        <Button size="lg" onClick={propose} className="mt-6">
-          채팅으로 교환 제안하기
+        {error && <p className="mt-3 text-center text-body3 text-red-900">{error}</p>}
+        <Button size="lg" onClick={propose} disabled={createChatRoom.isPending} className="mt-6">
+          {createChatRoom.isPending ? '제안하는 중...' : '채팅으로 교환 제안하기'}
         </Button>
       </BottomSheet>
     </>
