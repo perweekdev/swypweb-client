@@ -6,6 +6,7 @@ import { ChatInputBar } from '@components/chat/chat-input-bar';
 import { ChatMatchInfo } from '@components/chat/chat-match-info';
 import { ChatMessageList } from '@components/chat/chat-message-list';
 import { useChatHeader, useChatMessages, useChatProposal, useMarkChatRead } from '@hooks/use-chat';
+import { useChatSocket } from '@hooks/use-chat-socket';
 
 const EMPTY_SET = { myCards: [], partnerCards: [] };
 
@@ -24,6 +25,7 @@ export function ChatRoomView() {
   const { data: proposal } = useChatProposal(chatId);
   const { data: messagePages, isPending, isError } = useChatMessages(chatId);
   useMarkChatRead(chatId);
+  const { connected, sendMessage } = useChatSocket(chatId);
 
   // 서버는 최신 메시지부터 내려주므로 화면 표시용으로 시간순(오래된 것 → 최신)으로 뒤집는다.
   const messages = [...(messagePages?.pages.flatMap((page) => page.items) ?? [])].reverse();
@@ -58,7 +60,7 @@ export function ChatRoomView() {
         />
       )}
 
-      <ChatInputBar />
+      <ChatInputBar onSend={sendMessage} disabled={!connected} />
     </>
   );
 }
