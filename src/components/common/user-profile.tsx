@@ -10,6 +10,7 @@ import { Button } from '@components/ui/button';
 export function UserProfile({
   name,
   avatarColor,
+  avatarUrl,
   groups,
   variant,
   onAction,
@@ -17,6 +18,7 @@ export function UserProfile({
 }: {
   name: string;
   avatarColor?: string;
+  avatarUrl?: string | null;
   groups?: string;
   variant: 'editable' | 'offer' | 'info';
   onAction?: () => void;
@@ -24,7 +26,7 @@ export function UserProfile({
 }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <Avatar className="size-12 shrink-0" color={avatarColor} />
+      <Avatar className="size-12 shrink-0" color={avatarColor} src={avatarUrl} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-button1 text-secondary-900">{name}</p>
         {groups && <p className="truncate text-body3 text-secondary-500">{groups}</p>}

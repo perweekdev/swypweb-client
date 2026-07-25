@@ -89,8 +89,12 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
 async function request<T>(method: string, path: string, options: BodyOptions = {}): Promise<T> {
   const { query, body, auth = true, signal } = options;
 
+  // multipart는 브라우저가 boundary를 포함해 Content-Type을 직접 붙여야 한다.
+  // 여기서 지정하면 boundary가 빠져 서버가 파트를 파싱하지 못한다.
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json';
 
   const accessToken = auth ? useAuthStore.getState().accessToken : null;
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
@@ -100,7 +104,7 @@ async function request<T>(method: string, path: string, options: BodyOptions = {
     response = await fetch(buildUrl(path, query), {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
       signal,
     });
   } catch (error) {

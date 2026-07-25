@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useMyProfile } from '@hooks/use-my-profile';
+import { isApiError } from '@lib/api-error';
+import { withdraw } from '@lib/api/users';
 import { useAuthStore } from '@store/auth-store';
 import { Toggle } from '@components/ui/toggle';
 import { SettingRow } from '@components/ui/setting-row';
@@ -13,18 +16,43 @@ import { TabHeader } from '@components/layout/tab-header';
 import { useDragScroll } from '@hooks/use-drag-scroll';
 import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
-import { mockInterestGroups, mockUser } from '@/mocks/my';
+import { mockInterestGroups } from '@/mocks/my';
 
 /** MY-001 회원 마이페이지 */
 export function MemberMyPage() {
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
-  // 온보딩에서 받은 닉네임이 있으면 그것이 우선 (BE 연동 전까지 목이 기본값)
-  const nickname = useAuthStore((s) => s.nickname) ?? mockUser.nickname;
+  const storedNickname = useAuthStore((s) => s.nickname);
+  const { data: profile } = useMyProfile();
+  // 조회 실패·로딩 중에는 세션에 남은 닉네임으로 degrade한다(화면을 비우지 않는다).
+  const nickname = profile?.nickname ?? storedNickname ?? '';
   const [chatAlarm, setChatAlarm] = useState(true);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [withdrawError, setWithdrawError] = useState<string | null>(null);
   const groupScrollRef = useDragScroll<HTMLUListElement>();
+
+  const confirmWithdraw = async () => {
+    setWithdrawOpen(false);
+    setWithdrawError(null);
+
+    try {
+      await withdraw();
+    } catch (caught) {
+      // 이미 탈퇴한 계정(409)은 목적이 이미 달성된 상태이므로 정상 종료로 본다.
+      const alreadyWithdrawn = isApiError(caught) && caught.status === 409;
+      if (!alreadyWithdrawn) {
+        setWithdrawError(
+          isApiError(caught) ? caught.message : '탈퇴에 실패했어요. 잠시 후 다시 시도해주세요.'
+        );
+        return;
+      }
+    }
+
+    // ⚠️ 서버가 토큰을 무효화하지 않는다(최대 1시간 유효) → 즉시 로컬 토큰을 폐기한다.
+    logout();
+    router.replace(ROUTES.home);
+  };
 
   return (
     <>
@@ -33,6 +61,7 @@ export function MemberMyPage() {
       {/* 프로필 */}
       <UserProfile
         name={nickname}
+        avatarUrl={profile?.profileImageUrl}
         variant="editable"
         onAction={() => router.push(ROUTES.myProfile)}
         className="px-4 py-4"
@@ -98,6 +127,9 @@ export function MemberMyPage() {
           회원탈퇴
         </button>
       </div>
+      {withdrawError && (
+        <p className="mt-2 px-4 text-center text-body3 text-red-900">{withdrawError}</p>
+      )}
 
       <ConfirmDialog
         open={logoutOpen}
@@ -115,11 +147,7 @@ export function MemberMyPage() {
         title="정말 탈퇴하실 건가요?"
         confirmText="탈퇴"
         onCancel={() => setWithdrawOpen(false)}
-        onConfirm={() => {
-          // TODO: 실제 회원탈퇴 API 연동 (현재는 로그아웃 처리)
-          setWithdrawOpen(false);
-          logout();
-        }}
+        onConfirm={confirmWithdraw}
       />
     </>
   );
