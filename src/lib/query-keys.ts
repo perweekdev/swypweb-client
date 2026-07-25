@@ -34,6 +34,8 @@ export const queryKeys = {
   },
   tradeSets: {
     all: ['trade-sets'] as const,
+    /** GET /trade-sets?groupId= */
+    list: (groupId: number) => [...queryKeys.tradeSets.all, 'list', groupId] as const,
     /** GET /trade-sets/{id} */
     detail: (id: string) => [...queryKeys.tradeSets.all, 'detail', id] as const,
   },

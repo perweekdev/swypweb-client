@@ -60,8 +60,13 @@ export const EXCHANGE_ROUTES = {
   matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
   /** EX-006 교환할 포카 선택 */
   matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
-  /** EX-008 교환 세트 확인 */
-  registerConfirm: `${ROUTES.exchangeRegister}/confirm`,
+  /** EX-007 교환 세트 등록 — 등록 API가 그룹 단위라 대상 그룹을 쿼리로 넘긴다 */
+  register: (groupId: string) => `${ROUTES.exchangeRegister}?group=${encodeURIComponent(groupId)}`,
+  /** EX-008 교환 세트 확인 (등록 API가 그룹 단위라 그룹을 함께 넘긴다) */
+  registerConfirm: (groupId: string) =>
+    `${ROUTES.exchangeRegister}/confirm?group=${encodeURIComponent(groupId)}`,
+  /** EX-003 나의 교환 세트 관리 (그룹 단위 목록) */
+  setsOf: (groupId: string) => `${ROUTES.exchange}/sets?group=${encodeURIComponent(groupId)}`,
 } as const;
 
 /**
