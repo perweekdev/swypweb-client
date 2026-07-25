@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  createChatRoom,
   getChatHeader,
   getChatMessages,
   getChatProposal,
@@ -74,6 +75,19 @@ export function useChatMessages(chatId: string) {
     getNextPageParam: getNextCursorParam,
     enabled: ready && chatId.length > 0 && myUserId !== undefined,
     throwOnError: false,
+  });
+}
+
+/**
+ * 교환 제안 → 채팅방 생성 (HOME-004 / EX-006).
+ * 성공하면 채팅 목록을 갱신한다(새 방이 목록 맨 앞에 온다).
+ */
+export function useCreateChatRoom() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createChatRoom,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() }),
   });
 }
 
