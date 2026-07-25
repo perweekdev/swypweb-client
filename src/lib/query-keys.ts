@@ -27,6 +27,13 @@ export const queryKeys = {
     /** COL-003 편집용 전체 트리 */
     tree: (groupId: number) => [...queryKeys.collections.all, 'tree', groupId] as const,
   },
+  chat: {
+    all: ['chat'] as const,
+    rooms: () => [...queryKeys.chat.all, 'rooms'] as const,
+    header: (chatId: string) => [...queryKeys.chat.all, 'header', chatId] as const,
+    proposal: (chatId: string) => [...queryKeys.chat.all, 'proposal', chatId] as const,
+    messages: (chatId: string) => [...queryKeys.chat.all, 'messages', chatId] as const,
+  },
   matches: {
     all: ['matches'] as const,
     /** GET /trade-sets/{id}/matches */
