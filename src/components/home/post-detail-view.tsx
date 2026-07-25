@@ -8,6 +8,7 @@ import { DetailActionBar } from '@components/common/detail-action-bar';
 import { EmptyState } from '@components/common/empty-state';
 import { getTradeSetDetail } from '@lib/api/trade-sets';
 import { queryKeys } from '@lib/query-keys';
+import { useMyProfile } from '@hooks/use-my-profile';
 import { POST_ROUTES } from '@constants/routes';
 
 /**
@@ -22,6 +23,12 @@ export function PostDetailView() {
   const searchParams = useSearchParams();
   const nickname = searchParams.get('n') ?? '';
   const groups = searchParams.get('g') ?? undefined;
+  const authorId = searchParams.get('u');
+
+  // 내 교환글에는 제안할 수 없다(서버 AUTH_006) → CTA 자체를 숨긴다.
+  const { data: myProfile } = useMyProfile();
+  const isMine =
+    authorId !== null && myProfile !== undefined && authorId === String(myProfile.userId);
 
   const { data, isPending, isError } = useQuery({
     queryKey: queryKeys.tradeSets.detail(tradeSetId),
@@ -52,12 +59,18 @@ export function PostDetailView() {
           <div className="flex-1 px-4 pb-4 pt-1">
             <ExchangeCardSections haveCards={data.haveCards} wantCards={data.wantCards} />
           </div>
-          <DetailActionBar
-            name={nickname}
-            groups={groups}
-            label="교환할 포카 선택하기"
-            href={POST_ROUTES.select(data.id)}
-          />
+          {isMine ? (
+            <p className="sticky bottom-0 bg-background px-4 pb-8 pt-3 text-center text-body3 text-secondary-500">
+              내가 등록한 교환글이에요.
+            </p>
+          ) : (
+            <DetailActionBar
+              name={nickname}
+              groups={groups}
+              label="교환할 포카 선택하기"
+              href={POST_ROUTES.select(data.id)}
+            />
+          )}
         </>
       )}
     </>

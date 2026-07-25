@@ -36,10 +36,12 @@ export const POST_ROUTES = {
    * ⚠️ 상세 API 응답에 작성자가 없어(api-reference §7.3) 피드에서 받은 값을 쿼리로 전달한다.
    * 서버가 author 필드를 추가하면 이 파라미터는 제거한다.
    */
-  detail: (id: string, nickname?: string, groups?: string) => {
+  detail: (id: string, author?: { nickname?: string; groups?: string; authorId?: string }) => {
     const query = new URLSearchParams();
-    if (nickname) query.set('n', nickname);
-    if (groups) query.set('g', groups);
+    if (author?.nickname) query.set('n', author.nickname);
+    if (author?.groups) query.set('g', author.groups);
+    // 내 글이면 제안 CTA를 숨겨야 해서 작성자 id도 함께 넘긴다.
+    if (author?.authorId) query.set('u', author.authorId);
     const suffix = query.size > 0 ? `?${query}` : '';
     return `/posts/${id}${suffix}`;
   },

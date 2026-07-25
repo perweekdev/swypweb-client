@@ -11,6 +11,7 @@ import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 import { FloatingCta } from '@components/common/floating-cta';
 import { useHomeFeed, useInfiniteScrollSentinel } from '@hooks/use-home-feed';
 import { useAllGroups, useInterestGroups } from '@hooks/use-groups';
+import { useMyProfile } from '@hooks/use-my-profile';
 import { ROUTES, POST_ROUTES } from '@constants/routes';
 
 /** HOME-001 홈 피드 (교환글 탐색 메인) */
@@ -19,6 +20,10 @@ export default function HomePage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
+
+  // 내 교환글에는 제안할 수 없다(서버 AUTH_006) → 목록에서 미리 버튼을 숨긴다.
+  const { data: myProfile } = useMyProfile();
+  const myUserId = myProfile ? String(myProfile.userId) : null;
 
   // 비로그인은 그룹 목록을 못 받으므로(인증 필요) 필터가 비어 '전체'만 보인다 — 의도된 동작.
   const { data: allGroups } = useAllGroups();
@@ -81,9 +86,16 @@ export default function HomePage() {
               avatarColor={post.author.avatarColor}
               haveCards={post.haveCards}
               wantCards={post.wantCards}
+              isMine={myUserId !== null && post.author.id === myUserId}
               onOffer={requireAuth(() =>
                 // 상세 응답에 작성자가 없어(§7.3) 피드에서 받은 값을 넘긴다.
-                router.push(POST_ROUTES.detail(post.id, post.author.nickname, post.author.groups))
+                router.push(
+                  POST_ROUTES.detail(post.id, {
+                    nickname: post.author.nickname,
+                    groups: post.author.groups,
+                    authorId: post.author.id,
+                  })
+                )
               )}
             />
           </div>
