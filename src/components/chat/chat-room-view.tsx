@@ -8,15 +8,13 @@ import { ChatMessageList } from '@components/chat/chat-message-list';
 import { useChatHeader, useChatMessages, useChatProposal, useMarkChatRead } from '@hooks/use-chat';
 import { useChatSocket } from '@hooks/use-chat-socket';
 
-const EMPTY_SET = { myCards: [], partnerCards: [] };
-
 /**
  * CHAT-002 채팅방.
  *
  * 상단 요약은 헤더(8.3)의 대표 카드가 아니라 **제안 카드 전체(8.4)** 를 쓴다.
  * 헤더는 대표 1장 + 개수만 주는데 화면은 전체 목록이 필요하고, CHAT-003 상세와도 같은 데이터다.
  *
- * ⚠️ 메시지 전송은 WebSocket(I10)이라 이 단계에서는 조회만 동작한다.
+ * 메시지 전송·수신은 STOMP WebSocket이다(`useChatSocket`).
  */
 export function ChatRoomView() {
   const chatId = String(useParams().id ?? '');
@@ -35,11 +33,15 @@ export function ChatRoomView() {
       {/* 헤더 + 교환 정보는 스크롤해도 상단에 유지 (memo) */}
       <div className="sticky top-0 z-10 bg-background">
         <Header title={header?.partnerNickname ?? ''} />
-        <ChatMatchInfo
-          roomId={chatId}
-          exchangeSet={proposal ?? EMPTY_SET}
-          status={header?.status ?? 'ongoing'}
-        />
+        {/* 제안 카드가 오기 전에는 렌더하지 않는다 — 요약이 대표 카드 1장을 직접 참조해서,
+            빈 배열이면 undefined 접근으로 터진다. */}
+        {proposal && (
+          <ChatMatchInfo
+            roomId={chatId}
+            exchangeSet={proposal}
+            status={header?.status ?? 'ongoing'}
+          />
+        )}
       </div>
 
       {isPending && (

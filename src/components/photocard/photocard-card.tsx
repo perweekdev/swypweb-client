@@ -53,13 +53,24 @@ export function PhotocardBox({ card, className = '' }: { card: Photocard; classN
     <div
       className={`flex aspect-[110/129] items-center justify-center rounded-2xl bg-secondary-10 ${className}`}
     >
-      {/* TODO: imageUrl 제공 시 next/image로 교체 */}
-      <div
-        className="aspect-[55/85] h-[86%] rounded"
-        style={{ backgroundColor: card.color }}
-        role="img"
-        aria-label={`${card.memberName} ${card.albumName} ${card.versionName}`}
-      />
+      {card.imageUrl ? (
+        <div className="relative aspect-[55/85] h-[86%] overflow-hidden rounded">
+          <Image
+            src={card.imageUrl}
+            alt={cardLabel(card)}
+            fill
+            sizes="(max-width: 420px) 30vw, 110px"
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <div
+          className="aspect-[55/85] h-[86%] rounded"
+          style={{ backgroundColor: card.color }}
+          role="img"
+          aria-label={cardLabel(card)}
+        />
+      )}
     </div>
   );
 }
