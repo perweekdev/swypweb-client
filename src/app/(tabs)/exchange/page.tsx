@@ -118,14 +118,20 @@ export default function ExchangePage() {
             {mySets.map((set) => (
               <li key={set.id} className="shrink-0">
                 {/*
-                  세트 박스를 고르면 아래 '교환 가능한 상대'가 그 세트 기준으로 바뀐다(디자인 EX-001-matching).
-                  매칭이 교환 세트 단위로 계산되기 때문이며, 상세(EX-004)는 EX-003에서 진입한다.
+                  세트 박스 한 번 누르면 **선택 전환** — 아래 '교환 가능한 상대'가 그 세트 기준으로 바뀐다
+                  (매칭이 교환 세트 단위로 계산된다. 디자인 EX-001-matching).
+                  **이미 선택된 세트를 다시 누르면 상세(EX-004)** 로 들어간다.
+                  첫 세트는 기본 선택 상태라, 첫 클릭이 곧 상세 진입이 된다.
                 */}
                 {/* 목록 API는 축별 대표 카드 1장만 준다 → 나머지는 +N으로 표기 */}
                 <button
                   type="button"
                   aria-pressed={set.id === selectedSetId}
-                  onClick={() => setPickedSet(set.id)}
+                  onClick={() =>
+                    set.id === selectedSetId
+                      ? router.push(EXCHANGE_ROUTES.setDetail(set.id))
+                      : setPickedSet(set.id)
+                  }
                   className="block text-left"
                 >
                   <ExchangeSetFrame
