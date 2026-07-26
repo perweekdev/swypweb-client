@@ -26,6 +26,7 @@ export default function ExchangePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [pickedGroup, setPickedGroup] = useState<string | null>(null);
+  const [pickedSet, setPickedSet] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const setScrollRef = useDragScroll<HTMLUListElement>();
   const { justRegistered, consumeRegistered } = useExchangeDraftStore();
@@ -58,9 +59,10 @@ export default function ExchangePage() {
   const groups = isAuthenticated ? filterGroups : [];
 
   const mySets = sets ?? [];
-  // 매칭은 **교환 세트 단위**로 계산된다. 그룹에 세트가 여러 개면 가장 최근(첫) 세트 기준으로 보여준다.
-  // TODO: 세트 선택 UI(EX-004)가 나오면 사용자가 고른 세트로 바꾼다.
-  const { data: matchPages } = useMatches(mySets[0]?.id ?? null);
+  // 매칭은 **교환 세트 단위**로 계산된다 → 사용자가 고른 세트의 매칭을 보여준다.
+  // 고르기 전(또는 그룹을 바꿔 이전 선택이 사라졌으면) 가장 최근 세트를 기준으로 한다.
+  const selectedSetId = mySets.find((set) => set.id === pickedSet)?.id ?? mySets[0]?.id ?? null;
+  const { data: matchPages } = useMatches(selectedSetId);
   const matches = matchPages?.pages.flatMap((page) => page.items) ?? [];
 
   if (groups.length === 0) {
@@ -113,17 +115,23 @@ export default function ExchangePage() {
           />
         ) : (
           <ul ref={setScrollRef} className="mt-2 flex gap-2 overflow-x-auto scrollbar-hide px-4">
-            {mySets.map((set, i) => (
+            {mySets.map((set) => (
               <li key={set.id} className="shrink-0">
-                {/* TODO: 세트 선택 → EX-004 나의 교환 세트 상세 (디자인 미핸드오프) */}
-                {/* 최신(=첫 번째) 세트는 보라 테두리로 강조 (EX-008) */}
+                {/* 세트를 고르면 아래 '교환 가능한 상대'가 그 세트 기준으로 바뀐다(매칭은 세트 단위). */}
                 {/* 목록 API는 축별 대표 카드 1장만 준다 → 나머지는 +N으로 표기 */}
-                <ExchangeSetFrame
-                  variant={i === 0 ? 'highlighted' : 'default'}
-                  className="w-[276px]"
-                  have={{ card: set.haveRepresentative, extraCount: set.haveCount - 1 }}
-                  want={{ card: set.wantRepresentative, extraCount: set.wantCount - 1 }}
-                />
+                <button
+                  type="button"
+                  aria-pressed={set.id === selectedSetId}
+                  onClick={() => setPickedSet(set.id)}
+                  className="block text-left"
+                >
+                  <ExchangeSetFrame
+                    variant={set.id === selectedSetId ? 'highlighted' : 'default'}
+                    className="w-[276px]"
+                    have={{ card: set.haveRepresentative, extraCount: set.haveCount - 1 }}
+                    want={{ card: set.wantRepresentative, extraCount: set.wantCount - 1 }}
+                  />
+                </button>
               </li>
             ))}
           </ul>
