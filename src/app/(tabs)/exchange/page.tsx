@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@store/auth-store';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { TabHeader } from '@components/layout/tab-header';
@@ -22,14 +22,29 @@ import { useMatches } from '@hooks/use-matches';
 import { ROUTES, EXCHANGE_ROUTES } from '@constants/routes';
 
 /** EX-001 교환 메인 (내 교환 세트 + 교환 가능한 상대) */
-export default function ExchangePage() {
+function ExchangeView() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [pickedGroup, setPickedGroup] = useState<string | null>(null);
-  const [pickedSet, setPickedSet] = useState<string | null>(null);
+  // 상세(EX-004)에 다녀와도 보던 그룹·세트가 유지되도록 선택을 URL에 남긴다.
+  // 화면이 다시 마운트되면서 컴포넌트 state는 사라지지만, 쿼리는 뒤로가기로 그대로 복원된다.
+  const searchParams = useSearchParams();
+  const [pickedGroup, setPickedGroup] = useState<string | null>(searchParams.get('group'));
+  const [pickedSet, setPickedSet] = useState<string | null>(searchParams.get('set'));
   const [loginOpen, setLoginOpen] = useState(false);
   const setScrollRef = useDragScroll<HTMLUListElement>();
   const { justRegistered, consumeRegistered } = useExchangeDraftStore();
+
+  // push가 아니라 replace다 — 선택할 때마다 뒤로가기 단계가 쌓이면 안 된다.
+  const rememberSelection = useCallback(
+    (group: string | null, set: string | null) => {
+      const query = new URLSearchParams();
+      if (group) query.set('group', group);
+      if (set) query.set('set', set);
+      const search = query.toString();
+      router.replace(search ? `${ROUTES.exchange}?${search}` : ROUTES.exchange, { scroll: false });
+    },
+    [router]
+  );
 
   // EX-001 필터는 HOME-001과 달리 '전체'가 없고 **내 관심 그룹만** 나열한다(계측 + 스토리보드).
   const { data: interestGroups } = useInterestGroups();
@@ -91,7 +106,13 @@ export default function ExchangePage() {
         className="px-4 pb-3 pt-1"
         groups={groups}
         value={selectedGroup}
-        onChange={(id) => setPickedGroup(id ?? selectedGroup)}
+        onChange={(id) => {
+          // 그룹이 바뀌면 세트 목록 자체가 달라지므로 세트 선택은 버린다.
+          const next = id ?? selectedGroup;
+          setPickedGroup(next);
+          setPickedSet(null);
+          rememberSelection(next, null);
+        }}
         onAdd={goAddGroup}
         addLabel="추가하기"
         showAll={false}
@@ -127,11 +148,16 @@ export default function ExchangePage() {
                 <button
                   type="button"
                   aria-pressed={set.id === selectedSetId}
-                  onClick={() =>
-                    set.id === selectedSetId
-                      ? router.push(EXCHANGE_ROUTES.setDetail(set.id))
-                      : setPickedSet(set.id)
-                  }
+                  onClick={() => {
+                    if (set.id === selectedSetId) {
+                      // 기본 선택(첫 세트)은 아직 URL에 없다 — 상세에서 돌아올 자리를 먼저 남긴다.
+                      rememberSelection(selectedGroup, set.id);
+                      router.push(EXCHANGE_ROUTES.setDetail(set.id));
+                      return;
+                    }
+                    setPickedSet(set.id);
+                    rememberSelection(selectedGroup, set.id);
+                  }}
                   className="block text-left"
                 >
                   <ExchangeSetFrame
@@ -177,5 +203,13 @@ export default function ExchangePage() {
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
+  );
+}
+
+export default function ExchangePage() {
+  return (
+    <Suspense>
+      <ExchangeView />
+    </Suspense>
   );
 }
