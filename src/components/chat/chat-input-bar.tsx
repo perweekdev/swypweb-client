@@ -33,31 +33,71 @@ export function ChatInputBar({
   };
 
   return (
-    <div className="sticky bottom-0 flex items-center gap-2 bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-2">
-      <button
-        type="button"
-        aria-label="사진 첨부"
-        // 전송이 소켓을 타므로, 연결 전에는 텍스트와 마찬가지로 막는다.
-        disabled={disabled}
-        onClick={() => setSheetOpen(true)}
-        className={`shrink-0 ${disabled ? 'text-secondary-300' : 'text-secondary-900'}`}
-      >
-        <PlusIcon className="size-6" />
-      </button>
+    <>
+      <div className="sticky bottom-0 flex items-center gap-2 bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-2">
+        <button
+          type="button"
+          aria-label="사진 첨부"
+          // 전송이 소켓을 타므로, 연결 전에는 텍스트와 마찬가지로 막는다.
+          disabled={disabled}
+          onClick={() => setSheetOpen(true)}
+          className={`shrink-0 ${disabled ? 'text-secondary-300' : 'text-secondary-900'}`}
+        >
+          <PlusIcon className="size-6" />
+        </button>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={CHAT_IMAGE_ACCEPT}
-        className="hidden"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          // 같은 파일을 다시 골라도 change가 발생하도록 값을 비운다.
-          event.target.value = '';
-          if (file) onPickImage?.(file);
-        }}
-      />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={CHAT_IMAGE_ACCEPT}
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            // 같은 파일을 다시 골라도 change가 발생하도록 값을 비운다.
+            event.target.value = '';
+            if (file) onPickImage?.(file);
+          }}
+        />
 
+        <div className="relative min-w-0 flex-1">
+          <input
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.nativeEvent.isComposing) send();
+            }}
+            placeholder="메시지 입력하기"
+            aria-label="메시지 입력"
+            className="h-10 w-full rounded-full bg-secondary-10 pl-4 pr-9 text-body2 text-secondary-900 outline-none placeholder:text-secondary-300"
+          />
+          {canSend && (
+            <button
+              type="button"
+              aria-label="입력 지우기"
+              onClick={() => setText('')}
+              className="absolute right-3 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 text-white"
+            >
+              <CloseIcon className="size-2.5" />
+            </button>
+          )}
+        </div>
+
+        <button
+          type="button"
+          aria-label="보내기"
+          disabled={!canSend}
+          onClick={send}
+          className={`shrink-0 ${canSend ? 'text-secondary-900' : 'text-secondary-300'}`}
+        >
+          <SendIcon className="size-6" />
+        </button>
+      </div>
+
+      {/*
+        시트는 입력창(sticky) **밖**에 둔다.
+        `position: sticky`는 z-index와 무관하게 스택 컨텍스트를 만들어서, 그 안에 있으면
+        시트의 z-50이 갇혀 상단 헤더(sticky top-0 z-10)를 덮지 못한다 — 딤이 위쪽만 비껴간다.
+      */}
       <ActionSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
@@ -71,39 +111,6 @@ export function ChatInputBar({
           },
         ]}
       />
-
-      <div className="relative min-w-0 flex-1">
-        <input
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.nativeEvent.isComposing) send();
-          }}
-          placeholder="메시지 입력하기"
-          aria-label="메시지 입력"
-          className="h-10 w-full rounded-full bg-secondary-10 pl-4 pr-9 text-body2 text-secondary-900 outline-none placeholder:text-secondary-300"
-        />
-        {canSend && (
-          <button
-            type="button"
-            aria-label="입력 지우기"
-            onClick={() => setText('')}
-            className="absolute right-3 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 text-white"
-          >
-            <CloseIcon className="size-2.5" />
-          </button>
-        )}
-      </div>
-
-      <button
-        type="button"
-        aria-label="보내기"
-        disabled={!canSend}
-        onClick={send}
-        className={`shrink-0 ${canSend ? 'text-secondary-900' : 'text-secondary-300'}`}
-      >
-        <SendIcon className="size-6" />
-      </button>
-    </div>
+    </>
   );
 }
