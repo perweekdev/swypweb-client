@@ -113,9 +113,8 @@ export function MemberMyPage() {
       {/* 정보 */}
       <section className="px-4">
         <h2 className="text-body2 text-secondary-500">정보</h2>
-        {/* TODO: 개인정보 처리방침 / 이용약관 화면 라우팅 */}
-        <SettingRow label="개인정보 처리방침" onClick={() => {}} />
-        <SettingRow label="이용약관" onClick={() => {}} />
+        <SettingRow label="개인정보 처리방침" onClick={() => router.push(ROUTES.privacy)} />
+        <SettingRow label="이용약관" onClick={() => router.push(ROUTES.terms)} />
       </section>
 
       {/* 로그아웃 / 회원탈퇴 */}

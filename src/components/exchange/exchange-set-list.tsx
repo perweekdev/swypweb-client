@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@components/ui/button';
 import { IconButton } from '@components/ui/icon-button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
@@ -10,6 +11,7 @@ import { PhotocardRow } from '@components/photocard/photocard-row';
 import { MoreIcon } from '@components/icons';
 import { useDeleteTradeSet, useMyTradeSets, useTradeSetDetails } from '@hooks/use-trade-sets';
 import { isApiError } from '@lib/api-error';
+import { EXCHANGE_ROUTES } from '@constants/routes';
 
 /**
  * EX-003 나의 교환 세트 관리 목록.
@@ -21,6 +23,7 @@ import { isApiError } from '@lib/api-error';
  * 계측: 카드 61×98 gap 8 · 저장 버튼 full-width outline pill 42 · 세트 구분선은 화면 전체 폭.
  */
 export function ExchangeSetList({ groupId }: { groupId: number | null }) {
+  const router = useRouter();
   const { data: summaries, isPending, isError } = useMyTradeSets(groupId);
   const details = useTradeSetDetails((summaries ?? []).map((s) => s.id));
   const deleteTradeSet = useDeleteTradeSet();
@@ -87,8 +90,13 @@ export function ExchangeSetList({ groupId }: { groupId: number | null }) {
                 label={`구해요 ${set.wantCount}`}
                 cards={detail?.wantCards ?? []}
               />
-              {/* TODO: EX-010 이미지로 저장하기 (디자인 미핸드오프) */}
-              <Button variant="outline" size="lg" shape="pill" className="mt-4 w-full">
+              <Button
+                variant="outline"
+                size="lg"
+                shape="pill"
+                className="mt-4 w-full"
+                onClick={() => router.push(EXCHANGE_ROUTES.setImage(set.id))}
+              >
                 이미지로 저장하기
               </Button>
             </div>

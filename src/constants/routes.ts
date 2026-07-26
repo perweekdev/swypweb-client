@@ -46,6 +46,8 @@ export const EXCHANGE_ROUTES = {
   sets: `${ROUTES.exchange}/sets`,
   /** EX-004 나의 교환 세트 상세 — ⚠️ 디자인 미핸드오프, 경로만 예약 */
   setDetail: (id: string) => `${ROUTES.exchange}/sets/${id}`,
+  /** EX-010 교환 세트 이미지로 저장하기 */
+  setImage: (id: string) => `${ROUTES.exchange}/sets/${id}/image`,
   /** EX-005 매칭 결과 상세. `id`는 **상대의 교환 세트 id**다(상대 정보는 상세 API가 함께 준다) */
   matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
   /** EX-006 교환할 포카 선택 */
