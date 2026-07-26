@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@store/auth-store';
 import { useCollectionDraftStore } from '@store/collection-draft-store';
 import { TabHeader } from '@components/layout/tab-header';
@@ -17,10 +17,12 @@ import { useInterestGroups } from '@hooks/use-groups';
 import { ROUTES, COLLECTION_ROUTES } from '@constants/routes';
 
 /** COL-001 컬렉션 메인 (그룹별 앨범 트리 + 보유 여부) */
-export default function CollectionPage() {
+function CollectionView() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [pickedGroup, setPickedGroup] = useState<string | null>(null);
+  // 편집을 마치고 돌아오면 `?group=`으로 보던 그룹이 전달된다(COL-003 → COL-001).
+  const groupFromQuery = useSearchParams().get('group');
+  const [pickedGroup, setPickedGroup] = useState<string | null>(groupFromQuery);
   const [loginOpen, setLoginOpen] = useState(false);
   const { justSaved, consumeSaved } = useCollectionDraftStore();
 
@@ -96,5 +98,13 @@ export default function CollectionPage() {
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
+  );
+}
+
+export default function CollectionPage() {
+  return (
+    <Suspense>
+      <CollectionView />
+    </Suspense>
   );
 }

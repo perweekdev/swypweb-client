@@ -13,7 +13,7 @@ import { useInterestGroups } from '@hooks/use-groups';
 import { isApiError } from '@lib/api-error';
 import { API_ERROR_CODES } from '@constants/api-error-codes';
 import { useCollectionDraftStore } from '@store/collection-draft-store';
-import { ROUTES } from '@constants/routes';
+import { COLLECTION_ROUTES } from '@constants/routes';
 import type { CollectionAlbum } from '@/types/collection.types';
 
 const PLACEHOLDER_COLOR = '#E6E8EB';
@@ -114,7 +114,8 @@ export function CollectionEditor() {
     try {
       await saveCollection.mutateAsync([...selected].map(Number));
       markSaved();
-      router.push(ROUTES.collection);
+      // 편집하던 그룹을 그대로 보여준다 — 그냥 돌아가면 첫 관심 그룹으로 초기화된다.
+      router.push(COLLECTION_ROUTES.list(groupParam ?? undefined));
     } catch (caught) {
       if (isApiError(caught) && caught.code === API_ERROR_CODES.INVALID_PHOTOCARD) {
         setError('이 그룹에 속하지 않는 포카가 포함되어 있어요.');

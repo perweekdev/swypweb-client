@@ -43,9 +43,14 @@ export class ApiError extends Error {
     return this.status === 404 || isNotFoundCode(this.code);
   }
 
-  /** 닉네임 중복(409). 회원가입·닉네임 수정에서 분기용. */
+  /**
+   * 닉네임 중복. 회원가입·닉네임 수정에서 분기용.
+   *
+   * `RESOURCE_002`뿐 아니라 **409 자체**를 중복으로 본다 — 두 엔드포인트에서 충돌은
+   * 닉네임 중복밖에 없고, 서버가 코드 없이 상태만 주는 경우가 있다(전역 예외 핸들러 부재).
+   */
   get isNicknameDuplicated(): boolean {
-    return isNicknameDuplicatedCode(this.code);
+    return this.status === 409 || isNicknameDuplicatedCode(this.code);
   }
 }
 

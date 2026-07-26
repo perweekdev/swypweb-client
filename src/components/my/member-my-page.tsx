@@ -84,6 +84,13 @@ export function MemberMyPage() {
           ref={groupScrollRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pb-1 pt-3"
         >
+          {/* '추가하기'가 가장 왼쪽 — 등록한 그룹은 그 오른쪽에 차례로 온다(디자인) */}
+          <li className="flex w-16 shrink-0 flex-col items-center gap-1.5">
+            <Link href={ROUTES.myGroupsAdd} aria-label="관심 그룹 추가">
+              <GroupLogo size="lg" state="add" />
+            </Link>
+            <span className="text-body3 text-secondary-500">추가하기</span>
+          </li>
           {interestGroups?.map((group) => (
             <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
               <GroupLogo size="lg" name={group.name} color={group.color} logoUrl={group.logoUrl} />
@@ -92,12 +99,6 @@ export function MemberMyPage() {
               </span>
             </li>
           ))}
-          <li className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-            <Link href={ROUTES.myGroupsAdd} aria-label="관심 그룹 추가">
-              <GroupLogo size="lg" state="add" />
-            </Link>
-            <span className="text-body3 text-secondary-500">추가하기</span>
-          </li>
         </ul>
       </section>
 
