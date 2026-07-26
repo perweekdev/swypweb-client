@@ -12,6 +12,7 @@ interface FeedItemResponse {
   groupName: string;
   userId: number;
   nickname: string;
+  profileImageUrl: string | null;
   /** ⚠️ 이미지 URL 배열뿐 — photoCardId 등 식별자가 없다 */
   haveImages: string[];
   wantImages: string[];
@@ -42,7 +43,7 @@ function toFeedPost(item: FeedItemResponse): FeedPost {
     author: {
       id: String(item.userId),
       nickname: item.nickname,
-      // ⚠️ 피드 응답에 작성자 프로필 이미지가 없다 → 기본 아바타로 표시된다.
+      avatarUrl: item.profileImageUrl,
       groups: item.groupName,
     },
     haveCards: toCards(item.haveImages, `${item.tradeSetId}-have`),

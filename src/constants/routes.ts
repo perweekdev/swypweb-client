@@ -31,20 +31,8 @@ export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
  * 자세한 규칙: docs/routing-conventions.md
  */
 export const POST_ROUTES = {
-  /**
-   * HOME-003 교환글 상세.
-   * ⚠️ 상세 API 응답에 작성자가 없어(api-reference §7.3) 피드에서 받은 값을 쿼리로 전달한다.
-   * 서버가 author 필드를 추가하면 이 파라미터는 제거한다.
-   */
-  detail: (id: string, author?: { nickname?: string; groups?: string; authorId?: string }) => {
-    const query = new URLSearchParams();
-    if (author?.nickname) query.set('n', author.nickname);
-    if (author?.groups) query.set('g', author.groups);
-    // 내 글이면 제안 CTA를 숨겨야 해서 작성자 id도 함께 넘긴다.
-    if (author?.authorId) query.set('u', author.authorId);
-    const suffix = query.size > 0 ? `?${query}` : '';
-    return `/posts/${id}${suffix}`;
-  },
+  /** HOME-003 교환글 상세 (작성자 정보는 상세 API가 함께 준다) */
+  detail: (id: string) => `/posts/${id}`,
   /** HOME-004 교환할 포카 선택 */
   select: (id: string) => `/posts/${id}/select`,
 } as const;
@@ -58,14 +46,8 @@ export const EXCHANGE_ROUTES = {
   sets: `${ROUTES.exchange}/sets`,
   /** EX-004 나의 교환 세트 상세 — ⚠️ 디자인 미핸드오프, 경로만 예약 */
   setDetail: (id: string) => `${ROUTES.exchange}/sets/${id}`,
-  /**
-   * EX-005 매칭 결과 상세.
-   * `id`는 **상대의 교환 세트 id**다. 상세 응답에 상대 정보가 없어 닉네임을 쿼리로 전달한다.
-   */
-  matchDetail: (id: string, nickname?: string) =>
-    nickname
-      ? `${ROUTES.exchange}/matches/${id}?n=${encodeURIComponent(nickname)}`
-      : `${ROUTES.exchange}/matches/${id}`,
+  /** EX-005 매칭 결과 상세. `id`는 **상대의 교환 세트 id**다(상대 정보는 상세 API가 함께 준다) */
+  matchDetail: (id: string) => `${ROUTES.exchange}/matches/${id}`,
   /** EX-006 교환할 포카 선택 */
   matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
   /** EX-007 교환 세트 등록 — 등록 API가 그룹 단위라 대상 그룹을 쿼리로 넘긴다 */

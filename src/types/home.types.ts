@@ -9,11 +9,10 @@ export interface FeedPost {
   author: {
     id: string;
     nickname: string;
-    /**
-     * placeholder 배경색.
-     * ⚠️ 피드 응답에 작성자 프로필 이미지·색상이 없어 실제 데이터에서는 비어 있다(기본 아바타 표시).
-     */
+    /** placeholder 배경색(이미지가 없을 때만 쓰인다) */
     avatarColor?: string;
+    /** 서버 `profileImageUrl` */
+    avatarUrl?: string | null;
     /** 작성자 관심 그룹 표기 (예: '레드벨벳 · 아이브'). HOME-003 상세에서 노출 */
     groups?: string;
   };

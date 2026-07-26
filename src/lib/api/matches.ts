@@ -17,6 +17,7 @@ interface MatchResponse {
   tradeSetId: number;
   userId: number;
   nickname: string;
+  profileImageUrl?: string | null;
   matchScore: number;
   matchedHaveCards: MatchedCardResponse[];
   matchedWantCards: MatchedCardResponse[];
@@ -27,6 +28,7 @@ export interface MatchCandidate {
   id: string;
   partnerId: string;
   nickname: string;
+  avatarUrl: string | null;
   matchScore: number;
   haveCards: Photocard[];
   wantCards: Photocard[];
@@ -63,6 +65,7 @@ export async function getMatches(params: { tradeSetId: string; cursor?: string; 
       id: String(match.tradeSetId),
       partnerId: String(match.userId),
       nickname: match.nickname,
+      avatarUrl: match.profileImageUrl ?? null,
       matchScore: match.matchScore,
       haveCards: toCards(match.matchedHaveCards),
       wantCards: toCards(match.matchedWantCards),
