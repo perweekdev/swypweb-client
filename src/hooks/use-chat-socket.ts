@@ -39,7 +39,6 @@ export function useChatSocket(chatId: string) {
   const clientRef = useRef<Client | null>(null);
   const [connected, setConnected] = useState(false);
 
-  // 수신 메시지를 목록 캐시 맨 앞에 넣는다(서버가 최신순으로 주므로 첫 페이지의 선두).
   const appendMessage = useCallback(
     (incoming: IncomingMessage) => {
       const message: ChatMessage = {
@@ -50,16 +49,21 @@ export function useChatSocket(chatId: string) {
       };
 
       queryClient.setQueryData<MessagePages>(queryKeys.chat.messages(chatId), (previous) => {
-        if (!previous) return previous;
-        const [first, ...rest] = previous.pages;
-        if (!first) return previous;
+        if (!previous || previous.pages.length === 0) return previous;
         // 재연결 등으로 같은 메시지가 두 번 올 수 있어 중복을 막는다.
-        if (first.items.some((item) => item.id === message.id)) return previous;
+        const exists = previous.pages.some((page) =>
+          page.items.some((item) => item.id === message.id)
+        );
+        if (exists) return previous;
 
-        return {
-          ...previous,
-          pages: [{ ...first, items: [message, ...first.items] }, ...rest],
-        };
+        // 서버 목록은 오래된 것 → 최신 순이므로 **마지막 페이지의 끝**에 붙인다.
+        // (화면은 messageId로 다시 정렬하므로 순서가 어긋나도 표시는 안전하다)
+        const lastIndex = previous.pages.length - 1;
+        const pages = previous.pages.map((page, index) =>
+          index === lastIndex ? { ...page, items: [...page.items, message] } : page
+        );
+
+        return { ...previous, pages };
       });
 
       // 목록 화면의 마지막 메시지·안읽음도 갱신되도록 무효화한다.
@@ -78,11 +82,14 @@ export function useChatSocket(chatId: string) {
       onConnect: () => {
         setConnected(true);
         client.subscribe(`/sub/chat/rooms/${chatId}`, (frame) => {
+          let incoming: IncomingMessage;
           try {
-            appendMessage(JSON.parse(frame.body) as IncomingMessage);
+            incoming = JSON.parse(frame.body) as IncomingMessage;
           } catch {
-            // 파싱 불가한 프레임은 무시한다(연결을 끊지 않는다).
+            return; // 파싱 불가한 프레임만 버린다(연결은 유지).
           }
+          // 캐시 반영은 try로 감싸지 않는다 — 여기서 조용히 삼키면 메시지가 유실된 것처럼 보인다.
+          appendMessage(incoming);
         });
       },
       onDisconnect: () => setConnected(false),

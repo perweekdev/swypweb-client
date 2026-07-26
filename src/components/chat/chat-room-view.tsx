@@ -25,8 +25,11 @@ export function ChatRoomView() {
   useMarkChatRead(chatId);
   const { connected, sendMessage } = useChatSocket(chatId);
 
-  // 서버는 최신 메시지부터 내려주므로 화면 표시용으로 시간순(오래된 것 → 최신)으로 뒤집는다.
-  const messages = [...(messagePages?.pages.flatMap((page) => page.items) ?? [])].reverse();
+  // 화면은 위→아래가 오래된 순이어야 한다.
+  // 서버 응답 순서나 페이지 병합 순서에 의존하지 않도록 messageId(증가값)로 직접 정렬한다.
+  const messages = [...(messagePages?.pages.flatMap((page) => page.items) ?? [])].sort(
+    (a, b) => Number(a.id) - Number(b.id)
+  );
 
   return (
     <>
