@@ -10,7 +10,6 @@ import {
   getChatProposal,
   getChatRooms,
   markChatRead,
-  resolveIsReceiver,
 } from '@lib/api/chat';
 import { getNextCursorParam } from '@lib/cursor';
 import { queryKeys } from '@lib/query-keys';
@@ -46,23 +45,15 @@ export function useChatRooms() {
   });
 }
 
-/**
- * 채팅방 상단 정보.
- *
- * 제안자/수신자 판정은 캐시된 응답이 아니라 **`select`에서** 한다. 내 userId(프로필)가
- * 헤더보다 늦게 도착해도 다시 계산되고, 쿼리 키에 userId를 섞지 않아 재요청도 생기지 않는다.
- */
+/** 채팅방 상단 정보. `isReceiver`가 교환 완료 버튼의 노출 조건이다. */
 export function useChatHeader(chatId: string) {
   const ready = useAuthReady();
-  const { data: profile } = useMyProfile();
-  const myUserId = profile?.userId;
 
   return useQuery({
     queryKey: queryKeys.chat.header(chatId),
     queryFn: () => getChatHeader(chatId),
     enabled: ready && chatId.length > 0,
     throwOnError: false,
-    select: (header) => ({ ...header, isReceiver: resolveIsReceiver(header, myUserId) }),
   });
 }
 
