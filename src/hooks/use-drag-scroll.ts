@@ -7,6 +7,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * - 터치/펜은 네이티브 스와이프를 유지하도록 **마우스 포인터만** 처리한다.
  * - 3px 초과로 드래그하면 그 직후 클릭을 억제해 자식 버튼 오작동(예: 그룹 필터 오선택)을 막는다.
  * - move/up은 window에 붙여 커서가 영역 밖으로 나가도 드래그가 이어진다.
+ * - ⚠️ **이미지 위에서 끌 때**: 브라우저 기본 드래그(이미지 끌어놓기)가 시작되면 pointermove/up을
+ *   가져가 버려, 훅이 '누르는 중' 상태에 갇힌다(버튼을 떼도 마우스만 움직이면 계속 스크롤됨).
+ *   `dragstart`를 막아 애초에 시작되지 않게 하고, `pointercancel`로도 상태를 푼다.
  *
  * 반환값은 **콜백 ref**다. 스크롤 영역이 조건부로 렌더되는 경우(EX-007 선택 스트립처럼
  * 0장일 때 사라졌다 나타나는 경우)에도 노드가 붙는 시점에 리스너가 다시 연결된다.
@@ -53,6 +56,9 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
       el.style.userSelect = '';
     };
 
+    // 이미지·링크의 브라우저 기본 끌어놓기를 막는다(위 주석 참고).
+    const onDragStart = (e: Event) => e.preventDefault();
+
     // 드래그 직후 발생하는 클릭만 억제 (자식 버튼 오선택 방지)
     const onClickCapture = (e: MouseEvent) => {
       if (moved) {
@@ -64,15 +70,19 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
 
     el.style.cursor = 'grab';
     el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('dragstart', onDragStart);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
     el.addEventListener('click', onClickCapture, true);
 
     return () => {
       el.style.cursor = '';
       el.removeEventListener('pointerdown', onPointerDown);
+      el.removeEventListener('dragstart', onDragStart);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
       el.removeEventListener('click', onClickCapture, true);
     };
   }, [version]);
