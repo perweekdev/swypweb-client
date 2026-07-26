@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { CloseIcon, PlusIcon, SendIcon } from '@components/icons';
+import { ActionSheet } from '@components/common/action-sheet';
+import { CHAT_IMAGE_ACCEPT } from '@lib/api/chat';
 
 /**
  * CHAT-002 메시지 입력창.
@@ -11,12 +13,17 @@ import { CloseIcon, PlusIcon, SendIcon } from '@components/icons';
  */
 export function ChatInputBar({
   onSend,
+  onPickImage,
   disabled = false,
 }: {
   onSend?: (text: string) => boolean;
+  /** ＋ → '사진 보내기'로 고른 파일 */
+  onPickImage?: (file: File) => void;
   disabled?: boolean;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState('');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const canSend = text.trim().length > 0 && !disabled;
 
   const send = () => {
@@ -30,11 +37,40 @@ export function ChatInputBar({
       <button
         type="button"
         aria-label="사진 첨부"
-        // TODO: 플러스 버튼 → 기기 갤러리/카메라 연결 (스토리보드 CHAT-002)
-        className="shrink-0 text-secondary-900"
+        // 전송이 소켓을 타므로, 연결 전에는 텍스트와 마찬가지로 막는다.
+        disabled={disabled}
+        onClick={() => setSheetOpen(true)}
+        className={`shrink-0 ${disabled ? 'text-secondary-300' : 'text-secondary-900'}`}
       >
         <PlusIcon className="size-6" />
       </button>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={CHAT_IMAGE_ACCEPT}
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          // 같은 파일을 다시 골라도 change가 발생하도록 값을 비운다.
+          event.target.value = '';
+          if (file) onPickImage?.(file);
+        }}
+      />
+
+      <ActionSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        actions={[
+          {
+            label: '사진 보내기',
+            onClick: () => {
+              setSheetOpen(false);
+              fileInputRef.current?.click();
+            },
+          },
+        ]}
+      />
 
       <div className="relative min-w-0 flex-1">
         <input

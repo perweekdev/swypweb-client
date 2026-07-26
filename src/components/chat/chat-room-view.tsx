@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { ChatInputBar } from '@components/chat/chat-input-bar';
@@ -7,6 +8,8 @@ import { ChatMatchInfo } from '@components/chat/chat-match-info';
 import { ChatMessageList } from '@components/chat/chat-message-list';
 import { useChatHeader, useChatMessages, useChatProposal, useMarkChatRead } from '@hooks/use-chat';
 import { useChatSocket } from '@hooks/use-chat-socket';
+import { uploadChatImage, validateChatImage } from '@lib/api/chat';
+import { isApiError } from '@lib/api-error';
 
 /**
  * CHAT-002 채팅방.
@@ -23,7 +26,28 @@ export function ChatRoomView() {
   const { data: proposal } = useChatProposal(chatId);
   const { data: messagePages, isPending, isError } = useChatMessages(chatId);
   useMarkChatRead(chatId);
-  const { connected, sendMessage } = useChatSocket(chatId);
+  const { connected, sendMessage, sendImage } = useChatSocket(chatId);
+  const [imageError, setImageError] = useState<string | null>(null);
+
+  // 사진 첨부: 업로드해서 받은 URL을 IMAGE 메시지로 보낸다(§8.7).
+  const handlePickImage = async (file: File) => {
+    const invalidReason = validateChatImage(file);
+    if (invalidReason) {
+      setImageError(invalidReason);
+      return;
+    }
+
+    setImageError(null);
+    try {
+      const imageUrl = await uploadChatImage(chatId, file);
+      // 업로드는 됐어도 소켓이 끊겨 있으면 전송이 실패한다 — 조용히 사라지지 않게 알린다.
+      if (!sendImage(imageUrl)) {
+        setImageError('연결이 끊겨 사진을 보내지 못했어요. 잠시 후 다시 시도해주세요.');
+      }
+    } catch (caught) {
+      setImageError(isApiError(caught) ? caught.message : '사진을 보내지 못했어요.');
+    }
+  };
 
   // 화면은 위→아래가 오래된 순이어야 한다.
   // 서버 응답 순서나 페이지 병합 순서에 의존하지 않도록 messageId(증가값)로 직접 정렬한다.
@@ -65,7 +89,12 @@ export function ChatRoomView() {
         />
       )}
 
-      <ChatInputBar onSend={sendMessage} disabled={!connected} />
+      {imageError && <p className="px-4 pb-1 text-center text-body3 text-red-900">{imageError}</p>}
+      <ChatInputBar
+        onSend={sendMessage}
+        onPickImage={(file) => void handlePickImage(file)}
+        disabled={!connected}
+      />
     </>
   );
 }
