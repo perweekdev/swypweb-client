@@ -73,16 +73,29 @@ interface ChatHeaderResponse {
   representWantCardInfo: ChatCardResponse | null;
   haveCardCount: number;
   wantCardCount: number;
+  /** 내가 제안을 '받은' 쪽인지 (교환 완료 권한). 배포 서버 응답으로 확인함. */
+  isReceiver?: boolean;
 }
 
 export interface ChatRoomHeader {
   partnerNickname: string;
   status: ExchangeStatus;
+  /**
+   * 내가 제안을 **'받은' 쪽인가.** 교환 완료는 받은 쪽만 할 수 있어 버튼 노출 조건이 된다.
+   *
+   * 값이 없으면 `null`(판단 불가)이고, 이때는 버튼을 **가리지 않는다** — 잘못 숨겨서
+   * 아무도 완료하지 못하게 되는 쪽이, 눌렀을 때 403 안내를 보는 쪽보다 나쁘다.
+   */
+  isReceiver: boolean | null;
 }
 
 export async function getChatHeader(chatId: string): Promise<ChatRoomHeader> {
   const data = await api.get<ChatHeaderResponse>(`/chat-rooms/${chatId}/header`);
-  return { partnerNickname: data.partnerNickname, status: toStatus(data.isCompleted) };
+  return {
+    partnerNickname: data.partnerNickname,
+    status: toStatus(data.isCompleted),
+    isReceiver: typeof data.isReceiver === 'boolean' ? data.isReceiver : null,
+  };
 }
 
 // ─────────────────────────── 8.4 교환 제안 카드

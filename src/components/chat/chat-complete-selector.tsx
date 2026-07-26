@@ -7,7 +7,7 @@ import { Button } from '@components/ui/button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { EmptyState } from '@components/common/empty-state';
 import { SelectableCardGrid } from '@components/photocard/selectable-card-grid';
-import { useChatProposal, useCompleteChatExchange } from '@hooks/use-chat';
+import { useChatHeader, useChatProposal, useCompleteChatExchange } from '@hooks/use-chat';
 import { isApiError } from '@lib/api-error';
 import { CHAT_ROUTES } from '@constants/routes';
 
@@ -36,10 +36,9 @@ const DIALOG_COPY = {
 /**
  * CHAT-004 교환 완료 포카 선택.
  *
- * ⚠️ **교환 완료는 제안을 '받은' 쪽만 처리할 수 있다**(제안한 쪽에는 버튼이 보이면 안 된다).
- * 그런데 채팅 응답(8.2·8.3·8.4) 어디에도 **내가 제안자인지 수신자인지 구분할 값이 없다.**
- * 그래서 지금은 버튼을 가리지 못하고, 권한 없이 눌렀을 때 안내만 한다.
- * 서버가 구분 필드를 주면 진입 자체를 막는다.
+ * **교환 완료는 제안을 '받은' 쪽만 처리할 수 있다.** 헤더(8.3)의 구분 값으로 판정해
+ * 제안한 쪽에는 버튼을 숨기고, URL로 직접 들어와도 이 화면에서 막는다.
+ * 구분 값이 없어 판단할 수 없으면(`null`) 종전대로 열어 두고 403 안내에 맡긴다.
  *
  * 완료 후 삭제 팝업의 선택은 `deleteTradedCards`(필수)로 전달되고, **세트 정리는 서버가 한다.**
  * 그래서 프론트가 교환 세트 id를 알 필요가 없다.
@@ -50,7 +49,10 @@ export function ChatCompleteSelector() {
   const chatId = String(useParams().id ?? '');
 
   const { data: proposal, isPending, isError } = useChatProposal(chatId);
+  const { data: header } = useChatHeader(chatId);
   const completeExchange = useCompleteChatExchange(chatId);
+  // 제안한 쪽이 URL로 직접 들어온 경우 (버튼은 애초에 안 보인다)
+  const forbidden = header?.isReceiver === false;
 
   const [myPicked, setMyPicked] = useState<Set<string>>(new Set());
   const [partnerPicked, setPartnerPicked] = useState<Set<string>>(new Set());
@@ -58,7 +60,8 @@ export function ChatCompleteSelector() {
   const [error, setError] = useState<string | null>(null);
 
   // 스토리보드: '내 포카'와 '상대방 포카' 각각 1개 이상 선택 시 '완료' 활성화
-  const canComplete = myPicked.size > 0 && partnerPicked.size > 0 && !completeExchange.isPending;
+  const canComplete =
+    myPicked.size > 0 && partnerPicked.size > 0 && !completeExchange.isPending && !forbidden;
 
   const openDeleteDialog = () => {
     if (!canComplete || !proposal) return;
@@ -100,32 +103,41 @@ export function ChatCompleteSelector() {
       <Header
         title="상세 정보"
         right={
-          <Button
-            variant="navy"
-            size="sm"
-            disabled={!canComplete}
-            onClick={openDeleteDialog}
-            className="disabled:bg-secondary-100"
-          >
-            {completeExchange.isPending ? '처리 중' : '완료'}
-          </Button>
+          !forbidden && (
+            <Button
+              variant="navy"
+              size="sm"
+              disabled={!canComplete}
+              onClick={openDeleteDialog}
+              className="disabled:bg-secondary-100"
+            >
+              {completeExchange.isPending ? '처리 중' : '완료'}
+            </Button>
+          )
         }
       />
 
-      {isPending && (
+      {forbidden && (
+        <EmptyState
+          title="교환 완료는 제안을 받은 분만 처리할 수 있어요."
+          description="상대방이 완료 처리하면 이 채팅도 교환 완료로 바뀌어요."
+        />
+      )}
+
+      {!forbidden && isPending && (
         <p className="flex-1 px-4 py-10 text-center text-body2 text-secondary-500">
           불러오는 중...
         </p>
       )}
 
-      {isError && (
+      {!forbidden && isError && (
         <EmptyState
           title="교환 정보를 불러오지 못했어요."
           description="잠시 후 다시 시도해주세요."
         />
       )}
 
-      {proposal && (
+      {!forbidden && proposal && (
         <div className="px-4">
           <p className="whitespace-pre-line text-h3 text-black">
             {'교환이 완료된 포카를\n선택하세요.'}

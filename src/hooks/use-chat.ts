@@ -45,6 +45,7 @@ export function useChatRooms() {
   });
 }
 
+/** 채팅방 상단 정보. `isReceiver`가 교환 완료 버튼의 노출 조건이다. */
 export function useChatHeader(chatId: string) {
   const ready = useAuthReady();
 

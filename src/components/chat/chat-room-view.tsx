@@ -67,6 +67,7 @@ export function ChatRoomView() {
             roomId={chatId}
             exchangeSet={proposal}
             status={header?.status ?? 'ongoing'}
+            isReceiver={header?.isReceiver ?? null}
           />
         )}
       </div>
