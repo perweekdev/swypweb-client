@@ -15,6 +15,16 @@ function isNearBottom() {
 }
 
 /**
+ * 문서 맨 아래로 이동.
+ *
+ * `scrollIntoView`를 쓰지 않는다 — 기준점이 **sticky 입력창 뒤로 들어가** 마지막 메시지가 가려진다.
+ * 문서 전체 높이로 내리면 입력창도 흐름상 마지막이라 메시지가 온전히 보인다.
+ */
+function scrollToBottom() {
+  window.scrollTo({ top: document.documentElement.scrollHeight });
+}
+
+/**
  * CHAT-002 메시지 목록.
  * 연속된 같은 발신자 메시지는 한 덩어리로 묶어 아바타는 첫 메시지에만,
  * 시간은 마지막 메시지에만 표시한다(디자인).
@@ -23,6 +33,7 @@ function isNearBottom() {
  *  - **처음 열면 곧바로 맨 아래**(최신 메시지)에서 시작한다.
  *  - 새 메시지가 오면 **내가 보냈거나 이미 최신을 보고 있을 때만** 따라 내려간다.
  *    위로 올라가 예전 대화를 읽는 중에는 화면을 끌어내리지 않는다.
+ *  - 이미지가 늦게 로드되며 높이가 늘어나도 하단을 유지한다(ResizeObserver).
  */
 export function ChatMessageList({
   messages,
@@ -31,29 +42,42 @@ export function ChatMessageList({
   messages: ChatMessage[];
   partner: ChatPartner;
 }) {
-  const bottomRef = useRef<HTMLDivElement>(null);
-  // 첫 스크롤은 애니메이션 없이 즉시 — 열자마자 아래에 있어야 한다.
-  const hasScrolledOnce = useRef(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  /** 하단에 붙어 따라갈지 여부. 사용자가 위로 올리면 해제된다. */
+  const sticking = useRef(true);
   const lastMessage = messages[messages.length - 1];
 
+  // 사용자가 직접 스크롤하면 '따라가기'를 갱신한다.
+  useEffect(() => {
+    const onScroll = () => {
+      sticking.current = isNearBottom();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // 목록 높이가 바뀔 때마다(이미지 로드·폰트 적용 등) 하단을 다시 맞춘다.
+  // 한 번의 스크롤로는 나중에 늘어난 높이만큼 어긋난다.
+  useEffect(() => {
+    const element = listRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(() => {
+      if (sticking.current) scrollToBottom();
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  // 새 메시지: 내가 보낸 것은 어디에 있든 따라 내려간다.
   useEffect(() => {
     if (messages.length === 0) return;
-
-    const first = !hasScrolledOnce.current;
-    if (!first && !isNearBottom() && lastMessage?.sender !== 'me') return;
-    hasScrolledOnce.current = true;
-
-    const scroll = () =>
-      bottomRef.current?.scrollIntoView({ behavior: first ? 'auto' : 'smooth', block: 'end' });
-
-    scroll();
-    // 이미지 메시지는 로드 후 높이가 늘어나 한 번 더 맞춰줘야 끝까지 내려간다.
-    const timer = setTimeout(scroll, 250);
-    return () => clearTimeout(timer);
+    if (lastMessage?.sender === 'me') sticking.current = true;
+    if (sticking.current) scrollToBottom();
   }, [messages.length, lastMessage?.sender]);
 
   return (
-    <div className="flex-1 px-4 py-4">
+    <div ref={listRef} className="flex-1 px-4 py-4">
       {messages.map((message, i) => {
         const prev = messages[i - 1];
         const next = messages[i + 1];
@@ -112,9 +136,6 @@ export function ChatMessageList({
           </div>
         );
       })}
-
-      {/* 자동 스크롤 기준점 — 항상 목록 맨 끝에 둔다 */}
-      <div ref={bottomRef} />
     </div>
   );
 }
