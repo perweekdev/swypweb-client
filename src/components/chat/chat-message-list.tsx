@@ -101,7 +101,12 @@ export function ChatMessageList({
             >
               {!isMine &&
                 (isGroupStart ? (
-                  <Avatar className="size-8 shrink-0" color={partner.color} />
+                  <Avatar
+                    className="size-8 shrink-0"
+                    src={partner.avatarUrl}
+                    alt={partner.nickname}
+                    color={partner.color}
+                  />
                 ) : (
                   // 같은 덩어리의 후속 메시지는 아바타 자리만 비워 들여쓰기를 맞춘다
                   <span className="size-8 shrink-0" aria-hidden="true" />
