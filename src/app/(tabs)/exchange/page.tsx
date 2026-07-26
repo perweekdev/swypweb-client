@@ -117,7 +117,10 @@ export default function ExchangePage() {
           <ul ref={setScrollRef} className="mt-2 flex gap-2 overflow-x-auto scrollbar-hide px-4">
             {mySets.map((set) => (
               <li key={set.id} className="shrink-0">
-                {/* 세트를 고르면 아래 '교환 가능한 상대'가 그 세트 기준으로 바뀐다(매칭은 세트 단위). */}
+                {/*
+                  세트 박스를 고르면 아래 '교환 가능한 상대'가 그 세트 기준으로 바뀐다(디자인 EX-001-matching).
+                  매칭이 교환 세트 단위로 계산되기 때문이며, 상세(EX-004)는 EX-003에서 진입한다.
+                */}
                 {/* 목록 API는 축별 대표 카드 1장만 준다 → 나머지는 +N으로 표기 */}
                 <button
                   type="button"

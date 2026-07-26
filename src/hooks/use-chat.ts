@@ -106,8 +106,14 @@ export function useCompleteChatExchange(chatId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => completeChatExchange(chatId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.all }),
+    // 교환된 포카를 세트에서 지울지 — 삭제 팝업에서 고른 값
+    mutationFn: (deleteTradedCards: boolean) => completeChatExchange(chatId, deleteTradedCards),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.chat.all });
+      // 세트 정리는 서버가 하므로 교환 세트·매칭 캐시도 새로 받는다.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tradeSets.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.matches.all });
+    },
   });
 }
 
