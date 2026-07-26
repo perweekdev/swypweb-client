@@ -142,6 +142,14 @@ export function markChatRead(chatId: string) {
   return api.patch<{ chatId: number; unreadCount: number }>(`/chat-rooms/${chatId}/read`);
 }
 
+/**
+ * 교환 완료 처리 (CHAT-004).
+ * ⚠️ 요청 바디 유무는 서버 명세 확인 필요 — 우선 상태 전환만 하는 것으로 본다.
+ */
+export function completeChatExchange(chatId: string) {
+  return api.patch<unknown>(`/chat-rooms/${chatId}/complete`);
+}
+
 /** 채팅 이미지 제약. 프로필 이미지와 동일하게 가정한다(서버 확인 필요). */
 export const CHAT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const CHAT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png'];

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  completeChatExchange,
   createChatRoom,
   getChatHeader,
   getChatMessages,
@@ -97,6 +98,16 @@ export function useCreateChatRoom() {
   return useMutation({
     mutationFn: createChatRoom,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() }),
+  });
+}
+
+/** CHAT-004 교환 완료. 성공 시 상단 상태(헤더)와 목록 배지를 갱신한다. */
+export function useCompleteChatExchange(chatId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => completeChatExchange(chatId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.all }),
   });
 }
 
