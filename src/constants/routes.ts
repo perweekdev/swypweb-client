@@ -89,6 +89,12 @@ export const COLLECTION_ROUTES = {
 export const CHAT_ROUTES = {
   /** CHAT-002 채팅방 */
   room: (id: string) => `${ROUTES.chat}/${id}`,
+  /**
+   * 제안 직후 새로 만들어진 채팅방.
+   * 뒤로가기를 채팅 목록으로 보내기 위한 표시다 — 제안은 이미 끝난 요청이라
+   * 카드 선택 화면이나 그 이전 화면으로 되돌아가면 흐름이 어색해진다.
+   */
+  createdRoom: (id: string) => `${ROUTES.chat}/${id}?new=1`,
   /** CHAT-003 교환 포카 정보 */
   roomDetail: (id: string) => `${ROUTES.chat}/${id}/detail`,
   /** CHAT-004 교환 완료 포카 선택 */

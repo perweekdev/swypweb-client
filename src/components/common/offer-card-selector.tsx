@@ -81,7 +81,9 @@ export function OfferCardSelector({
         receiveCardIds: [...partnerPicked].map(Number),
         giveCardIds: [...myPicked].map(Number),
       });
-      router.replace(CHAT_ROUTES.room(String(chatRoomId)));
+      // 제안은 이미 끝났으므로 카드 선택 화면을 히스토리에서 지우고(replace),
+      // 채팅방에서 뒤로가면 카드 선택 이전 화면이 아니라 채팅 목록으로 가도록 표시한다.
+      router.replace(CHAT_ROUTES.createdRoom(String(chatRoomId)));
     } catch (caught) {
       if (!isApiError(caught)) {
         setError('잠시 후 다시 시도해주세요.');
