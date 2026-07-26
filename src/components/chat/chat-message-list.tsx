@@ -52,9 +52,19 @@ export function ChatMessageList({
                 </span>
               )}
 
-              <ChatBubble variant={isMine ? 'mine' : 'partner'} className="max-w-[72%]">
-                {message.text}
-              </ChatBubble>
+              {message.imageUrl ? (
+                // 이미지 메시지는 말풍선 없이 사진만 보여준다.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={message.imageUrl}
+                  alt="보낸 사진"
+                  className="max-w-[60%] rounded-xl object-cover"
+                />
+              ) : (
+                <ChatBubble variant={isMine ? 'mine' : 'partner'} className="max-w-[72%]">
+                  {message.text}
+                </ChatBubble>
+              )}
 
               {!isMine && isGroupEnd && (
                 <span className="shrink-0 text-body4 text-secondary-300">

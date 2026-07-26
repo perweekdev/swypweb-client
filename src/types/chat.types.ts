@@ -21,11 +21,13 @@ export interface ChatPartner {
   color?: string;
 }
 
-/** 채팅 메시지 */
+/** 채팅 메시지. 이미지 메시지는 `imageUrl`이 채워지고 `text`가 비어 있을 수 있다. */
 export interface ChatMessage {
   id: string;
   sender: MessageSender;
   text: string;
+  /** 이미지 메시지일 때만 채워진다(텍스트 메시지에는 없다) */
+  imageUrl?: string | null;
   /** ISO 8601 */
   sentAt: string;
 }

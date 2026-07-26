@@ -45,6 +45,7 @@ export function useChatSocket(chatId: string) {
         id: String(incoming.messageId),
         sender: incoming.senderId === myUserId ? 'me' : 'partner',
         text: incoming.content ?? '',
+        imageUrl: incoming.imageUrl,
         // 실시간 프레임의 시각 형식이 REST와 다를 수 있다. 파싱에 실패하면 '방금 도착'으로 보정한다
         // — 여기서 빈 값을 넣으면 메시지 목록 렌더가 통째로 실패한다.
         sentAt: toIsoString(incoming.createdAt) || new Date().toISOString(),
@@ -108,26 +109,35 @@ export function useChatSocket(chatId: string) {
     };
   }, [accessToken, chatId, myUserId, appendMessage]);
 
-  /** 메시지 전송. 서버가 브로드캐스트로 되돌려주므로 낙관적 추가는 하지 않는다. */
-  const sendMessage = useCallback(
-    (text: string) => {
-      const trimmed = text.trim();
+  /** 서버가 브로드캐스트로 되돌려주므로 낙관적 추가는 하지 않는다. */
+  const publish = useCallback(
+    (payload: { type: 'TEXT' | 'IMAGE'; content: string | null; imageUrl: string | null }) => {
       const client = clientRef.current;
-      if (!trimmed || !client?.connected) return false;
+      if (!client?.connected) return false;
 
       client.publish({
         destination: '/pub/chat/messages',
-        body: JSON.stringify({
-          chatRoomId: Number(chatId),
-          type: 'TEXT',
-          content: trimmed,
-          imageUrl: null,
-        }),
+        body: JSON.stringify({ chatRoomId: Number(chatId), ...payload }),
       });
       return true;
     },
     [chatId]
   );
 
-  return { connected, sendMessage };
+  const sendMessage = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return false;
+      return publish({ type: 'TEXT', content: trimmed, imageUrl: null });
+    },
+    [publish]
+  );
+
+  /** 업로드로 얻은 URL을 IMAGE 메시지로 보낸다(§8.7). */
+  const sendImage = useCallback(
+    (imageUrl: string) => publish({ type: 'IMAGE', content: null, imageUrl }),
+    [publish]
+  );
+
+  return { connected, sendMessage, sendImage };
 }

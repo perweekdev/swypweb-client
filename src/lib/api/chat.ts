@@ -129,6 +129,7 @@ export async function getChatMessages(params: {
       id: String(message.messageId),
       sender: message.senderId === params.myUserId ? ('me' as const) : ('partner' as const),
       text: message.content ?? '',
+      imageUrl: message.imageUrl,
       sentAt: toIsoString(message.createdAt),
     })),
     nextCursor: page.nextCursor,
@@ -139,6 +140,30 @@ export async function getChatMessages(params: {
 /** 8.6 읽음 처리 */
 export function markChatRead(chatId: string) {
   return api.patch<{ chatId: number; unreadCount: number }>(`/chat-rooms/${chatId}/read`);
+}
+
+/** 채팅 이미지 제약. 프로필 이미지와 동일하게 가정한다(서버 확인 필요). */
+export const CHAT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const CHAT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png'];
+export const CHAT_IMAGE_ACCEPT = CHAT_IMAGE_MIME_TYPES.join(',');
+
+export function validateChatImage(file: File): string | null {
+  if (!CHAT_IMAGE_MIME_TYPES.includes(file.type)) return 'JPG 또는 PNG 이미지만 보낼 수 있어요.';
+  if (file.size > CHAT_IMAGE_MAX_BYTES) return '이미지 용량은 5MB 이하만 가능해요.';
+  return null;
+}
+
+/**
+ * 채팅 이미지 업로드 → 응답의 `imageUrl`을 WebSocket `IMAGE` 메시지로 보낸다(§8.7).
+ *
+ * ⚠️ **경로/파트명 확인 필요.** 문서(`c751ce9`)에는 미구현으로 되어 있어 인벤토리 경로를 따랐다.
+ * 서버 명세가 다르면 **이 함수만** 고치면 된다.
+ */
+export async function uploadChatImage(chatId: string, file: File): Promise<string> {
+  const form = new FormData();
+  form.append('image', file);
+  const data = await api.post<{ imageUrl: string }>(`/chat-rooms/${chatId}/messages/image`, form);
+  return data.imageUrl;
 }
 
 /** 8.1 채팅방 생성(교환 제안). 본인 세트에 제안 → 403 `AUTH_006` */
