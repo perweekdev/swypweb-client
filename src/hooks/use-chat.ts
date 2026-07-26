@@ -21,7 +21,13 @@ function useAuthReady() {
   return hydrated && isAuthenticated;
 }
 
-/** CHAT-001 채팅방 목록 (문자열 커서) */
+/**
+ * CHAT-001 채팅방 목록 (문자열 커서)
+ *
+ * ⚠️ 서버 구독 채널이 **방 단위(`/sub/chat/rooms/{id}`)뿐**이라, 목록 화면에서는 새 메시지를
+ * 실시간으로 받을 방법이 없다(사용자 단위 채널이 없음 — BE 요청 대상).
+ * 그래서 화면이 열려 있는 동안만 주기적으로 다시 불러오고, 탭으로 돌아올 때도 갱신한다.
+ */
 export function useChatRooms() {
   const ready = useAuthReady();
 
@@ -32,6 +38,9 @@ export function useChatRooms() {
     getNextPageParam: getNextCursorParam,
     enabled: ready,
     throwOnError: false,
+    // 목록 화면이 떠 있는 동안만 동작한다(언마운트되면 멈춘다).
+    refetchInterval: 15_000,
+    refetchOnWindowFocus: true,
   });
 }
 

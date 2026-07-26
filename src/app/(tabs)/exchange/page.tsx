@@ -141,10 +141,10 @@ export default function ExchangePage() {
               <HomeFeedCard
                 className="cursor-pointer px-4 py-4"
                 name={match.nickname}
+                avatarUrl={match.avatarUrl}
                 haveCards={match.haveCards}
                 wantCards={match.wantCards}
-                // 상대 정보가 상세 응답에 없어(§7.3) 닉네임을 함께 넘긴다.
-                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id, match.nickname))}
+                onClick={() => router.push(EXCHANGE_ROUTES.matchDetail(match.id))}
                 onOffer={() => router.push(EXCHANGE_ROUTES.matchSelect(match.id))}
               />
             </div>

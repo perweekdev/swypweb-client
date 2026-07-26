@@ -54,7 +54,7 @@ export default function HomePage() {
 
   return (
     <>
-      <TabHeader title="포카매치" />
+      <TabHeader title="포카매치" logo />
 
       <GroupFilter
         className="px-4 pb-3 pt-1"
@@ -78,16 +78,7 @@ export default function HomePage() {
 
       <div className="pb-24">
         {posts.map((post, i) => {
-          // 상세 응답에 작성자가 없어(§7.3) 피드에서 받은 값을 쿼리로 넘긴다.
-          const openDetail = requireAuth(() =>
-            router.push(
-              POST_ROUTES.detail(post.id, {
-                nickname: post.author.nickname,
-                groups: post.author.groups,
-                authorId: post.author.id,
-              })
-            )
-          );
+          const openDetail = requireAuth(() => router.push(POST_ROUTES.detail(post.id)));
 
           return (
             <div key={post.id}>
@@ -96,6 +87,7 @@ export default function HomePage() {
                 className="cursor-pointer px-4 py-4"
                 name={post.author.nickname}
                 avatarColor={post.author.avatarColor}
+                avatarUrl={post.author.avatarUrl}
                 haveCards={post.haveCards}
                 wantCards={post.wantCards}
                 isMine={myUserId !== null && post.author.id === myUserId}

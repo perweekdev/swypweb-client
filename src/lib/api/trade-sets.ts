@@ -17,6 +17,10 @@ interface TradeSetDetailResponse {
   groupId: number;
   groupName: string;
   createdAt: string;
+  /** 작성자 정보 (서버 추가분) */
+  userId: number;
+  nickname: string;
+  profileImageUrl: string | null;
   haveCards: TradeSetCardResponse[];
   wantCards: TradeSetCardResponse[];
 }
@@ -38,6 +42,11 @@ function toCard(card: TradeSetCardResponse): Photocard {
 export interface TradeSetDetail {
   id: string;
   groupName: string;
+  author: {
+    id: string;
+    nickname: string;
+    avatarUrl: string | null;
+  };
   haveCards: Photocard[];
   wantCards: Photocard[];
 }
@@ -140,7 +149,7 @@ export function deleteTradeSet(tradeSetId: string) {
 
 /**
  * 7.3 교환 세트 상세. **공개 API**(인증 불필요).
- * ⚠️ 작성자(author) 정보가 응답에 없다 → 홈 피드에서 받은 값을 화면으로 전달해야 한다.
+ * 작성자 정보를 함께 준다 — 화면은 이 값을 쓰면 되고 따로 전달할 필요가 없다.
  * 없는 세트 → 404.
  */
 export async function getTradeSetDetail(tradeSetId: string): Promise<TradeSetDetail> {
@@ -149,6 +158,11 @@ export async function getTradeSetDetail(tradeSetId: string): Promise<TradeSetDet
   return {
     id: String(data.tradeSetId),
     groupName: data.groupName,
+    author: {
+      id: String(data.userId),
+      nickname: data.nickname,
+      avatarUrl: data.profileImageUrl,
+    },
     haveCards: data.haveCards.map(toCard),
     wantCards: data.wantCards.map(toCard),
   };

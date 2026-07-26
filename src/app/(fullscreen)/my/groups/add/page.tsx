@@ -78,7 +78,7 @@ export default function AddGroupPage() {
                     className={isAdded ? 'opacity-50' : ''}
                   />
                   <span
-                    className={`text-center text-body3 ${
+                    className={`break-keep text-center text-body3 ${
                       isAdded ? 'text-secondary-300' : 'text-secondary-900'
                     }`}
                   >

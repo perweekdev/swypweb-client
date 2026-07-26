@@ -49,7 +49,10 @@ export function GroupFilter({
       className="flex w-14 shrink-0 flex-col items-center gap-1.5"
     >
       {node}
-      <span className="line-clamp-2 w-full text-center text-body4 text-secondary-900">{label}</span>
+      {/* break-keep: 한국어는 단어 중간에서 끊지 않는다 ('관심그룹 추가/하기' → '관심그룹/추가하기') */}
+      <span className="line-clamp-2 w-full break-keep text-center text-body4 text-secondary-900">
+        {label}
+      </span>
     </button>
   );
 

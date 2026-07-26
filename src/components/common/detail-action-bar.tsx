@@ -18,12 +18,14 @@ import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
 export function DetailActionBar({
   name,
   avatarColor,
+  avatarUrl,
   groups,
   label,
   href,
 }: {
   name: string;
   avatarColor?: string;
+  avatarUrl?: string | null;
   groups?: string;
   label: string;
   href: string;
@@ -41,7 +43,13 @@ export function DetailActionBar({
     <div className="sticky bottom-0 bg-background px-4 pb-4">
       <div className="border-t border-secondary-50" />
       <div className="space-y-3 pt-3">
-        <UserProfile variant="info" name={name} avatarColor={avatarColor} groups={groups} />
+        <UserProfile
+          variant="info"
+          name={name}
+          avatarColor={avatarColor}
+          avatarUrl={avatarUrl}
+          groups={groups}
+        />
         <Button size="lg" onClick={handleAction}>
           {label}
         </Button>

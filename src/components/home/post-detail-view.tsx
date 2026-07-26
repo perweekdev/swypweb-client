@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { ExchangeCardSections } from '@components/common/exchange-card-sections';
 import { DetailActionBar } from '@components/common/detail-action-bar';
@@ -13,22 +13,10 @@ import { POST_ROUTES } from '@constants/routes';
 
 /**
  * HOME-003 교환글 상세.
- *
- * 상세 API(`GET /trade-sets/{id}`)는 공개지만 **작성자 정보를 주지 않는다**(api-reference §7.3).
- * 그래서 피드에서 넘겨준 닉네임·그룹명을 쿼리에서 읽어 하단 액션바에 쓴다.
- * 서버가 author 필드를 추가하면 쿼리 전달을 없애고 응답 값으로 바꾼다.
+ * 경로의 id는 교환 세트 id이며, 작성자 정보는 상세 API가 함께 준다(§7.3).
  */
 export function PostDetailView() {
   const tradeSetId = String(useParams().id ?? '');
-  const searchParams = useSearchParams();
-  const nickname = searchParams.get('n') ?? '';
-  const groups = searchParams.get('g') ?? undefined;
-  const authorId = searchParams.get('u');
-
-  // 내 교환글에는 제안할 수 없다(서버 AUTH_006) → CTA 자체를 숨긴다.
-  const { data: myProfile } = useMyProfile();
-  const isMine =
-    authorId !== null && myProfile !== undefined && authorId === String(myProfile.userId);
 
   const { data, isPending, isError } = useQuery({
     queryKey: queryKeys.tradeSets.detail(tradeSetId),
@@ -36,6 +24,11 @@ export function PostDetailView() {
     enabled: tradeSetId.length > 0,
     throwOnError: false,
   });
+
+  // 내 교환글에는 제안할 수 없다(서버 AUTH_006) → CTA 자체를 숨긴다.
+  const { data: myProfile } = useMyProfile();
+  const isMine =
+    data !== undefined && myProfile !== undefined && data.author.id === String(myProfile.userId);
 
   return (
     <>
@@ -65,8 +58,9 @@ export function PostDetailView() {
             </p>
           ) : (
             <DetailActionBar
-              name={nickname}
-              groups={groups}
+              name={data.author.nickname}
+              avatarUrl={data.author.avatarUrl}
+              groups={data.groupName}
               label="교환할 포카 선택하기"
               href={POST_ROUTES.select(data.id)}
             />
