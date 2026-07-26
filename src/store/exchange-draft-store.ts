@@ -19,6 +19,8 @@ interface ExchangeDraftState {
   toggle: (side: ExchangeSide, cardId: string) => void;
   /** 선택 스트립의 X 버튼 — 담긴 포카 제거 */
   remove: (side: ExchangeSide, cardId: string) => void;
+  /** EX-009 수정 진입 시 기존 세트의 선택으로 채운다 */
+  setSelection: (haveIds: string[], wantIds: string[]) => void;
   reset: () => void;
 
   /** EX-001에서 '교환이 등록되었어요' 토스트를 띄우기 위한 1회성 플래그 */
@@ -47,6 +49,7 @@ export const useExchangeDraftStore = create<ExchangeDraftState>((set) => ({
       const field = key(side);
       return { [field]: state[field].filter((id) => id !== cardId) };
     }),
+  setSelection: (haveIds, wantIds) => set({ haveIds, wantIds }),
   reset: () => set({ haveIds: [], wantIds: [] }),
 
   justRegistered: false,

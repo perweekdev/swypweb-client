@@ -41,6 +41,8 @@ function toCard(card: TradeSetCardResponse): Photocard {
 
 export interface TradeSetDetail {
   id: string;
+  /** 수정 화면에서 컬렉션 트리를 불러올 때 필요하다 */
+  groupId: number;
   groupName: string;
   author: {
     id: string;
@@ -157,6 +159,7 @@ export async function getTradeSetDetail(tradeSetId: string): Promise<TradeSetDet
 
   return {
     id: String(data.tradeSetId),
+    groupId: data.groupId,
     groupName: data.groupName,
     author: {
       id: String(data.userId),

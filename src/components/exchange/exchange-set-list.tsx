@@ -108,8 +108,10 @@ export function ExchangeSetList({ groupId }: { groupId: number | null }) {
         open={menuSetId !== null}
         onClose={() => setMenuSetId(null)}
         actions={[
-          // TODO: EX-009 교환 세트 수정 (디자인 미핸드오프 — 수정 API는 준비됨)
-          { label: '수정하기', onClick: () => {} },
+          {
+            label: '수정하기',
+            onClick: () => menuSetId && router.push(EXCHANGE_ROUTES.setEdit(menuSetId)),
+          },
           { label: '삭제하기', destructive: true, onClick: () => setDeleteSetId(menuSetId) },
         ]}
       />

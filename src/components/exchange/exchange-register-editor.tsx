@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { Button } from '@components/ui/button';
 import { HaveWantTab } from '@components/ui/have-want-tab';
@@ -22,17 +22,23 @@ const PLACEHOLDER_COLOR = '#E6E8EB';
  * 있어요/구해요 탭 → 선택된 포카(가로 스크롤, X로 제거) → 앨범 아코디언 안의 5열 포카 그리드.
  * 선택은 드래프트 스토어에 담기고, `완료`에서 EX-008 확인 화면으로 넘긴다(뒤로 와도 유지).
  *
- * 등록 API가 **그룹 단위**(`POST /trade-sets/{groupId}`)라 대상 그룹을 `?group=`으로 받는다.
+ * 등록/수정 API가 모두 **그룹 단위**라 대상 그룹을 받아야 한다. 어디서 진입하든(홈/내교환/수정)
+ * 그룹이 정해진 상태로 열리도록 **호출부가 groupId를 넘긴다**.
+ * `tradeSetId`가 있으면 **수정 모드**(EX-009)이며, 완료 시 등록이 아니라 수정으로 이어진다.
+ *
  * 카드 목록은 컬렉션 트리를 그대로 쓰되(보유 여부와 무관하게 선택 가능) 전체를 한 번에 받는다.
  *
  * 계측: 완료 53×38 pill(비활성 secondary-100 / 활성 secondary-900) · 그리드 5열 카드 64 gap 6
  * · 앨범명 h3 secondary-900 · 버전명 body3 secondary-500 · 구분선 secondary-50.
  */
-export function ExchangeRegisterEditor() {
+export function ExchangeRegisterEditor({
+  groupId,
+  tradeSetId,
+}: {
+  groupId: number;
+  tradeSetId?: string;
+}) {
   const router = useRouter();
-  const groupParam = useSearchParams().get('group');
-  const groupId = groupParam ? Number(groupParam) : null;
-
   const [side, setSide] = useState<ExchangeSide>('have');
   const { haveIds, wantIds, toggle, remove } = useExchangeDraftStore();
   const { data: tree, isPending, isError } = useGroupCollectionTree(groupId);
@@ -62,18 +68,20 @@ export function ExchangeRegisterEditor() {
     .map((id) => cardsById.get(id))
     .filter((card): card is Photocard => card !== undefined);
   // 스토리보드: 있어요/구해요 각각 1장 이상 선택해야 등록할 수 있다
-  const canComplete = haveIds.length > 0 && wantIds.length > 0 && groupParam !== null;
+  const canComplete = haveIds.length > 0 && wantIds.length > 0;
 
   return (
     <>
       <Header
-        title="교환 세트 등록"
+        title={tradeSetId ? '교환 세트 수정' : '교환 세트 등록'}
         right={
           <Button
             variant="navy"
             size="sm"
             disabled={!canComplete}
-            onClick={() => router.push(EXCHANGE_ROUTES.registerConfirm(groupParam as string))}
+            onClick={() =>
+              router.push(EXCHANGE_ROUTES.registerConfirm(String(groupId), tradeSetId))
+            }
             className="mr-2"
           >
             완료

@@ -54,9 +54,17 @@ export const EXCHANGE_ROUTES = {
   matchSelect: (id: string) => `${ROUTES.exchange}/matches/${id}/select`,
   /** EX-007 교환 세트 등록 — 등록 API가 그룹 단위라 대상 그룹을 쿼리로 넘긴다 */
   register: (groupId: string) => `${ROUTES.exchangeRegister}?group=${encodeURIComponent(groupId)}`,
-  /** EX-008 교환 세트 확인 (등록 API가 그룹 단위라 그룹을 함께 넘긴다) */
-  registerConfirm: (groupId: string) =>
-    `${ROUTES.exchangeRegister}/confirm?group=${encodeURIComponent(groupId)}`,
+  /**
+   * EX-008 교환 세트 확인 (등록/수정 API가 그룹 단위라 그룹을 함께 넘긴다).
+   * `tradeSetId`가 있으면 등록이 아니라 **수정**으로 처리한다(EX-009).
+   */
+  registerConfirm: (groupId: string, tradeSetId?: string) => {
+    const query = new URLSearchParams({ group: groupId });
+    if (tradeSetId) query.set('edit', tradeSetId);
+    return `${ROUTES.exchangeRegister}/confirm?${query}`;
+  },
+  /** EX-009 교환 세트 수정 */
+  setEdit: (id: string) => `${ROUTES.exchange}/sets/${id}/edit`,
   /** EX-003 나의 교환 세트 관리 (그룹 단위 목록) */
   setsOf: (groupId: string) => `${ROUTES.exchange}/sets?group=${encodeURIComponent(groupId)}`,
 } as const;
