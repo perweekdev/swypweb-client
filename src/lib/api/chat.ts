@@ -73,16 +73,48 @@ interface ChatHeaderResponse {
   representWantCardInfo: ChatCardResponse | null;
   haveCardCount: number;
   wantCardCount: number;
+  /**
+   * 제안자/수신자 구분. 서버에 **둘 중 한 형태**로 요청해 두었고 어느 쪽으로 왔는지 확정 전이라
+   * 세 가지를 모두 받아 둔다(`resolveIsReceiver`). 확인되면 남은 필드는 지운다.
+   */
+  isReceiver?: boolean | null;
+  receiverUserId?: number | null;
+  proposerUserId?: number | null;
 }
 
 export interface ChatRoomHeader {
   partnerNickname: string;
   status: ExchangeStatus;
+  /** 내가 제안을 '받은' 쪽인가. 판단 불가면 `null` — `resolveIsReceiver` 참고. */
+  isReceiver: boolean | null;
+  receiverUserId: number | null;
+  proposerUserId: number | null;
+}
+
+/**
+ * 내가 제안을 **'받은' 쪽인지** 판정한다. 교환 완료는 받은 쪽만 할 수 있어 버튼 노출 조건이 된다.
+ *
+ * 서버가 `isReceiver`(boolean)를 주면 그대로 쓰고, `receiverUserId`/`proposerUserId`만 주면
+ * 내 userId와 비교한다. **셋 다 없으면 `null`(판단 불가)** 이고, 이때는 버튼을 가리지 않는다 —
+ * 잘못 숨겨서 완료를 아무도 못 하게 되는 쪽이, 눌렀을 때 403 안내를 보는 쪽보다 나쁘다.
+ */
+export function resolveIsReceiver(header: ChatRoomHeader, myUserId?: number): boolean | null {
+  if (typeof header.isReceiver === 'boolean') return header.isReceiver;
+  if (myUserId === undefined) return null;
+  if (typeof header.receiverUserId === 'number') return header.receiverUserId === myUserId;
+  if (typeof header.proposerUserId === 'number') return header.proposerUserId !== myUserId;
+  return null;
 }
 
 export async function getChatHeader(chatId: string): Promise<ChatRoomHeader> {
   const data = await api.get<ChatHeaderResponse>(`/chat-rooms/${chatId}/header`);
-  return { partnerNickname: data.partnerNickname, status: toStatus(data.isCompleted) };
+  return {
+    partnerNickname: data.partnerNickname,
+    status: toStatus(data.isCompleted),
+    isReceiver: typeof data.isReceiver === 'boolean' ? data.isReceiver : null,
+    receiverUserId: typeof data.receiverUserId === 'number' ? data.receiverUserId : null,
+    proposerUserId: typeof data.proposerUserId === 'number' ? data.proposerUserId : null,
+  };
 }
 
 // ─────────────────────────── 8.4 교환 제안 카드
