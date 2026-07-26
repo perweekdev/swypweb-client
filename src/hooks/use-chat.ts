@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   completeChatExchange,
@@ -15,6 +16,8 @@ import { getNextCursorParam } from '@lib/cursor';
 import { queryKeys } from '@lib/query-keys';
 import { useMyProfile } from '@hooks/use-my-profile';
 import { useAuthStore } from '@store/auth-store';
+import type { CursorPage } from '@/types/api.types';
+import type { ChatRoomSummary } from '@/types/chat.types';
 
 function useAuthReady() {
   const hydrated = useAuthStore((s) => s.hydrated);
@@ -55,6 +58,39 @@ export function useChatHeader(chatId: string) {
     enabled: ready && chatId.length > 0,
     throwOnError: false,
   });
+}
+
+/**
+ * 채팅 상대의 프로필 사진.
+ *
+ * 채팅방 헤더(8.3)에는 **프로필 이미지 필드가 없고** 목록(8.2)의 `partnerProfileImageUrl`에만 있다.
+ * 그래서 목록에서 가져온다.
+ *  - 목록을 거쳐 들어왔으면 이미 캐시에 있으므로 **추가 요청이 없다**
+ *  - 새로고침·제안 직후처럼 캐시가 없을 때만 목록 첫 페이지를 한 번 부른다
+ *
+ * 첫 페이지에 없으면(방이 아주 많은 경우) 기본 아바타로 남는다 — 목록은 최근 대화순이라
+ * 방금 연 방은 대개 앞쪽에 있고, 목록을 스크롤해 들어온 경우는 위의 캐시 경로가 받는다.
+ */
+export function useChatPartnerAvatar(chatId: string) {
+  const ready = useAuthReady();
+  const queryClient = useQueryClient();
+
+  const cached = queryClient
+    .getQueryData<InfiniteData<CursorPage<ChatRoomSummary, string>>>(queryKeys.chat.rooms())
+    ?.pages.flatMap((page) => page.items)
+    .find((room) => room.id === chatId);
+
+  const { data } = useQuery({
+    queryKey: queryKeys.chat.partner(chatId),
+    queryFn: async () => {
+      const page = await getChatRooms();
+      return page.items.find((room) => room.id === chatId)?.partner.avatarUrl ?? null;
+    },
+    enabled: ready && chatId.length > 0 && cached === undefined,
+    throwOnError: false,
+  });
+
+  return cached?.partner.avatarUrl ?? data ?? null;
 }
 
 /** 교환 제안 카드 — 채팅방 상단 요약(CHAT-002)과 CHAT-003 상세가 공유한다. */

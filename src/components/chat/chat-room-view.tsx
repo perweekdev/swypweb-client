@@ -6,7 +6,13 @@ import { Header } from '@components/layout/header';
 import { ChatInputBar } from '@components/chat/chat-input-bar';
 import { ChatMatchInfo } from '@components/chat/chat-match-info';
 import { ChatMessageList } from '@components/chat/chat-message-list';
-import { useChatHeader, useChatMessages, useChatProposal, useMarkChatRead } from '@hooks/use-chat';
+import {
+  useChatHeader,
+  useChatMessages,
+  useChatPartnerAvatar,
+  useChatProposal,
+  useMarkChatRead,
+} from '@hooks/use-chat';
 import { useChatSocket } from '@hooks/use-chat-socket';
 import { uploadChatImage, validateChatImage } from '@lib/api/chat';
 import { isApiError } from '@lib/api-error';
@@ -28,6 +34,8 @@ export function ChatRoomView() {
   const isNewRoom = useSearchParams().get('new') === '1';
 
   const { data: header } = useChatHeader(chatId);
+  // 헤더(8.3)에 프로필 이미지가 없어 목록(8.2)에서 가져온다.
+  const partnerAvatarUrl = useChatPartnerAvatar(chatId);
   const { data: proposal } = useChatProposal(chatId);
   const { data: messagePages, isPending, isError } = useChatMessages(chatId);
   useMarkChatRead(chatId);
@@ -94,7 +102,7 @@ export function ChatRoomView() {
       {!isPending && !isError && (
         <ChatMessageList
           messages={messages}
-          partner={{ nickname: header?.partnerNickname ?? '', avatarUrl: null }}
+          partner={{ nickname: header?.partnerNickname ?? '', avatarUrl: partnerAvatarUrl }}
         />
       )}
 
