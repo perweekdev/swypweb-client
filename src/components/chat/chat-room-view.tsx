@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@components/layout/header';
 import { ChatInputBar } from '@components/chat/chat-input-bar';
 import { ChatMatchInfo } from '@components/chat/chat-match-info';
@@ -10,6 +10,7 @@ import { useChatHeader, useChatMessages, useChatProposal, useMarkChatRead } from
 import { useChatSocket } from '@hooks/use-chat-socket';
 import { uploadChatImage, validateChatImage } from '@lib/api/chat';
 import { isApiError } from '@lib/api-error';
+import { ROUTES } from '@constants/routes';
 
 /**
  * CHAT-002 채팅방.
@@ -20,7 +21,11 @@ import { isApiError } from '@lib/api-error';
  * 메시지 전송·수신은 STOMP WebSocket이다(`useChatSocket`).
  */
 export function ChatRoomView() {
+  const router = useRouter();
   const chatId = String(useParams().id ?? '');
+  // 제안 직후 만들어진 방(`?new=1`)은 뒤로가기를 채팅 목록으로 보낸다.
+  // 그대로 히스토리를 되짚으면 이미 끝난 '교환할 포카 선택' 이전 화면이 다시 나온다.
+  const isNewRoom = useSearchParams().get('new') === '1';
 
   const { data: header } = useChatHeader(chatId);
   const { data: proposal } = useChatProposal(chatId);
@@ -59,7 +64,10 @@ export function ChatRoomView() {
     <>
       {/* 헤더 + 교환 정보는 스크롤해도 상단에 유지 (memo) */}
       <div className="sticky top-0 z-10 bg-background">
-        <Header title={header?.partnerNickname ?? ''} />
+        <Header
+          title={header?.partnerNickname ?? ''}
+          onBack={isNewRoom ? () => router.replace(ROUTES.chat) : undefined}
+        />
         {/* 제안 카드가 오기 전에는 렌더하지 않는다 — 요약이 대표 카드 1장을 직접 참조해서,
             빈 배열이면 undefined 접근으로 터진다. */}
         {proposal && (
