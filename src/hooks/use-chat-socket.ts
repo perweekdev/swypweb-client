@@ -45,7 +45,9 @@ export function useChatSocket(chatId: string) {
         id: String(incoming.messageId),
         sender: incoming.senderId === myUserId ? 'me' : 'partner',
         text: incoming.content ?? '',
-        sentAt: toIsoString(incoming.createdAt),
+        // 실시간 프레임의 시각 형식이 REST와 다를 수 있다. 파싱에 실패하면 '방금 도착'으로 보정한다
+        // — 여기서 빈 값을 넣으면 메시지 목록 렌더가 통째로 실패한다.
+        sentAt: toIsoString(incoming.createdAt) || new Date().toISOString(),
       };
 
       queryClient.setQueryData<MessagePages>(queryKeys.chat.messages(chatId), (previous) => {
