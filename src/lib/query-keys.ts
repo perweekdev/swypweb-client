@@ -3,6 +3,11 @@
  * 무효화는 상위 키(`all`)로 걸어 하위를 한 번에 만료시킨다.
  */
 export const queryKeys = {
+  terms: {
+    all: ['terms'] as const,
+    /** GET /terms/{service|privacy} */
+    document: (type: string) => [...queryKeys.terms.all, type] as const,
+  },
   users: {
     all: ['users'] as const,
     /** GET /users/me */

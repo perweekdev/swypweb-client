@@ -1,13 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@components/ui/button';
 import { SettingRow } from '@components/ui/setting-row';
 import { TabHeader } from '@components/layout/tab-header';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
+import { ROUTES } from '@constants/routes';
 
 /** MY-004 비회원 마이페이지 */
 export function GuestMyPage() {
+  const router = useRouter();
   const [loginOpen, setLoginOpen] = useState(false);
 
   return (
@@ -25,9 +28,8 @@ export function GuestMyPage() {
 
       <section className="px-4 pt-5">
         <h2 className="text-body2 text-secondary-500">정보</h2>
-        {/* TODO: 개인정보 처리방침 / 이용약관 화면 라우팅 */}
-        <SettingRow label="개인정보 처리방침" onClick={() => {}} />
-        <SettingRow label="이용약관" onClick={() => {}} />
+        <SettingRow label="개인정보 처리방침" onClick={() => router.push(ROUTES.privacy)} />
+        <SettingRow label="이용약관" onClick={() => router.push(ROUTES.terms)} />
       </section>
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
