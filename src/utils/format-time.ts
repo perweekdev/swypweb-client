@@ -8,24 +8,24 @@
 // 서비스 기준 시간대 고정. 서버(UTC)와 브라우저(KST) 렌더 결과가 갈리지 않게 한다.
 const TIME_ZONE = 'Asia/Seoul';
 
+/**
+ * ⚠️ `Intl.DateTimeFormat.format()`은 Invalid Date를 받으면 **RangeError를 던진다.**
+ * 서버 값이 예상 밖 형식이면 화면 전체가 죽으므로, 표시 유틸에서는 예외 대신 빈 문자열을 돌려준다.
+ */
+function safeFormat(iso: string, options: Intl.DateTimeFormatOptions): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('ko-KR', { timeZone: TIME_ZONE, ...options }).format(date);
+}
+
 /** 채팅방(CHAT-002) 날짜 구분선: "2026년 7월 4일" */
 export function formatChatDate(iso: string): string {
-  return new Intl.DateTimeFormat('ko-KR', {
-    timeZone: TIME_ZONE,
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(iso));
+  return safeFormat(iso, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 /** 채팅방(CHAT-002) 메시지 시간: "오전 9:02" */
 export function formatChatTime(iso: string): string {
-  return new Intl.DateTimeFormat('ko-KR', {
-    timeZone: TIME_ZONE,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).format(new Date(iso));
+  return safeFormat(iso, { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 /** 같은 날짜인지 (날짜 구분선 삽입 판단용) */
