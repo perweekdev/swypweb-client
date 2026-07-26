@@ -80,7 +80,9 @@ export function NicknameOnboarding() {
         router.replace(`${ROUTES.login}?error=OAUTH_LOGIN_FAILED`);
         return;
       }
-      setError(caught.message);
+      // 서버 원문(예: 'Internal Server Error')을 그대로 보여주지 않는다 — 사용자가 할 수 있는 게 없다.
+      // 이 단계에서 실패는 대부분 닉네임 문제이므로 다시 시도할 수 있게 안내한다.
+      setError('닉네임을 등록하지 못했어요. 다른 닉네임으로 다시 시도해주세요.');
     }
   };
 

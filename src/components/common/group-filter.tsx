@@ -41,6 +41,10 @@ export function GroupFilter({
 }) {
   const scrollRef = useDragScroll<HTMLDivElement>();
 
+  // 관심 등록한 그룹(하트)을 앞쪽에 모은다. showAll이 아닐 때는 애초에 관심 그룹만 들어온다.
+  const myGroups = showAll ? groups.filter((g) => g.favorited) : groups;
+  const otherGroups = showAll ? groups.filter((g) => !g.favorited) : [];
+
   const item = (key: string, label: string, node: ReactNode, onClick?: () => void) => (
     <button
       key={key}
@@ -56,11 +60,30 @@ export function GroupFilter({
     </button>
   );
 
+  const renderGroup = (g: Group) =>
+    item(
+      g.id,
+      g.name,
+      <GroupLogo
+        size="md"
+        name={g.name}
+        color={g.color}
+        logoUrl={g.logoUrl}
+        favorited={g.favorited}
+        state={value === g.id ? 'selected' : 'default'}
+      />,
+      () => onChange(g.id)
+    );
+
   return (
     <div ref={scrollRef} className={`flex gap-x-2.5 overflow-x-auto scrollbar-hide ${className}`}>
       {item('add', addLabel, <GroupLogo size="md" state="add" />, onAdd)}
-      {/* HOME-001은 추가 버튼과 필터 목록 사이에 세로 구분선이 있다(EX-001엔 없음) */}
-      {showAll && <span className="my-1.5 w-px shrink-0 self-start bg-secondary-50 h-12" />}
+
+      {/* 내 관심 그룹은 '추가하기' 바로 옆(구분선 왼쪽)에 모아 둔다 */}
+      {myGroups.map(renderGroup)}
+
+      {/* HOME-001은 '내 그룹'과 '전체 탐색' 사이에 세로 구분선이 있다(EX-001엔 없음) */}
+      {showAll && <span className="my-1.5 h-12 w-px shrink-0 self-start bg-secondary-50" />}
       {showAll &&
         item(
           'all',
@@ -70,21 +93,7 @@ export function GroupFilter({
           />,
           () => onChange(null)
         )}
-      {groups.map((g) =>
-        item(
-          g.id,
-          g.name,
-          <GroupLogo
-            size="md"
-            name={g.name}
-            color={g.color}
-            logoUrl={g.logoUrl}
-            favorited={g.favorited}
-            state={value === g.id ? 'selected' : 'default'}
-          />,
-          () => onChange(g.id)
-        )
-      )}
+      {otherGroups.map(renderGroup)}
     </div>
   );
 }

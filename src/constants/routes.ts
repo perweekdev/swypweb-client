@@ -77,6 +77,12 @@ export const EXCHANGE_ROUTES = {
 export const COLLECTION_ROUTES = {
   /** COL-003 컬렉션 편집 */
   edit: (groupId: string) => `${ROUTES.collection}/edit?group=${encodeURIComponent(groupId)}`,
+  /**
+   * COL-001 컬렉션 메인. 편집을 마치고 돌아올 때 **보던 그룹을 유지**하려고 그룹을 실어 보낸다.
+   * (탭 화면이라 평소에는 쿼리 없이 `/collection`으로 접근한다)
+   */
+  list: (groupId?: string) =>
+    groupId ? `${ROUTES.collection}?group=${encodeURIComponent(groupId)}` : ROUTES.collection,
 } as const;
 
 /** 채팅방 하위 라우트 (CHAT-002 / 003 / 004) */

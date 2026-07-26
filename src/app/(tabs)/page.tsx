@@ -8,7 +8,6 @@ import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { EmptyState } from '@components/common/empty-state';
 import { LoginBottomSheet } from '@components/my/login-bottom-sheet';
-import { FloatingCta } from '@components/common/floating-cta';
 import { useHomeFeed, useInfiniteScrollSentinel } from '@hooks/use-home-feed';
 import { useAllGroups, useInterestGroups } from '@hooks/use-groups';
 import { useMyProfile } from '@hooks/use-my-profile';
@@ -104,10 +103,7 @@ export default function HomePage() {
         )}
       </div>
 
-      <FloatingCta
-        label="교환 등록하기"
-        onClick={requireAuth(() => router.push(ROUTES.exchangeRegister))}
-      />
+      {/* MVP 범위 결정: 홈에는 '교환 등록하기' CTA를 두지 않는다(등록은 내 교환 탭에서). */}
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
