@@ -54,7 +54,7 @@ export default function HomePage() {
 
   return (
     <>
-      <TabHeader title="포카매치" />
+      <TabHeader title="포카매치" logo />
 
       <GroupFilter
         className="px-4 pb-3 pt-1"
