@@ -6,6 +6,7 @@ import {
   deleteTradeSet,
   getMyTradeSets,
   getTradeSetDetail,
+  updateTradeSet,
   type TradeSetPayload,
 } from '@lib/api/trade-sets';
 import { queryKeys } from '@lib/query-keys';
@@ -58,6 +59,16 @@ export function useCreateTradeSet(groupId: number | null) {
 
   return useMutation({
     mutationFn: (payload: TradeSetPayload) => createTradeSet(groupId as number, payload),
+    onSuccess: invalidate,
+  });
+}
+
+/** EX-009 교환 세트 수정. 성공 시 상세 캐시도 비워 최신 카드가 보이게 한다. */
+export function useUpdateTradeSet(tradeSetId: string) {
+  const invalidate = useInvalidateTradeSets();
+
+  return useMutation({
+    mutationFn: (payload: TradeSetPayload) => updateTradeSet(tradeSetId, payload),
     onSuccess: invalidate,
   });
 }

@@ -6,7 +6,7 @@ import { Header } from '@components/layout/header';
 import { Button } from '@components/ui/button';
 import { ExchangeCardSections } from '@components/common/exchange-card-sections';
 import { useGroupCollectionTree } from '@hooks/use-collection';
-import { useCreateTradeSet } from '@hooks/use-trade-sets';
+import { useCreateTradeSet, useUpdateTradeSet } from '@hooks/use-trade-sets';
 import { isApiError } from '@lib/api-error';
 import { API_ERROR_CODES } from '@constants/api-error-codes';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
@@ -21,12 +21,17 @@ const PLACEHOLDER_COLOR = '#E6E8EB';
  */
 export function ExchangeRegisterConfirm() {
   const router = useRouter();
-  const groupParam = useSearchParams().get('group');
+  const searchParams = useSearchParams();
+  const groupParam = searchParams.get('group');
   const groupId = groupParam ? Number(groupParam) : null;
+  // `edit`이 있으면 등록이 아니라 수정(EX-009)이다.
+  const editingId = searchParams.get('edit');
 
   const { haveIds, wantIds, markRegistered } = useExchangeDraftStore();
   const { data: tree } = useGroupCollectionTree(groupId);
   const createTradeSet = useCreateTradeSet(groupId);
+  const updateTradeSet = useUpdateTradeSet(editingId ?? '');
+  const submitting = createTradeSet.isPending || updateTradeSet.isPending;
   const [error, setError] = useState<string | null>(null);
 
   const cardsById = useMemo(() => {
@@ -53,18 +58,20 @@ export function ExchangeRegisterConfirm() {
 
   const haveCards = pick(haveIds);
   const wantCards = pick(wantIds);
-  const canRegister =
-    haveIds.length > 0 && wantIds.length > 0 && groupId !== null && !createTradeSet.isPending;
+  const canRegister = haveIds.length > 0 && wantIds.length > 0 && groupId !== null && !submitting;
 
   const onRegister = async () => {
     if (!canRegister) return;
     setError(null);
 
+    const payload = {
+      haveCardIds: haveIds.map(Number),
+      wantCardIds: wantIds.map(Number),
+    };
+
     try {
-      await createTradeSet.mutateAsync({
-        haveCardIds: haveIds.map(Number),
-        wantCardIds: wantIds.map(Number),
-      });
+      if (editingId) await updateTradeSet.mutateAsync(payload);
+      else await createTradeSet.mutateAsync(payload);
       markRegistered();
       router.push(ROUTES.exchange);
     } catch (caught) {
@@ -90,7 +97,7 @@ export function ExchangeRegisterConfirm() {
 
       <div className="flex-1 px-4 pb-6">
         <p className="whitespace-pre-line text-h1 leading-tight text-black">
-          {'등록될 교환 세트를\n확인해주세요'}
+          {editingId ? '수정될 교환 세트를\n확인해주세요' : '등록될 교환 세트를\n확인해주세요'}
         </p>
         <ExchangeCardSections className="mt-6" haveCards={haveCards} wantCards={wantCards} />
       </div>
@@ -98,7 +105,7 @@ export function ExchangeRegisterConfirm() {
       <div className="sticky bottom-0 bg-background px-4 pb-8 pt-3">
         {error && <p className="mb-2 text-center text-body3 text-red-900">{error}</p>}
         <Button size="lg" disabled={!canRegister} onClick={onRegister}>
-          {createTradeSet.isPending ? '등록 중...' : '등록하기'}
+          {submitting ? '저장 중...' : editingId ? '수정하기' : '등록하기'}
         </Button>
       </div>
     </>
