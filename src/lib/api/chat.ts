@@ -158,15 +158,22 @@ export function markChatRead(chatId: string) {
 /**
  * 교환 완료 처리 (CHAT-004).
  *
- * `deleteTradedCards`는 **필수**(@NotNull)다 — 교환된 포카를 교환 세트에서 지울지 여부이며,
- * 화면의 삭제 팝업에서 사용자가 고른 값이 그대로 들어간다. 정리는 **서버가 수행**한다.
+ * 세 필드 모두 **필수**이고 카드 배열은 **비어 있으면 400**이다(2026-07-26 실측으로 확정 —
+ * API 문서 §8.9는 `deleteTradedCards` 하나만 적고 있어 실제와 다르다).
+ *   - `deleteSelectedCards` — 교환된 포카를 교환 세트에서 지울지. 삭제 팝업의 선택이 들어간다
+ *   - `myCardIds` / `partnerCardIds` — 화면에서 고른 **교환 완료된 포카**의 photoCardId
  *
- * 오류: 409 `RESOURCE_006`(이미 완료) / 403 `AUTH_007`(제안을 받은 쪽이 아님)
+ * 세트 정리는 **서버가 수행**하므로 프론트가 교환 세트 id를 알 필요는 없다.
+ *
+ * 오류: 400(검증) / 404(없는 chatId) / 403 `AUTH_007`(제안을 받은 쪽이 아니거나 참여자 아님)
  */
-export function completeChatExchange(chatId: string, deleteTradedCards: boolean) {
-  return api.patch<{ chatId: number; isCompleted: boolean; deletedTradedCards: boolean }>(
+export function completeChatExchange(
+  chatId: string,
+  body: { deleteSelectedCards: boolean; myCardIds: number[]; partnerCardIds: number[] }
+) {
+  return api.patch<{ chatId: number; isCompleted: boolean; deleteSelectedCards: boolean }>(
     `/chat-rooms/${chatId}/complete`,
-    { deleteTradedCards }
+    body
   );
 }
 
