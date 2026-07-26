@@ -4,21 +4,23 @@
  * 서버는 `LocalDateTime`을 **오프셋 없이** 직렬화한다: "2026-07-24T15:04:05.123"
  * JS의 Date는 오프셋 없는 값을 **브라우저 로컬 시간대**로 해석하므로 그대로 쓰면 어긋난다.
  *
- * ⚠️ **이 값은 UTC다.** (api-reference §1.7은 KST라고 안내하지만 실제와 다르다)
- *   - 서버 JVM 시계가 UTC로 동작함을 확인했다(Spring 오류 응답의 `timestamp`가 UTC와 일치).
- *   - 교차 검증: 홈 피드 교환글 `createdAt`이 2026-07-25T08:47:55인데, 그날 로그인이 가능해진
- *     시각은 14:17 KST였다. KST라면 로그인 전에 글을 쓴 셈이라 성립하지 않는다.
+ * ⚠️ **이 값은 KST다** (api-reference §1.7과 일치). 서버 저장 시각이 여러 번 바뀌었으므로
+ * 아래 실측 근거를 남긴다 — 다시 어긋나면 이 주석의 절차로 재확인한다.
+ *   - 2026-07-25: 저장값이 **UTC − 9시간**이었다(이중 변환 버그, BE에 보고).
+ *   - 2026-07-26: BE 수정 후 재측정. 13:19:56 UTC에 보낸 메시지가 `2026-07-26T22:19:56`으로
+ *     저장된다 → **정확히 +9시간 = KST**. 서버 JVM은 여전히 UTC다(오류 응답 `timestamp`가 UTC).
  *   → 화면 표기는 `@utils/format-time`이 `timeZone: 'Asia/Seoul'`로 변환하므로 KST로 보인다.
  *
- * 서버가 오프셋을 포함해 내려주면(§ BE 요청 3-7) 이 가정은 필요 없어진다.
+ * 재확인 방법: 메시지를 보낸 UTC 시각과 `GET /chat-rooms/{id}/messages`의 `createdAt`을 비교한다.
+ * 서버가 오프셋을 포함해 내려주면(BE 요청 3-7) 이 가정 자체가 필요 없어진다.
  */
 
 /** 이미 Z 또는 ±HH:MM 오프셋이 붙어 있는지 */
 const HAS_OFFSET = /(?:Z|[+-]\d{2}:?\d{2})$/;
 
-/** 서버 문자열 → Date. 오프셋이 없으면 UTC로 간주한다. */
+/** 서버 문자열 → Date. 오프셋이 없으면 KST로 간주한다. */
 export function parseServerDate(value: string): Date {
-  return new Date(HAS_OFFSET.test(value) ? value : `${value}Z`);
+  return new Date(HAS_OFFSET.test(value) ? value : `${value}+09:00`);
 }
 
 /**

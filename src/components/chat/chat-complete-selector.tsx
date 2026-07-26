@@ -17,6 +17,13 @@ const toggleIn = (set: Set<string>, id: string) => {
   return next;
 };
 
+/**
+ * 선택한 카드 → 서버가 받는 photoCardId 배열.
+ * 카드 id는 서버의 photoCardId를 문자열로 담고 있지만, 값이 없으면 어댑터가 `have-0` 같은
+ * 대체 키를 넣는다 → 숫자가 아닌 항목은 버린다(서버에 보내면 400).
+ */
+const toCardIds = (picked: Set<string>) => [...picked].map(Number).filter(Number.isInteger);
+
 /** 어떤 삭제 팝업을 띄울지 (스토리보드 CHAT-004 동작 정의) */
 type DeleteDialog = 'cards' | 'set';
 
@@ -40,8 +47,8 @@ const DIALOG_COPY = {
  * 제안한 쪽에는 버튼을 숨기고, URL로 직접 들어와도 이 화면에서 막는다.
  * 구분 값이 없어 판단할 수 없으면(`null`) 종전대로 열어 두고 403 안내에 맡긴다.
  *
- * 완료 후 삭제 팝업의 선택은 `deleteTradedCards`(필수)로 전달되고, **세트 정리는 서버가 한다.**
- * 그래서 프론트가 교환 세트 id를 알 필요가 없다.
+ * 서버에는 **고른 포카(양쪽 photoCardId)와 삭제 팝업의 선택**을 함께 보낸다.
+ * 정리는 서버가 하므로 프론트가 교환 세트 id를 알 필요는 없다.
  * 취소(`아니요`)도 교환 완료 자체는 진행된다 — 팝업은 '정리 여부'만 묻는다(스토리보드).
  */
 export function ChatCompleteSelector() {
@@ -72,13 +79,17 @@ export function ChatCompleteSelector() {
     setDialog(clearsASide ? 'set' : 'cards');
   };
 
-  /** 팝업의 선택이 곧 `deleteTradedCards`다. 어느 쪽을 골라도 교환 완료는 진행된다. */
-  const complete = async (deleteTradedCards: boolean) => {
+  /** 팝업의 선택이 곧 `deleteSelectedCards`다. 어느 쪽을 골라도 교환 완료는 진행된다. */
+  const complete = async (deleteSelectedCards: boolean) => {
     setDialog(null);
     setError(null);
 
     try {
-      await completeExchange.mutateAsync(deleteTradedCards);
+      await completeExchange.mutateAsync({
+        deleteSelectedCards,
+        myCardIds: toCardIds(myPicked),
+        partnerCardIds: toCardIds(partnerPicked),
+      });
       router.replace(CHAT_ROUTES.room(chatId));
     } catch (caught) {
       if (!isApiError(caught)) {
@@ -92,6 +103,11 @@ export function ChatCompleteSelector() {
       }
       if (caught.status === 409) {
         setError('이미 교환이 완료된 채팅이에요.');
+        return;
+      }
+      // 서버는 양쪽 카드가 비어 있으면 400을 준다 — 선택을 다시 하도록 안내한다.
+      if (caught.status === 400) {
+        setError('교환된 포카를 다시 선택해주세요.');
         return;
       }
       setError('교환 완료 처리에 실패했어요. 잠시 후 다시 시도해주세요.');
