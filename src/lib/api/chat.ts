@@ -142,6 +142,21 @@ export function markChatRead(chatId: string) {
   return api.patch<{ chatId: number; unreadCount: number }>(`/chat-rooms/${chatId}/read`);
 }
 
+/**
+ * 교환 완료 처리 (CHAT-004).
+ *
+ * `deleteTradedCards`는 **필수**(@NotNull)다 — 교환된 포카를 교환 세트에서 지울지 여부이며,
+ * 화면의 삭제 팝업에서 사용자가 고른 값이 그대로 들어간다. 정리는 **서버가 수행**한다.
+ *
+ * 오류: 409 `RESOURCE_006`(이미 완료) / 403 `AUTH_007`(제안을 받은 쪽이 아님)
+ */
+export function completeChatExchange(chatId: string, deleteTradedCards: boolean) {
+  return api.patch<{ chatId: number; isCompleted: boolean; deletedTradedCards: boolean }>(
+    `/chat-rooms/${chatId}/complete`,
+    { deleteTradedCards }
+  );
+}
+
 /** 채팅 이미지 제약. 프로필 이미지와 동일하게 가정한다(서버 확인 필요). */
 export const CHAT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const CHAT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png'];

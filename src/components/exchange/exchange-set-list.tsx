@@ -71,7 +71,11 @@ export function ExchangeSetList({ groupId }: { groupId: number | null }) {
         return (
           <section key={set.id}>
             {i > 0 && <div className="border-t border-secondary-50" />}
-            <div className="px-4 pb-4 pt-3">
+            {/* 세트를 누르면 상세(EX-004)로 진입한다. ⋮·버튼은 각자 전파를 막는다. */}
+            <div
+              className="cursor-pointer px-4 pb-4 pt-3"
+              onClick={() => router.push(EXCHANGE_ROUTES.setDetail(set.id))}
+            >
               <PhotocardRow
                 label={`있어요 ${set.haveCount}`}
                 cards={detail?.haveCards ?? []}
@@ -79,7 +83,10 @@ export function ExchangeSetList({ groupId }: { groupId: number | null }) {
                   <IconButton
                     aria-label="교환 세트 더보기"
                     area={32}
-                    onClick={() => setMenuSetId(set.id)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setMenuSetId(set.id);
+                    }}
                   >
                     <MoreIcon className="size-5" />
                   </IconButton>
@@ -95,7 +102,10 @@ export function ExchangeSetList({ groupId }: { groupId: number | null }) {
                 size="lg"
                 shape="pill"
                 className="mt-4 w-full"
-                onClick={() => router.push(EXCHANGE_ROUTES.setImage(set.id))}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  router.push(EXCHANGE_ROUTES.setImage(set.id));
+                }}
               >
                 이미지로 저장하기
               </Button>

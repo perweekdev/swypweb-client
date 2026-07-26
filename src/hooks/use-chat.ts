@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  completeChatExchange,
   createChatRoom,
   getChatHeader,
   getChatMessages,
@@ -97,6 +98,22 @@ export function useCreateChatRoom() {
   return useMutation({
     mutationFn: createChatRoom,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() }),
+  });
+}
+
+/** CHAT-004 교환 완료. 성공 시 상단 상태(헤더)와 목록 배지를 갱신한다. */
+export function useCompleteChatExchange(chatId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    // 교환된 포카를 세트에서 지울지 — 삭제 팝업에서 고른 값
+    mutationFn: (deleteTradedCards: boolean) => completeChatExchange(chatId, deleteTradedCards),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.chat.all });
+      // 세트 정리는 서버가 하므로 교환 세트·매칭 캐시도 새로 받는다.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.tradeSets.all });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.matches.all });
+    },
   });
 }
 
