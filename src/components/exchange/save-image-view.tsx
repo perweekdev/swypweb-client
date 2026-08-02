@@ -136,7 +136,7 @@ export function SaveImageView() {
       </div>
 
       <div className="sticky bottom-0 bg-background px-4 pb-8 pt-3">
-        {saved && <Toast className="mb-3" message="이미지가 저장되었어요!" />}
+        <Toast open={saved} className="mb-3" message="이미지가 저장되었어요!" />
         <Button size="lg" disabled={!previewUrl} onClick={save}>
           저장하기
         </Button>

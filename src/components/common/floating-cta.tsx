@@ -7,6 +7,10 @@ import { PlusIcon } from '@components/icons';
  *
  * 프레임 폭(max-w-420)에 맞춘 fixed 컨테이너를 함께 제공한다.
  * `below`에 토스트 등을 주면 CTA 아래에 쌓이고, 그만큼 CTA가 위로 올라간다(EX-001/COL-001 토스트 동작).
+ *
+ * ⚠️ 간격은 `below`가 직접 갖는다(`mt-2` 등). 컨테이너에 `gap`을 두면 토스트가 감춰져
+ * 아무것도 안 그려질 때도 그만큼 CTA가 떠버린다 — 토스트는 퇴장 애니메이션 때문에
+ * 항상 넘어오고 자기가 알아서 `null`이 된다.
  */
 export function FloatingCta({
   label,
@@ -21,7 +25,7 @@ export function FloatingCta({
   icon?: ReactNode;
 }) {
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[420px] flex-col items-end gap-2 px-4 pb-[calc(64px_+_env(safe-area-inset-bottom))]">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[420px] flex-col items-end px-4 pb-[calc(64px_+_env(safe-area-inset-bottom))]">
       <button
         type="button"
         onClick={onClick}

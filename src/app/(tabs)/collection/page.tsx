@@ -93,7 +93,7 @@ function CollectionView() {
         label="편집하기"
         icon={<PencilIcon className="size-5" />}
         onClick={() => router.push(COLLECTION_ROUTES.edit(selectedGroup))}
-        below={justSaved && <Toast message="컬렉션이 변경되었어요!" />}
+        below={<Toast open={justSaved} className="mt-2" message="컬렉션이 변경되었어요!" />}
       />
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />

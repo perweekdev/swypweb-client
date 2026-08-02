@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@store/auth-store';
-import { TabHeader } from '@components/layout/tab-header';
+import { HomeTopBar } from '@components/home/home-top-bar';
 import { GroupFilter } from '@components/common/group-filter';
 import { HomeFeedCard } from '@components/common/home-feed-card';
 import { EmptyState } from '@components/common/empty-state';
@@ -54,15 +54,15 @@ export default function HomePage() {
 
   return (
     <>
-      <TabHeader title="포카매치" logo />
-
-      <GroupFilter
-        className="px-4 pb-3 pt-1"
-        groups={filterGroups}
-        value={selectedGroup}
-        onChange={setSelectedGroup}
-        onAdd={requireAuth(() => router.push(ROUTES.myGroupsAdd))}
-      />
+      <HomeTopBar>
+        <GroupFilter
+          className="px-4 pb-3 pt-1"
+          groups={filterGroups}
+          value={selectedGroup}
+          onChange={setSelectedGroup}
+          onAdd={requireAuth(() => router.push(ROUTES.myGroupsAdd))}
+        />
+      </HomeTopBar>
 
       {isPending && (
         <p className="px-4 py-10 text-center text-body2 text-secondary-500">불러오는 중...</p>

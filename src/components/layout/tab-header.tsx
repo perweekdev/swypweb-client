@@ -9,9 +9,18 @@ import { AppLogo } from '@components/icons/brand';
  * 로고 안에 '포카매치' 워드마크가 포함돼 있어 텍스트를 따로 두지 않고,
  * 제목 의미는 `h1` + `aria-label`로 유지한다.
  */
-export function TabHeader({ title, logo = false }: { title: string; logo?: boolean }) {
+export function TabHeader({
+  title,
+  logo = false,
+  sticky = true,
+}: {
+  title: string;
+  logo?: boolean;
+  /** 바깥에서 고정을 직접 제어할 때 끈다(HOME-001은 필터와 한 덩어리로 움직인다) */
+  sticky?: boolean;
+}) {
   return (
-    <header className="sticky top-0 z-20 bg-background px-4 pb-2 pt-4">
+    <header className={`bg-background px-4 pb-2 pt-4 ${sticky ? 'sticky top-0 z-20' : ''}`}>
       <h1 className="text-h1 text-secondary-900">
         {/* 계측(HOME-001): 로고 87×23. 워드마크는 검정이라 text-black을 명시한다 */}
         {logo ? <AppLogo className="h-[23px] w-[87px] text-black" title={title} /> : title}

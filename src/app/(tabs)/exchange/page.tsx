@@ -203,7 +203,7 @@ function ExchangeView() {
       <FloatingCta
         label="교환 등록하기"
         onClick={() => selectedGroup && router.push(EXCHANGE_ROUTES.register(selectedGroup))}
-        below={justRegistered && <Toast message="교환이 등록되었어요!" />}
+        below={<Toast open={justRegistered} className="mt-2" message="교환이 등록되었어요!" />}
       />
 
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
