@@ -24,7 +24,8 @@ export default function HomePage() {
   const { data: myProfile } = useMyProfile();
   const myUserId = myProfile ? String(myProfile.userId) : null;
 
-  // 비로그인은 그룹 목록을 못 받으므로(인증 필요) 필터가 비어 '전체'만 보인다 — 의도된 동작.
+  // 그룹 목록은 공개 API라 비회원도 전체 아티스트를 골라 볼 수 있다.
+  // 관심 그룹(하트·앞쪽 정렬)만 회원 전용이라 비회원에게는 비어 있다.
   const { data: allGroups } = useAllGroups();
   const { data: interestGroups } = useInterestGroups();
   const favoriteIds = new Set(interestGroups?.map((g) => g.id) ?? []);

@@ -82,8 +82,11 @@ export function GroupFilter({
       {/* 내 관심 그룹은 '추가하기' 바로 옆(구분선 왼쪽)에 모아 둔다 */}
       {myGroups.map(renderGroup)}
 
-      {/* HOME-001은 '내 그룹'과 '전체 탐색' 사이에 세로 구분선이 있다(EX-001엔 없음) */}
-      {showAll && <span className="my-1.5 h-12 w-px shrink-0 self-start bg-secondary-50" />}
+      {/* HOME-001은 '내 그룹'과 '전체 탐색' 사이에 세로 구분선이 있다(EX-001엔 없음).
+          관심 그룹이 없으면(비회원·미설정) 나눌 것이 없으므로 그리지 않는다 — 디자인도 동일. */}
+      {showAll && myGroups.length > 0 && (
+        <span className="my-1.5 h-12 w-px shrink-0 self-start bg-secondary-50" />
+      )}
       {showAll &&
         item(
           'all',
