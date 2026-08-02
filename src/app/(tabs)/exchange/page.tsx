@@ -118,7 +118,9 @@ function ExchangeView() {
         showAll={false}
       />
 
-      <section className="pt-2">
+      {/* 세트가 없을 때 안내 문구가 남은 영역 중앙에 오도록 이 섹션이 높이를 차지해야 한다.
+          (블록 배치로 두면 EmptyState의 flex-1이 먹지 않아 부제목 바로 아래에 붙는다) */}
+      <section className={`pt-2 ${mySets.length === 0 ? 'flex flex-1 flex-col' : ''}`}>
         <div className="flex items-center justify-between px-4">
           <Subtitle>내 교환 세트 {mySets.length}</Subtitle>
           {mySets.length > 0 && selectedGroup && (
@@ -174,9 +176,12 @@ function ExchangeView() {
       </section>
 
       {mySets.length > 0 && (
-        <section className="pb-28">
+        <section className={`pb-28 ${matches.length === 0 ? 'flex flex-1 flex-col' : ''}`}>
           <div className="mx-4 mt-4 border-t border-secondary-50" />
           <Subtitle className="px-4 pt-4">교환 가능한 상대 {matches.length}</Subtitle>
+
+          {/* 매칭이 없을 때도 빈 화면으로 두지 않는다(디자인 EX-001). 제목 없이 한 줄 안내만 둔다 */}
+          {matches.length === 0 && <EmptyState description="아직 교환 가능한 상대가 없어요" />}
 
           {matches.map((match, i) => (
             <div key={match.id}>

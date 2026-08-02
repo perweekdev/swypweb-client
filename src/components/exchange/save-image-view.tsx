@@ -105,7 +105,8 @@ export function SaveImageView() {
     <>
       <Header title="이미지 확인" />
 
-      <div className="flex-1 px-4">
+      {/* flex 컬럼이어야 오류 시 EmptyState가 남은 영역 중앙에 온다 */}
+      <div className="flex flex-1 flex-col px-4">
         <p className="whitespace-pre-line pt-2 text-h1 leading-tight text-black">
           {'저장될 이미지를\n확인해주세요'}
         </p>

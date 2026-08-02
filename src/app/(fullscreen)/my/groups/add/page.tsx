@@ -46,7 +46,8 @@ export default function AddGroupPage() {
     <>
       <Header title="관심 그룹 추가" />
 
-      <div className="flex-1 overflow-y-auto px-4 pb-4 pt-2">
+      {/* flex 컬럼이어야 로딩 실패 시 EmptyState가 남은 영역 중앙에 온다 */}
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-4 pt-2">
         {isPending && (
           <p className="py-10 text-center text-body2 text-secondary-500">불러오는 중...</p>
         )}
