@@ -20,6 +20,14 @@ function useAuthReady() {
   return hydrated && isAuthenticated;
 }
 
+/**
+ * 전체 그룹 목록은 **공개 API**라 로그인 없이도 부를 수 있다.
+ * 다만 세션 복구 전에 쏘면 로그인 사용자의 요청에 토큰이 빠지므로 `hydrated`는 기다린다.
+ */
+function useHydrated() {
+  return useAuthStore((s) => s.hydrated);
+}
+
 /** 내 관심 그룹 */
 export function useInterestGroups() {
   const enabled = useAuthReady();
@@ -32,9 +40,15 @@ export function useInterestGroups() {
   });
 }
 
-/** 전체 그룹 (관심 그룹 추가 화면) */
+/**
+ * 전체 그룹 (홈 그룹 필터 · 관심 그룹 추가 화면).
+ *
+ * 비로그인도 조회할 수 있다(2026-08-02 서버 `permitAll` 적용, 실측 200).
+ * 관심 여부(`interested`)는 쓰지 않고 `useInterestGroups()`로 따로 판단하므로,
+ * 회원/비회원이 같은 캐시를 공유해도 하트 표시가 어긋나지 않는다.
+ */
 export function useAllGroups() {
-  const enabled = useAuthReady();
+  const enabled = useHydrated();
 
   return useQuery({
     queryKey: queryKeys.groups.list(),
