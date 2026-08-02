@@ -64,6 +64,9 @@ export function MemberMyPage() {
         className="px-4 py-4"
       />
 
+      {/* 계측(MY-001): 프로필·관심그룹·설정·정보를 구분선으로 나눈다 */}
+      <div className="mx-4 border-b border-secondary-50" />
+
       {/* 관심 그룹 — 비회원 화면(MY-004)과 마크업을 공유한다 */}
       <InterestGroupSection
         groups={interestGroups}
@@ -71,18 +74,22 @@ export function MemberMyPage() {
         edit={{ href: ROUTES.myGroups }}
       />
 
-      {/* 설정 */}
-      <section className="px-4 pt-6">
-        <h2 className="text-body2 text-secondary-500">설정</h2>
+      <div className="mx-4 mt-6 border-b border-secondary-50" />
+
+      {/* 설정 — 헤딩은 본문과 같은 16(body1)/secondary-900이다(계측). 회색 소제목이 아니다 */}
+      <section className="px-4 pt-4">
+        <h2 className="text-body1 text-secondary-900">설정</h2>
         <SettingRow
           label="채팅 알림"
           right={<Toggle checked={chatAlarm} onChange={setChatAlarm} ariaLabel="채팅 알림" />}
         />
       </section>
 
+      <div className="mx-4 border-b border-secondary-50" />
+
       {/* 정보 */}
-      <section className="px-4">
-        <h2 className="text-body2 text-secondary-500">정보</h2>
+      <section className="px-4 pt-4">
+        <h2 className="text-body1 text-secondary-900">정보</h2>
         <SettingRow label="개인정보 처리방침" onClick={() => router.push(ROUTES.privacy)} />
         <SettingRow label="이용약관" onClick={() => router.push(ROUTES.terms)} />
       </section>

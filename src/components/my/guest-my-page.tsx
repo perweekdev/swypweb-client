@@ -38,8 +38,9 @@ export function GuestMyPage() {
 
       <div className="mx-4 mt-6 border-b border-secondary-50" />
 
-      <section className="px-4 pt-5">
-        <h2 className="text-body2 text-secondary-500">정보</h2>
+      {/* 헤딩은 본문과 같은 16(body1)/secondary-900이다(계측). 회원 화면과 동일 */}
+      <section className="px-4 pt-4">
+        <h2 className="text-body1 text-secondary-900">정보</h2>
         <SettingRow label="개인정보 처리방침" onClick={() => router.push(ROUTES.privacy)} />
         <SettingRow label="이용약관" onClick={() => router.push(ROUTES.terms)} />
       </section>

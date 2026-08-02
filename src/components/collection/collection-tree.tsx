@@ -6,6 +6,7 @@ import { PhotocardImage } from '@components/photocard/photocard-card';
 import { useAlbumVersions, useCollectionAlbums, useVersionPhotocards } from '@hooks/use-collection';
 import type { CollectionPhotocard } from '@lib/api/collections';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * 서버 API 기반 컬렉션 트리 (COL-001).
@@ -16,8 +17,6 @@ import type { Photocard } from '@/types/photocard.types';
  *
  * (목 데이터용 `CollectionAlbumList`는 COL-003·EX-007이 아직 쓰고 있어 그대로 둔다.)
  */
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 /** 카드 렌더는 화면마다 다르다(조회 / 선택) — 공통 변환만 여기서 한다. */
 function toPhotocard(card: CollectionPhotocard, versionName: string, albumName: string): Photocard {

@@ -12,8 +12,7 @@ import { API_ERROR_CODES } from '@constants/api-error-codes';
 import { useExchangeDraftStore } from '@store/exchange-draft-store';
 import { ROUTES } from '@constants/routes';
 import type { Photocard } from '@/types/photocard.types';
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * EX-008 교환 세트 확인. 등록 직전 있어요/구해요를 3열로 훑어보고 등록한다.

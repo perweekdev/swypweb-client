@@ -15,8 +15,7 @@ import { API_ERROR_CODES } from '@constants/api-error-codes';
 import { useCollectionDraftStore } from '@store/collection-draft-store';
 import { COLLECTION_ROUTES } from '@constants/routes';
 import type { CollectionAlbum } from '@/types/collection.types';
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * COL-003 컬렉션 편집.

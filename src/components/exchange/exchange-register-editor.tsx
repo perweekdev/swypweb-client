@@ -14,8 +14,7 @@ import { EXCHANGE_ROUTES } from '@constants/routes';
 import { MAX_CARDS_PER_SIDE } from '@constants/exchange';
 import type { ExchangeSide } from '@/types/exchange.types';
 import type { Photocard } from '@/types/photocard.types';
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * EX-007 교환 세트 등록.

@@ -1,5 +1,6 @@
 import { api } from '@lib/api-client';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /** 교환 세트 API. 근거: docs/api-reference.md §7 */
 
@@ -24,8 +25,6 @@ interface TradeSetDetailResponse {
   haveCards: TradeSetCardResponse[];
   wantCards: TradeSetCardResponse[];
 }
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 function toCard(card: TradeSetCardResponse): Photocard {
   return {

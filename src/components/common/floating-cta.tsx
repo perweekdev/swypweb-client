@@ -25,7 +25,8 @@ export function FloatingCta({
   icon?: ReactNode;
 }) {
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[420px] flex-col items-end px-4 pb-[calc(64px_+_env(safe-area-inset-bottom))]">
+    // 하단 여백 70 = 탭바 높이(패딩 12+12 · 아이콘 24 · 간격 4 · 라벨 18). 탭바를 고치면 여기도 함께 맞춘다.
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-[420px] flex-col items-end px-4 pb-[calc(70px_+_env(safe-area-inset-bottom))]">
       <button
         type="button"
         onClick={onClick}

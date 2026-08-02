@@ -3,6 +3,7 @@ import { toCursorPage } from '@lib/cursor';
 import type { CursorPage } from '@/types/api.types';
 import type { FeedPost } from '@/types/home.types';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /** 홈 피드 API. 근거: docs/api-reference.md §7.7 */
 
@@ -20,7 +21,6 @@ interface FeedItemResponse {
 }
 
 /** 이미지 에셋 전 placeholder와 동일한 중립색(secondary-50) */
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 /**
  * 피드는 이미지 URL만 주므로 Photocard의 이름 필드를 채울 수 없다.

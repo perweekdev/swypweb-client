@@ -4,10 +4,9 @@ import { toIsoString } from '@utils/server-date';
 import type { CursorPage } from '@/types/api.types';
 import type { ChatMessage, ChatRoomSummary, ExchangeStatus } from '@/types/chat.types';
 import type { ExchangeSet, Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /** 채팅 API. 근거: docs/api-reference.md §8 */
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 interface ChatCardResponse {
   photoCardId?: number;

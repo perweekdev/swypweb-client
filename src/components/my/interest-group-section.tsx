@@ -53,7 +53,8 @@ export function InterestGroupSection({
   const scrollRef = useDragScroll<HTMLUListElement>();
 
   return (
-    <section className="pt-3">
+    // 계측(MY-001): 구분선 → 제목 17, 라벨 아래 여백은 다음 구분선까지 32
+    <section className="pt-4">
       <div className="flex items-center justify-between px-4">
         <h2 className="text-body1 text-secondary-900">관심 그룹</h2>
         <ActionArea
@@ -71,7 +72,8 @@ export function InterestGroupSection({
           <ActionArea action={add} ariaLabel="관심 그룹 추가">
             <GroupLogo size="lg" state="add" />
           </ActionArea>
-          <span className="text-body3 text-secondary-500">추가하기</span>
+          {/* 계측: 그룹 이름과 같은 secondary-900. 회색이 아니다 */}
+          <span className="text-body3 text-secondary-900">추가하기</span>
         </li>
         {groups?.map((group) => (
           <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">

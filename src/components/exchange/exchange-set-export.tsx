@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { AppLogo } from '@components/icons/brand';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * EX-010 '이미지로 저장하기'로 내보낼 이미지의 본체.
@@ -20,7 +21,6 @@ import type { Photocard } from '@/types/photocard.types';
  */
 
 const EXPORT_WIDTH = 780;
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 function ExportCard({ card }: { card: Photocard }) {
   return (
