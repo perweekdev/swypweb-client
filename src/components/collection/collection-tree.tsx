@@ -48,13 +48,9 @@ function VersionCards({
 
   return (
     <section>
-      <div className="flex min-h-6 items-center justify-between">
+      {/* 디자인(COL-001)에는 보유 개수 표기가 없다 — 버전명만 둔다 */}
+      <div className="flex min-h-6 items-center">
         <p className="text-body3 text-secondary-500">{versionName}</p>
-        {data && (
-          <p className="text-body4 text-secondary-300">
-            {data.ownedCount}/{data.totalCount}
-          </p>
-        )}
       </div>
 
       {isPending && <Message>불러오는 중...</Message>}
@@ -67,7 +63,7 @@ function VersionCards({
               {/* 조회 전용: 보유는 사진 그대로, 미보유는 딤 처리 */}
               <PhotocardImage
                 card={toPhotocard(card, versionName, albumName)}
-                className={`aspect-[8/13] w-full ${card.isOwned ? '' : 'opacity-40'}`}
+                className={`aspect-card w-full ${card.isOwned ? '' : 'opacity-40'}`}
               />
             </li>
           ))}
@@ -116,7 +112,8 @@ export function CollectionTree({
       {data.albums.map((album, index) => (
         <CollectionAccordion
           key={album.albumId}
-          title={`${album.name} (${album.ownedCount}/${album.totalCount})`}
+          // 디자인(COL-001)에는 보유 개수 `(2/48)` 표기가 없다 — 앨범명만 둔다
+          title={album.name}
           defaultOpen={index === 0}
         >
           <AlbumVersions albumId={album.albumId} albumName={album.name} />

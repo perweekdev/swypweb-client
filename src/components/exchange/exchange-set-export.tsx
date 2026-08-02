@@ -30,12 +30,12 @@ function ExportCard({ card }: { card: Photocard }) {
           <img
             src={card.imageUrl}
             alt=""
-            className="aspect-[55/85] h-[86%] rounded object-cover"
+            className="aspect-card h-[86%] rounded object-cover"
             crossOrigin="anonymous"
           />
         ) : (
           <div
-            className="aspect-[55/85] h-[86%] rounded"
+            className="aspect-card h-[86%] rounded"
             style={{ backgroundColor: card.color || PLACEHOLDER_COLOR }}
           />
         )}

@@ -28,7 +28,8 @@ export function UserProfile({
     <div className={`flex items-center gap-3 ${className}`}>
       <Avatar className="size-12 shrink-0" color={avatarColor} src={avatarUrl} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-button1 text-secondary-900">{name}</p>
+        {/* 계측(HOME-001): 닉네임 14(button2). 우측 '제안하기' 버튼(size sm)도 같은 14다 */}
+        <p className="truncate text-button2 text-secondary-900">{name}</p>
         {groups && <p className="truncate text-body3 text-secondary-500">{groups}</p>}
       </div>
       {variant !== 'info' && (

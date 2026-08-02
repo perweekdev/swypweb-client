@@ -21,6 +21,11 @@
   --font-sans:
     'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
 
+  /* ── Aspect ratio ────────────────────────────────────────────
+     포토카드 한 장의 비율. 디자인 실측(HOME-001 피드 61×98)을 전 화면 공통으로 쓴다.
+     → `aspect-card`. 화면마다 55/85·8/13로 갈려 있던 것을 이 토큰 하나로 통일했다. */
+  --aspect-card: 61 / 98;
+
   /* ── Primary ───────────────────────────────────────────────── */
   --color-primary-900: #7c3aed;
   --color-primary-700: #9661f1;

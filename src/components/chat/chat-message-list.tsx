@@ -94,9 +94,10 @@ export function ChatMessageList({
               </p>
             )}
 
+            {/* 같은 사람이 연달아 보낸 메시지 사이는 8px. 사진도 텍스트와 같은 간격을 쓴다(디자인) */}
             <div
               className={`flex items-end gap-2 ${isMine ? 'justify-end' : ''} ${
-                isGroupStart ? 'mt-3 first:mt-0' : 'mt-1'
+                isGroupStart ? 'mt-3 first:mt-0' : 'mt-2'
               }`}
             >
               {!isMine &&
