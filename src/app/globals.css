@@ -9,10 +9,17 @@
  */
 @theme {
   /* ── Font family ─────────────────────────────────────────────
-     Jakarta를 앞에 두어 영문/숫자는 Jakarta로, 글리프가 없는 한글은
-     다음 순위인 Pretendard로 자동 폴백된다. */
+     영문/숫자는 Jakarta, 한글은 Pretendard.
+     Jakarta의 @font-face에는 라틴/키릴/베트남어 unicode-range가 걸려 있어 한글을 잡지 않고,
+     그다음 순위인 Pretendard로 넘어간다.
+
+     ⚠️ `var(--font-jakarta)`를 쓰지 않고 **패밀리명을 직접 적는다.**
+     그 변수는 `"Plus Jakarta Sans", "Plus Jakarta Sans Fallback"`으로 전개되는데,
+     뒤쪽 폴백(next/font가 만드는 `local(Arial)`)에는 unicode-range가 없어 **한글을 가로챈다.**
+     next/font(Turbopack)는 패밀리명을 해싱하지 않고 원래 이름 그대로 내보내므로
+     직접 참조가 성립한다(빌드 산출 CSS에서 `@font-face{font-family:Plus Jakarta Sans}` 확인). */
   --font-sans:
-    var(--font-jakarta), 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
+    'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
 
   /* ── Primary ───────────────────────────────────────────────── */
   --color-primary-900: #7c3aed;

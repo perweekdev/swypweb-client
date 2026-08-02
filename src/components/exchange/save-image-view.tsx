@@ -14,25 +14,9 @@ import { withInlinedImages } from '@lib/image-export';
 import { queryKeys } from '@lib/query-keys';
 import type { Photocard } from '@/types/photocard.types';
 
-/** 워터마크는 앱 자산이라 그대로 fetch해 data URL로 바꾼다. */
-async function loadLogoDataUrl(): Promise<string | null> {
-  try {
-    const blob = await (await fetch('/logo-watermark.png')).blob();
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(typeof reader.result === 'string' ? reader.result : null);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
 interface ExportSource {
   haveCards: Photocard[];
   wantCards: Photocard[];
-  logoDataUrl: string | null;
 }
 
 /**
@@ -64,12 +48,11 @@ export function SaveImageView() {
 
     let cancelled = false;
     void (async () => {
-      const [haveCards, wantCards, logoDataUrl] = await Promise.all([
+      const [haveCards, wantCards] = await Promise.all([
         withInlinedImages(data.haveCards),
         withInlinedImages(data.wantCards),
-        loadLogoDataUrl(),
       ]);
-      if (!cancelled) setSource({ haveCards, wantCards, logoDataUrl });
+      if (!cancelled) setSource({ haveCards, wantCards });
     })();
 
     return () => {
@@ -162,11 +145,7 @@ export function SaveImageView() {
       <div className="pointer-events-none fixed -left-[9999px] top-0" aria-hidden>
         {source && (
           <div ref={exportRef}>
-            <ExchangeSetExport
-              haveCards={source.haveCards}
-              wantCards={source.wantCards}
-              logoDataUrl={source.logoDataUrl}
-            />
+            <ExchangeSetExport haveCards={source.haveCards} wantCards={source.wantCards} />
           </div>
         )}
       </div>
