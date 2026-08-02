@@ -2,19 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useMyProfile } from '@hooks/use-my-profile';
 import { isApiError } from '@lib/api-error';
 import { withdraw } from '@lib/api/users';
 import { useAuthStore } from '@store/auth-store';
 import { Toggle } from '@components/ui/toggle';
 import { SettingRow } from '@components/ui/setting-row';
-import { GroupLogo } from '@components/ui/group-logo';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
 import { UserProfile } from '@components/common/user-profile';
+import { InterestGroupSection } from '@components/my/interest-group-section';
 import { TabHeader } from '@components/layout/tab-header';
-import { useDragScroll } from '@hooks/use-drag-scroll';
-import { ChevronRightIcon } from '@components/icons';
 import { ROUTES } from '@constants/routes';
 import { useInterestGroups } from '@hooks/use-groups';
 
@@ -31,7 +28,6 @@ export function MemberMyPage() {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
-  const groupScrollRef = useDragScroll<HTMLUListElement>();
 
   const confirmWithdraw = async () => {
     setWithdrawOpen(false);
@@ -68,52 +64,32 @@ export function MemberMyPage() {
         className="px-4 py-4"
       />
 
-      {/* 관심 그룹 */}
-      <section className="pt-3">
-        <div className="flex items-center justify-between px-4">
-          <h2 className="text-body1 text-secondary-900">관심 그룹</h2>
-          <Link
-            href={ROUTES.myGroups}
-            className="flex items-center gap-0.5 text-body3 text-secondary-500"
-          >
-            편집하기
-            <ChevronRightIcon className="size-4" />
-          </Link>
-        </div>
-        <ul
-          ref={groupScrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pb-1 pt-3"
-        >
-          {/* '추가하기'가 가장 왼쪽 — 등록한 그룹은 그 오른쪽에 차례로 온다(디자인) */}
-          <li className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-            <Link href={ROUTES.myGroupsAdd} aria-label="관심 그룹 추가">
-              <GroupLogo size="lg" state="add" />
-            </Link>
-            <span className="text-body3 text-secondary-500">추가하기</span>
-          </li>
-          {interestGroups?.map((group) => (
-            <li key={group.id} className="flex w-16 shrink-0 flex-col items-center gap-1.5">
-              <GroupLogo size="lg" name={group.name} color={group.color} logoUrl={group.logoUrl} />
-              <span className="w-full truncate text-center text-body3 text-secondary-900">
-                {group.name}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* 계측(MY-001): 프로필·관심그룹·설정·정보를 구분선으로 나눈다 */}
+      <div className="mx-4 border-b border-secondary-50" />
 
-      {/* 설정 */}
-      <section className="px-4 pt-6">
-        <h2 className="text-body2 text-secondary-500">설정</h2>
+      {/* 관심 그룹 — 비회원 화면(MY-004)과 마크업을 공유한다 */}
+      <InterestGroupSection
+        groups={interestGroups}
+        add={{ href: ROUTES.myGroupsAdd }}
+        edit={{ href: ROUTES.myGroups }}
+      />
+
+      <div className="mx-4 mt-6 border-b border-secondary-50" />
+
+      {/* 설정 — 헤딩은 본문과 같은 16(body1)/secondary-900이다(계측). 회색 소제목이 아니다 */}
+      <section className="px-4 pt-4">
+        <h2 className="text-body1 text-secondary-900">설정</h2>
         <SettingRow
           label="채팅 알림"
           right={<Toggle checked={chatAlarm} onChange={setChatAlarm} ariaLabel="채팅 알림" />}
         />
       </section>
 
+      <div className="mx-4 border-b border-secondary-50" />
+
       {/* 정보 */}
-      <section className="px-4">
-        <h2 className="text-body2 text-secondary-500">정보</h2>
+      <section className="px-4 pt-4">
+        <h2 className="text-body1 text-secondary-900">정보</h2>
         <SettingRow label="개인정보 처리방침" onClick={() => router.push(ROUTES.privacy)} />
         <SettingRow label="이용약관" onClick={() => router.push(ROUTES.terms)} />
       </section>

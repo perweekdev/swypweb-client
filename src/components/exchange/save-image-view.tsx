@@ -14,25 +14,9 @@ import { withInlinedImages } from '@lib/image-export';
 import { queryKeys } from '@lib/query-keys';
 import type { Photocard } from '@/types/photocard.types';
 
-/** 워터마크는 앱 자산이라 그대로 fetch해 data URL로 바꾼다. */
-async function loadLogoDataUrl(): Promise<string | null> {
-  try {
-    const blob = await (await fetch('/logo-watermark.png')).blob();
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(typeof reader.result === 'string' ? reader.result : null);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
 interface ExportSource {
   haveCards: Photocard[];
   wantCards: Photocard[];
-  logoDataUrl: string | null;
 }
 
 /**
@@ -64,12 +48,11 @@ export function SaveImageView() {
 
     let cancelled = false;
     void (async () => {
-      const [haveCards, wantCards, logoDataUrl] = await Promise.all([
+      const [haveCards, wantCards] = await Promise.all([
         withInlinedImages(data.haveCards),
         withInlinedImages(data.wantCards),
-        loadLogoDataUrl(),
       ]);
-      if (!cancelled) setSource({ haveCards, wantCards, logoDataUrl });
+      if (!cancelled) setSource({ haveCards, wantCards });
     })();
 
     return () => {
@@ -122,7 +105,8 @@ export function SaveImageView() {
     <>
       <Header title="이미지 확인" />
 
-      <div className="flex-1 px-4">
+      {/* flex 컬럼이어야 오류 시 EmptyState가 남은 영역 중앙에 온다 */}
+      <div className="flex flex-1 flex-col px-4">
         <p className="whitespace-pre-line pt-2 text-h1 leading-tight text-black">
           {'저장될 이미지를\n확인해주세요'}
         </p>
@@ -152,7 +136,7 @@ export function SaveImageView() {
       </div>
 
       <div className="sticky bottom-0 bg-background px-4 pb-8 pt-3">
-        {saved && <Toast className="mb-3" message="이미지가 저장되었어요!" />}
+        <Toast open={saved} className="mb-3" message="이미지가 저장되었어요!" />
         <Button size="lg" disabled={!previewUrl} onClick={save}>
           저장하기
         </Button>
@@ -162,11 +146,7 @@ export function SaveImageView() {
       <div className="pointer-events-none fixed -left-[9999px] top-0" aria-hidden>
         {source && (
           <div ref={exportRef}>
-            <ExchangeSetExport
-              haveCards={source.haveCards}
-              wantCards={source.wantCards}
-              logoDataUrl={source.logoDataUrl}
-            />
+            <ExchangeSetExport haveCards={source.haveCards} wantCards={source.wantCards} />
           </div>
         )}
       </div>

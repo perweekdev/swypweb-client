@@ -41,14 +41,14 @@ export function BottomTabNav() {
           <Link
             key={href}
             href={href}
-            className={`flex flex-1 flex-col items-center gap-1 py-2 ${
+            className={`flex flex-1 flex-col items-center gap-1 py-3 ${
               active ? 'text-secondary-900' : 'text-secondary-500'
             }`}
           >
             <TabIcon className="size-6" />
-            <span className={`text-[10px] leading-none ${active ? 'font-medium' : ''}`}>
-              {label}
-            </span>
+            {/* 계측(HOME-001): 라벨 12(body3), 경계선→아이콘 12, 아이콘→라벨 4.
+                활성 탭만 medium — 디자인에서 '홈'이 나머지보다 확실히 굵다. */}
+            <span className={`text-body3 ${active ? 'font-medium' : ''}`}>{label}</span>
           </Link>
         );
       })}

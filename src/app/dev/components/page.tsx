@@ -552,7 +552,7 @@ export default function ComponentCatalogPage() {
             renderCard={(card) => (
               <PhotocardImage
                 card={card}
-                className={`aspect-[8/13] w-full ${ownedSel.has(card.id) ? '' : 'opacity-40'}`}
+                className={`aspect-card w-full ${ownedSel.has(card.id) ? '' : 'opacity-40'}`}
               />
             )}
           />

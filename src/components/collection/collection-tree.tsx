@@ -6,6 +6,7 @@ import { PhotocardImage } from '@components/photocard/photocard-card';
 import { useAlbumVersions, useCollectionAlbums, useVersionPhotocards } from '@hooks/use-collection';
 import type { CollectionPhotocard } from '@lib/api/collections';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * 서버 API 기반 컬렉션 트리 (COL-001).
@@ -16,8 +17,6 @@ import type { Photocard } from '@/types/photocard.types';
  *
  * (목 데이터용 `CollectionAlbumList`는 COL-003·EX-007이 아직 쓰고 있어 그대로 둔다.)
  */
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 /** 카드 렌더는 화면마다 다르다(조회 / 선택) — 공통 변환만 여기서 한다. */
 function toPhotocard(card: CollectionPhotocard, versionName: string, albumName: string): Photocard {
@@ -48,13 +47,9 @@ function VersionCards({
 
   return (
     <section>
-      <div className="flex min-h-6 items-center justify-between">
+      {/* 디자인(COL-001)에는 보유 개수 표기가 없다 — 버전명만 둔다 */}
+      <div className="flex min-h-6 items-center">
         <p className="text-body3 text-secondary-500">{versionName}</p>
-        {data && (
-          <p className="text-body4 text-secondary-300">
-            {data.ownedCount}/{data.totalCount}
-          </p>
-        )}
       </div>
 
       {isPending && <Message>불러오는 중...</Message>}
@@ -67,7 +62,7 @@ function VersionCards({
               {/* 조회 전용: 보유는 사진 그대로, 미보유는 딤 처리 */}
               <PhotocardImage
                 card={toPhotocard(card, versionName, albumName)}
-                className={`aspect-[8/13] w-full ${card.isOwned ? '' : 'opacity-40'}`}
+                className={`aspect-card w-full ${card.isOwned ? '' : 'opacity-40'}`}
               />
             </li>
           ))}
@@ -116,7 +111,8 @@ export function CollectionTree({
       {data.albums.map((album, index) => (
         <CollectionAccordion
           key={album.albumId}
-          title={`${album.name} (${album.ownedCount}/${album.totalCount})`}
+          // 디자인(COL-001)에는 보유 개수 `(2/48)` 표기가 없다 — 앨범명만 둔다
+          title={album.name}
           defaultOpen={index === 0}
         >
           <AlbumVersions albumId={album.albumId} albumName={album.name} />

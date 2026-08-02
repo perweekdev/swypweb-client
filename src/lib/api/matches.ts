@@ -2,10 +2,9 @@ import { api } from '@lib/api-client';
 import { toCursorPage } from '@lib/cursor';
 import type { CursorPage } from '@/types/api.types';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /** 추천 매칭 API. 근거: docs/api-reference.md §7.6 */
-
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 interface MatchedCardResponse {
   photoCardId: number;

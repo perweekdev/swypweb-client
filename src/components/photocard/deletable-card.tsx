@@ -17,7 +17,7 @@ export function DeletableCard({
 }) {
   return (
     <div className={`relative ${className}`}>
-      <PhotocardImage card={card} className="aspect-[55/85] w-full" />
+      <PhotocardImage card={card} className="aspect-card w-full" />
       <button
         type="button"
         aria-label="삭제"

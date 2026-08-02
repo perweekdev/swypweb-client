@@ -6,6 +6,8 @@ import { Button } from '@components/ui/button';
  *   editable — '프로필 편집하기' (관심그룹 표시)
  *   offer    — '제안하기' (홈 피드/교환 상대)
  *   info     — 버튼 없음, 조회용 (교환글 상세 작성자)
+ *
+ * 아바타 크기는 화면마다 다르다 — 마이페이지 48, 홈 피드 40(계측). 기본은 48.
  */
 export function UserProfile({
   name,
@@ -14,6 +16,7 @@ export function UserProfile({
   groups,
   variant,
   onAction,
+  avatarClassName = 'size-12',
   className = '',
 }: {
   name: string;
@@ -22,13 +25,15 @@ export function UserProfile({
   groups?: string;
   variant: 'editable' | 'offer' | 'info';
   onAction?: () => void;
+  avatarClassName?: string;
   className?: string;
 }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <Avatar className="size-12 shrink-0" color={avatarColor} src={avatarUrl} />
+      <Avatar className={`shrink-0 ${avatarClassName}`} color={avatarColor} src={avatarUrl} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-button1 text-secondary-900">{name}</p>
+        {/* 계측(HOME-001): 닉네임 14(button2). 우측 '제안하기' 버튼(size sm)도 같은 14다 */}
+        <p className="truncate text-button2 text-secondary-900">{name}</p>
         {groups && <p className="truncate text-body3 text-secondary-500">{groups}</p>}
       </div>
       {variant !== 'info' && (

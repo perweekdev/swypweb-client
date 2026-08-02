@@ -33,7 +33,7 @@ export function SelectableCard({
     >
       <PhotocardImage
         card={card}
-        className={`aspect-[8/13] w-full ${state === 'not_collected' ? 'opacity-40' : ''} ${
+        className={`aspect-card w-full ${state === 'not_collected' ? 'opacity-40' : ''} ${
           selected ? 'ring-2 ring-primary-900' : ''
         }`}
       />

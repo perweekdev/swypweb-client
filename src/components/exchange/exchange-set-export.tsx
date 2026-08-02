@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+import { AppLogo } from '@components/icons/brand';
 import type { Photocard } from '@/types/photocard.types';
+import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * EX-010 '이미지로 저장하기'로 내보낼 이미지의 본체.
@@ -19,7 +21,6 @@ import type { Photocard } from '@/types/photocard.types';
  */
 
 const EXPORT_WIDTH = 780;
-const PLACEHOLDER_COLOR = '#E6E8EB';
 
 function ExportCard({ card }: { card: Photocard }) {
   return (
@@ -29,12 +30,12 @@ function ExportCard({ card }: { card: Photocard }) {
           <img
             src={card.imageUrl}
             alt=""
-            className="aspect-[55/85] h-[86%] rounded object-cover"
+            className="aspect-card h-[86%] rounded object-cover"
             crossOrigin="anonymous"
           />
         ) : (
           <div
-            className="aspect-[55/85] h-[86%] rounded"
+            className="aspect-card h-[86%] rounded"
             style={{ backgroundColor: card.color || PLACEHOLDER_COLOR }}
           />
         )}
@@ -70,17 +71,18 @@ function CardGrid({ cards }: { cards: Photocard[] }) {
 export function ExchangeSetExport({
   haveCards,
   wantCards,
-  logoDataUrl,
 }: {
   haveCards: Photocard[];
   wantCards: Photocard[];
-  /** 워터마크도 data URL로 넘긴다(같은 이유) */
-  logoDataUrl: string | null;
 }) {
   return (
     <div className="bg-white px-8 pb-10 pt-7" style={{ width: EXPORT_WIDTH }}>
       <div className="flex h-8 justify-end">
-        {logoDataUrl && <img src={logoDataUrl} alt="포카매치" className="h-full w-auto" />}
+        {/*
+          워터마크. 계측(`docs/designed/logo/이미지 양식 (3xn).png`, 782 폭): 69×18, 투명도 50%.
+          래스터(70×24 png)였을 때는 캡처가 2배수라 늘려 그려져 뭉갰다 → 인라인 SVG로 바꿔 해상도를 분리한다.
+        */}
+        <AppLogo className="h-[18px] w-[69px] text-black opacity-50" />
       </div>
 
       <div className="mt-2 flex items-start">

@@ -37,6 +37,8 @@ export function HomeFeedCard({
         avatarUrl={avatarUrl}
         variant={isMine ? 'info' : 'offer'}
         onAction={onOffer}
+        // 계측(HOME-001): 피드 아바타는 40. 마이페이지(48)보다 작다
+        avatarClassName="size-10"
       />
       <div className="mt-3 space-y-3">
         <PhotocardRow label={`있어요 ${haveCards.length}`} cards={haveCards} />
