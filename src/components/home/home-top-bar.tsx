@@ -14,13 +14,20 @@ import { useScrollDirection } from '@hooks/use-scroll-direction';
  *
  * 로고와 필터를 **한 덩어리(sticky)** 로 묶고 통째로 위로 밀어 구현한다.
  * 각각 따로 sticky를 걸면 둘 다 top:0을 잡아 겹친다.
- *  - 0          : 전체 노출
- *  - -로고 높이  : 로고만 화면 밖 → 필터가 상단에 붙는다
- *  - -100%      : 전체 감춤
+ *  - 0                 : 전체 노출
+ *  - -(로고 높이 - 4)  : 로고만 화면 밖 → 필터가 상단에서 8 떨어져 붙는다
+ *  - -바 높이          : 전체 감춤
  *
  * 높이는 폰트·안전영역에 따라 달라져 **측정해서** 쓴다(하드코딩하면 필터 위치가 어긋난다).
  * 바 전체를 지나기 전에는 감추지 않는다 — 그 구간에서 감추면 원래 자리에 빈 띠가 남는다.
  */
+
+/**
+ * 필터만 남았을 때 원 위쪽에 두는 여백. 디자인 실측값(`HOME-001-scroll.png`에서 잉크가 y=8에서 시작).
+ * 필터 블록이 자체 상단 여백(`pt-1` = 4)을 갖고 있어 그중 4는 이미 채워진다 → 나머지만 덜 민다.
+ */
+const FILTER_ONLY_TOP_GAP = 8;
+const FILTER_BLOCK_TOP_PADDING = 4;
 export function HomeTopBar({ children }: { children: ReactNode }) {
   const barRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -45,7 +52,8 @@ export function HomeTopBar({ children }: { children: ReactNode }) {
   }, []);
 
   const { up, passed } = useScrollDirection(size.bar);
-  const shift = !passed ? 0 : up ? size.header : size.bar;
+  const filterOnlyShift = size.header - (FILTER_ONLY_TOP_GAP - FILTER_BLOCK_TOP_PADDING);
+  const shift = !passed ? 0 : up ? filterOnlyShift : size.bar;
 
   return (
     <div
