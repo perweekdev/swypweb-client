@@ -68,21 +68,38 @@ function CardGrid({ cards }: { cards: Photocard[] }) {
   );
 }
 
+/** 워터마크 크기. 계측(`docs/designed/logo/이미지 양식 (3xn).png`, 782 폭) */
+export const WATERMARK_SIZE = { width: 69, height: 18 };
+
 export function ExchangeSetExport({
   haveCards,
   wantCards,
+  logoDataUrl,
 }: {
   haveCards: Photocard[];
   wantCards: Photocard[];
+  /**
+   * 미리 래스터화한 워터마크(`rasterizeSvg`).
+   * 인라인 SVG를 그대로 두면 캡처의 foreignObject 안에서 **중첩 SVG**가 되어 깨진다.
+   * 준비되지 않았을 때만 인라인으로 폴백한다(워터마크가 아예 빠지는 것보다 낫다).
+   */
+  logoDataUrl?: string | null;
 }) {
   return (
     <div className="bg-white px-8 pb-10 pt-7" style={{ width: EXPORT_WIDTH }}>
       <div className="flex h-8 justify-end">
-        {/*
-          워터마크. 계측(`docs/designed/logo/이미지 양식 (3xn).png`, 782 폭): 69×18, 투명도 50%.
-          래스터(70×24 png)였을 때는 캡처가 2배수라 늘려 그려져 뭉갰다 → 인라인 SVG로 바꿔 해상도를 분리한다.
-        */}
-        <AppLogo className="h-[18px] w-[69px] text-black opacity-50" />
+        {/* 워터마크 69×18, 투명도 50% */}
+        {logoDataUrl ? (
+          <img
+            src={logoDataUrl}
+            alt="포카매치"
+            width={WATERMARK_SIZE.width}
+            height={WATERMARK_SIZE.height}
+            className="opacity-50"
+          />
+        ) : (
+          <AppLogo className="h-[18px] w-[69px] text-black opacity-50" />
+        )}
       </div>
 
       <div className="mt-2 flex items-start">
