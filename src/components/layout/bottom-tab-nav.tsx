@@ -11,11 +11,11 @@ import {
   ExchangeIcon,
   HomeFilledIcon,
   HomeIcon,
-  ProfileIcon,
+  UserFilledIcon,
   UserIcon,
 } from '@components/icons';
 
-// active는 채운 아이콘, inactive는 선 아이콘(tab-elements 계측). 교환은 선 아이콘만 존재해 색으로만 구분.
+// active는 채운 아이콘, inactive는 선 아이콘. 내교환만 두 상태의 모양이 같아 색으로만 구분한다(디자인).
 const TABS = [
   { href: ROUTES.home, label: '홈', Icon: HomeIcon, IconActive: HomeFilledIcon },
   {
@@ -26,7 +26,7 @@ const TABS = [
   },
   { href: ROUTES.exchange, label: '내교환', Icon: ExchangeIcon, IconActive: ExchangeIcon },
   { href: ROUTES.chat, label: '채팅', Icon: ChatIcon, IconActive: ChatFilledIcon },
-  { href: ROUTES.my, label: '마이', Icon: UserIcon, IconActive: ProfileIcon },
+  { href: ROUTES.my, label: '마이', Icon: UserIcon, IconActive: UserFilledIcon },
 ] as const;
 
 export function BottomTabNav() {

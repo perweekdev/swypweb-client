@@ -40,21 +40,30 @@ export function DetailActionBar({
   };
 
   return (
-    <div className="sticky bottom-0 bg-background px-4 pb-4">
-      <div className="border-t border-secondary-50" />
-      <div className="space-y-3 pt-3">
-        <UserProfile
-          variant="info"
-          name={name}
-          avatarColor={avatarColor}
-          avatarUrl={avatarUrl}
-          groups={groups}
-        />
-        <Button size="lg" onClick={handleAction}>
-          {label}
-        </Button>
+    <>
+      <div className="sticky bottom-0 bg-background px-4 pb-4">
+        <div className="border-t border-secondary-50" />
+        <div className="space-y-3 pt-3">
+          <UserProfile
+            variant="info"
+            name={name}
+            avatarColor={avatarColor}
+            avatarUrl={avatarUrl}
+            groups={groups}
+          />
+          <Button size="lg" onClick={handleAction}>
+            {label}
+          </Button>
+        </div>
       </div>
+
+      {/*
+        시트는 하단 바(sticky) **밖**에 둔다.
+        `position: sticky`는 z-index와 무관하게 스택 컨텍스트를 만들어서, 그 안에 있으면
+        시트의 z-50이 갇혀 상단 헤더(sticky top-0 z-20)를 덮지 못한다 — 딤이 위쪽만 비껴간다.
+        (채팅 입력창 `ChatInputBar`에서 같은 이유로 한 번 고쳤던 문제다)
+      */}
       <LoginBottomSheet open={loginOpen} onClose={() => setLoginOpen(false)} />
-    </div>
+    </>
   );
 }

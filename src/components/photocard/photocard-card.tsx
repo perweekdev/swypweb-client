@@ -82,11 +82,12 @@ export function PhotocardBox({ card, className = '' }: { card: Photocard; classN
  *  - `wrap` — 배경 박스가 있는 상세 카드(HOME-003·CHAT-003)는 **줄바꿈**해 전체를 보여준다.
  *  - 기본   — 채팅 상단 요약(CHAT-002)처럼 높이가 고정된 자리는 **말줄임**.
  *
- * 줄바꿈에는 `break-keep`(한국어를 단어 중간에서 끊지 않음)과
- * `break-words`(공백 없는 긴 영문 앨범명은 강제로 끊음)를 함께 건다.
+ * 줄바꿈은 **`break-all`(줄을 꽉 채운 뒤 아무 데서나 개행)** 이다.
+ * 단어 단위로 내리면 `Midnight Sum Ver.` 다음의 `(Photobook)`이 통째로 넘어가 앞줄에 빈 공간이 남는다.
+ * 디자인(HOME-003)은 `Midnight Sum Ver.(Phot` / `obook)`처럼 **단어 중간에서 끊어** 폭을 다 쓴다.
  */
 export function PhotocardMeta({ card, wrap = false }: { card: Photocard; wrap?: boolean }) {
-  const overflow = wrap ? 'break-keep break-words' : 'truncate';
+  const overflow = wrap ? 'break-all' : 'truncate';
 
   return (
     <>

@@ -2,19 +2,38 @@ import type { ReactNode } from 'react';
 
 type IconProps = { className?: string };
 
-// 공통 아웃라인 아이콘 래퍼 (currentColor 기반 → 부모 text 색상 상속)
-function Icon({ className, children }: { className?: string; children: ReactNode }) {
+/**
+ * 아이콘은 전부 디자이너가 준 SVG(`docs/designed/update/icon/`)를 그대로 옮긴 것이다.
+ * 색만 `currentColor`로 바꿔, 호출부의 `text-*`를 그대로 따르게 했다.
+ *
+ * 디자인은 outline(#6A7389) / fill(#06153A) 두 벌을 주는데 **모양이 다른 경우가 있다.**
+ * 기본은 outline을 쓰고, fill은 **하단 탭바 활성 상태**와 하트 배지에만 쓴다(디자이너 확인).
+ *
+ * ⚠️ 래퍼가 공통으로 주는 것은 **stroke 색과 두께(1.5)뿐**이다.
+ * `strokeLinecap`/`strokeLinejoin`은 원본이 경로마다 다르게 지정하고 있어(대부분 miter 기본값)
+ * **래퍼에서 일괄로 주면 안 된다** — 화살촉·지붕 꼭짓점이 뭉툭해진다.
+ * 원본에 stroke가 없는 자식(면으로만 그린 점 등)은 `stroke="none"`으로 끊어 준다.
+ *
+ * 크기는 호출부가 `size-*`로 정한다. viewBox는 24×24가 기본이고 ⓘ만 20×20이다.
+ */
+
+/** 선 아이콘 — stroke 1.5. 끝/꺾임 처리는 각 경로가 원본대로 갖는다 */
+function StrokeIcon({
+  className,
+  children,
+  viewBox = '0 0 24 24',
+}: {
+  className?: string;
+  children: ReactNode;
+  viewBox?: string;
+}) {
   return (
     <svg
       className={className}
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
+      viewBox={viewBox}
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.7}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      strokeWidth={1.5}
       aria-hidden="true"
     >
       {children}
@@ -22,201 +41,289 @@ function Icon({ className, children }: { className?: string; children: ReactNode
   );
 }
 
+/** 면 아이콘 */
+function FillIcon({
+  className,
+  children,
+  viewBox = '0 0 24 24',
+}: {
+  className?: string;
+  children: ReactNode;
+  viewBox?: string;
+}) {
+  return (
+    <svg className={className} viewBox={viewBox} fill="currentColor" aria-hidden="true">
+      {children}
+    </svg>
+  );
+}
+
+/** 선과 면을 함께 쓰는 아이콘 (탭바 활성 상태 — 같은 색으로 채우고 테두리를 둔다) */
+function SolidStrokeIcon({ className, children }: { className?: string; children: ReactNode }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+/** 하단 탭바 홈 (비활성) */
 export function HomeIcon({ className }: IconProps) {
   return (
-    <Icon className={className}>
-      <path d="M4 11 12 4l8 7" />
-      <path d="M6 9.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5" />
-      <path d="M10 20v-4.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20" />
-    </Icon>
+    <StrokeIcon className={className}>
+      <path d="M11.3415 3.57604L4.3415 9.70104C4.12448 9.89092 4 10.1653 4 10.4536V19.9998C4 20.5521 4.44772 20.9998 5 20.9998L8.99998 21C9.27613 21 9.5 20.7761 9.5 20.5V14.9998C9.5 14.4476 9.44772 13.9998 10 13.9998H14C14.5523 13.9998 14.5 14.4476 14.5 14.9998V20.5C14.5 20.7761 14.7239 21 15 21L19 20.9998C19.5523 20.9998 20 20.5521 20 19.9998V10.4536C20 10.1653 19.8755 9.89093 19.6585 9.70104L12.6585 3.57604C12.2815 3.24614 11.7185 3.24614 11.3415 3.57604Z" />
+    </StrokeIcon>
   );
 }
 
-export function CollectionIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M6 4a2 2 0 0 1 2-2h9a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H8a2 2 0 0 1-2-2V4Z" />
-      <path d="M6 17.5h11" />
-    </Icon>
-  );
-}
-
-export function ExchangeIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M4 8.5h13l-3.2-3.2" />
-      <path d="M20 15.5H7l3.2 3.2" />
-    </Icon>
-  );
-}
-
-export function ChatIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4V6a1 1 0 0 1 1-1Z" />
-    </Icon>
-  );
-}
-
-export function UserIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <circle cx="12" cy="8" r="3.3" />
-      <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
-    </Icon>
-  );
-}
-
-export function ChevronRightIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="m9 6 6 6-6 6" />
-    </Icon>
-  );
-}
-
-export function ChevronDownIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="m6 9 6 6 6-6" />
-    </Icon>
-  );
-}
-
-/** 더보기 케밥 (nav-bar 우측 ⋮) */
-export function MoreIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <circle cx="12" cy="5" r="1.6" />
-      <circle cx="12" cy="12" r="1.6" />
-      <circle cx="12" cy="19" r="1.6" />
-    </svg>
-  );
-}
-
-export function ChevronLeftIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="m15 6-6 6 6 6" />
-    </Icon>
-  );
-}
-
-export function PlusIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M12 5v14M5 12h14" />
-    </Icon>
-  );
-}
-
-/** 선택 표시 (CHAT-004 포카 선택) */
-export function CheckIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="m5 12.5 4.5 4.5L19 7.5" />
-    </Icon>
-  );
-}
-
-/** 닫기 / 입력 지우기 */
-export function CloseIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M6 6l12 12M18 6L6 18" />
-    </Icon>
-  );
-}
-
-/** 교환 방향 표시 (CHAT-002 매치 정보의 두 포카 사이) */
-export function SwapIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M3 8.5h18l-4-4" />
-      <path d="M21 15.5H3l4 4" />
-    </Icon>
-  );
-}
-
-/** 메시지 보내기 (종이비행기) */
-export function SendIcon({ className }: IconProps) {
-  return (
-    <Icon className={className}>
-      <path d="M21 3 10.5 13.5" />
-      <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3Z" />
-    </Icon>
-  );
-}
-
-/** 하단 탭 active용 채운 아이콘 (tab-elements active) */
+/** 하단 탭바 홈 (활성) */
 export function HomeFilledIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M11.35 3.26a1 1 0 0 1 1.3 0l7.3 6.3a1 1 0 0 1 .35.76V19a1 1 0 0 1-1 1h-3.8a1 1 0 0 1-1-1v-4.2a1 1 0 0 0-1-1h-1.6a1 1 0 0 0-1 1V19a1 1 0 0 1-1 1H5.7a1 1 0 0 1-1-1v-8.68a1 1 0 0 1 .35-.76z" />
-    </svg>
+    <SolidStrokeIcon className={className}>
+      <path d="M11.3415 3.57604L4.3415 9.70104C4.12448 9.89092 4 10.1653 4 10.4536V19.9998C4 20.5521 4.44772 20.9998 5 20.9998L8.99998 21C9.27613 21 9.5 20.7761 9.5 20.5V14.9998C9.5 14.4476 9.44772 13.9998 10 13.9998H14C14.5523 13.9998 14.5 14.4476 14.5 14.9998V20.5C14.5 20.7761 14.7239 21 15 21L19 20.9998C19.5523 20.9998 20 20.5521 20 19.9998V10.4536C20 10.1653 19.8755 9.89093 19.6585 9.70104L12.6585 3.57604C12.2815 3.24614 11.7185 3.24614 11.3415 3.57604Z" />
+    </SolidStrokeIcon>
   );
 }
 
+/** 하단 탭바 컬렉션 (비활성) */
+export function CollectionIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M19 21H7C6.44772 21 6 20.5523 6 20V6C6 4.89543 6.89543 4 8 4H19V12.5V16.75" />
+      <path d="M19.7426 17C18.7004 17 17.8555 17.8954 17.8555 19C17.8555 20.1046 18.7004 21 19.7426 21H7.88716C6.84491 21 6 20.1046 6 19C6 17.8954 6.84491 17 7.88716 17H19.7426Z" />
+      <path d="M10 6V15" strokeLinecap="round" />
+    </StrokeIcon>
+  );
+}
+
+/** 하단 탭바 컬렉션 (활성) */
 export function CollectionFilledIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M6 4a2 2 0 0 1 2-2h9a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H8a2 2 0 0 1-2-2zm2 12.5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2z" />
-    </svg>
+    <FillIcon className={className}>
+      <path d="M19.75 17.75H19.7422C19.1548 17.7503 18.6055 18.2682 18.6055 19C18.6055 19.7318 19.1548 20.2497 19.7422 20.25V21.75H7C6.0335 21.75 5.25 20.9665 5.25 20V6C5.25 4.48122 6.48122 3.25 8 3.25H19.75V17.75ZM7.88672 17.75C7.29929 17.7503 6.75 18.2682 6.75 19C6.75 19.7318 7.29929 20.2497 7.88672 20.25H17.3965C17.2107 19.8711 17.1055 19.4453 17.1055 19C17.1055 18.5547 17.2107 18.1289 17.3965 17.75H7.88672ZM10 5.25C9.58579 5.25 9.25 5.58579 9.25 6V15C9.25 15.4142 9.58579 15.75 10 15.75C10.4142 15.75 10.75 15.4142 10.75 15V6C10.75 5.58579 10.4142 5.25 10 5.25Z" />
+    </FillIcon>
   );
 }
 
+/** 하단 탭바 내교환 — 활성/비활성이 같은 모양이라 색으로만 구분한다(디자인) */
+export function ExchangeIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M6 14V6C6 5.44772 6.44772 5 7 5H17" strokeLinecap="round" />
+      <path
+        d="M15.5 2.5L17.6464 4.64645C17.8417 4.84171 17.8417 5.15829 17.6464 5.35355L15.5 7.5"
+        strokeLinecap="round"
+      />
+      <path d="M18 10V18C18 18.5523 17.5523 19 17 19H7" strokeLinecap="round" />
+      <path
+        d="M8.5 21.5L6.35355 19.3536C6.15829 19.1583 6.15829 18.8417 6.35355 18.6464L8.5 16.5"
+        strokeLinecap="round"
+      />
+    </StrokeIcon>
+  );
+}
+
+/** 하단 탭바 채팅 (비활성) */
+export function ChatIcon({ className }: IconProps) {
+  return (
+    <FillIcon className={className}>
+      <path d="M20 6H20.75V6H20ZM17.1035 18V17.25H16.6125L16.4161 17.7L17.1035 18ZM16.1113 20.2734L16.7987 20.5734L16.7987 20.5734L16.1113 20.2734ZM15.1953 20.2764L14.51 20.581L14.51 20.581L15.1953 20.2764ZM14.1836 18L14.869 17.6954L14.671 17.25H14.1836V18ZM4 16H3.25V16H4ZM18 4V4.75C18.6904 4.75 19.25 5.30964 19.25 6H20H20.75C20.75 4.48122 19.5188 3.25 18 3.25V4ZM20 6H19.25V16H20H20.75V6H20ZM20 16H19.25C19.25 16.6904 18.6904 17.25 18 17.25V18V18.75C19.5188 18.75 20.75 17.5188 20.75 16H20ZM18 18V17.25H17.1035V18V18.75H18V18ZM17.1035 18L16.4161 17.7L15.4239 19.9734L16.1113 20.2734L16.7987 20.5734L17.7909 18.3L17.1035 18ZM16.1113 20.2734L15.4239 19.9734C15.5111 19.7737 15.7926 19.7736 15.8807 19.9717L15.1953 20.2764L14.51 20.581C14.9513 21.5739 16.3637 21.5702 16.7987 20.5734L16.1113 20.2734ZM15.1953 20.2764L15.8807 19.9718L14.869 17.6954L14.1836 18L13.4982 18.3046L14.51 20.581L15.1953 20.2764ZM14.1836 18V17.25H6V18V18.75H14.1836V18ZM6 18V17.25C5.30964 17.25 4.75 16.6904 4.75 16H4H3.25C3.25 17.5188 4.48122 18.75 6 18.75V18ZM4 16H4.75V6H4H3.25V16H4ZM4 6H4.75C4.75 5.30964 5.30964 4.75 6 4.75V4V3.25C4.48122 3.25 3.25 4.48122 3.25 6H4ZM6 4V4.75H18V4V3.25H6V4Z" />
+      <circle cx="8" cy="11" r="1" />
+      <circle cx="12" cy="11" r="1" />
+      <circle cx="16" cy="11" r="1" />
+    </FillIcon>
+  );
+}
+
+/** 하단 탭바 채팅 (활성) */
 export function ChatFilledIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M5 4h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9.4L5 20V5a1 1 0 0 1 1-1z" />
-    </svg>
+    <FillIcon className={className}>
+      <path d="M18 3.25C19.5188 3.25 20.75 4.48122 20.75 6V16C20.75 17.5188 19.5188 18.75 18 18.75H17.5947L16.7988 20.5732C16.3638 21.57 14.9511 21.5739 14.5098 20.5811L13.6963 18.75H6C4.48122 18.75 3.25 17.5188 3.25 16V6C3.25 4.48122 4.48122 3.25 6 3.25H18ZM8 10C7.44772 10 7 10.4477 7 11C7 11.5523 7.44772 12 8 12C8.55228 12 9 11.5523 9 11C9 10.4477 8.55228 10 8 10ZM12 10C11.4477 10 11 10.4477 11 11C11 11.5523 11.4477 12 12 12C12.5523 12 13 11.5523 13 11C13 10.4477 12.5523 10 12 10ZM16 10C15.4477 10 15 10.4477 15 11C15 11.5523 15.4477 12 16 12C16.5523 12 17 11.5523 17 11C17 10.4477 16.5523 10 16 10Z" />
+    </FillIcon>
   );
 }
 
-/** 채워진 프로필 실루엣 (image-profile placeholder, 마이 탭 active) */
-export function ProfileIcon({ className }: IconProps) {
+/** 하단 탭바 마이 (비활성) */
+export function UserIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <circle cx="12" cy="9" r="4" />
-      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0Z" />
-    </svg>
+    <StrokeIcon className={className}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M19.391 18.0126C19.7145 18.647 19.9116 19.3181 19.9764 20.0007C20.0024 20.2757 19.7761 20.5 19.5 20.5H12L4.5 20.5C4.22386 20.5 3.99757 20.2757 4.02363 20.0007C4.08835 19.3181 4.28552 18.647 4.60896 18.0126C5.011 17.2239 5.60028 16.5074 6.34315 15.9038C7.08601 15.3002 7.96793 14.8214 8.93853 14.4948C9.90914 14.1681 10.9494 14 12 14C13.0506 14 14.0909 14.1681 15.0615 14.4948C16.0321 14.8214 16.914 15.3002 17.6569 15.9038C18.3997 16.5074 18.989 17.2239 19.391 18.0126Z" />
+    </StrokeIcon>
   );
 }
 
-/** 채워진 하트 (관심 그룹 배지) */
-export function HeartIcon({ className }: IconProps) {
+/** 하단 탭바 마이 (활성) */
+export function UserFilledIcon({ className }: IconProps) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 20.5 4.2 12.9a4.6 4.6 0 0 1 6.5-6.5l1.3 1.3 1.3-1.3a4.6 4.6 0 0 1 6.5 6.5Z" />
-    </svg>
+    <SolidStrokeIcon className={className}>
+      <path d="M15.5 8C15.5 9.933 13.933 11.5 12 11.5C10.067 11.5 8.5 9.933 8.5 8C8.5 6.067 10.067 4.5 12 4.5C13.933 4.5 15.5 6.067 15.5 8Z" />
+      <path d="M19.5 20.5C19.7761 20.5 20.0024 20.2757 19.9764 20.0007C19.9116 19.3181 19.7145 18.647 19.391 18.0126C18.989 17.2239 18.3997 16.5074 17.6569 15.9038C16.914 15.3002 16.0321 14.8214 15.0615 14.4948C14.0909 14.1681 13.0506 14 12 14C10.9494 14 9.90914 14.1681 8.93853 14.4948C7.96793 14.8214 7.08601 15.3002 6.34315 15.9038C5.60028 16.5074 5.011 17.2239 4.60896 18.0126C4.28552 18.647 4.08835 19.3181 4.02363 20.0007C3.99757 20.2757 4.22386 20.5 4.5 20.5L12 20.5H19.5Z" />
+    </SolidStrokeIcon>
   );
 }
 
+/** 있어요 ⇄ 구해요 교환 표시 */
+export function SwapIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path
+        d="M3 6.5H19.5M16.5 2.5L19.7119 6.17075C19.8769 6.35926 19.8769 6.64074 19.7119 6.82925L16.5 10.5M20 17H3.5M6.5 21L3.2881 17.3293C3.12315 17.1407 3.12315 16.8593 3.2881 16.6707L6.5 13"
+        strokeLinecap="round"
+      />
+    </StrokeIcon>
+  );
+}
+
+/** 화면 상단 뒤로가기 */
+export function ChevronLeftIcon({ className }: IconProps) {
+  return (
+    <FillIcon className={className}>
+      <path d="M1.82023 12L9.53523 19.716C9.6819 19.8627 9.75457 20.0387 9.75323 20.244C9.7519 20.4493 9.67723 20.6257 9.52923 20.773C9.38123 20.9203 9.2049 20.994 9.00023 20.994C8.79557 20.994 8.61923 20.9203 8.47123 20.773L0.830234 13.137C0.668901 12.975 0.550901 12.795 0.476234 12.597C0.402234 12.3977 0.365234 12.1987 0.365234 12C0.365234 11.8013 0.402234 11.6027 0.476234 11.404C0.550901 11.2053 0.668901 11.0253 0.830234 10.864L8.47023 3.21999C8.61757 3.07266 8.7949 2.99999 9.00223 3.00199C9.2089 3.00399 9.38623 3.07866 9.53424 3.22599C9.6809 3.37333 9.75423 3.54966 9.75423 3.75499C9.75423 3.96033 9.6809 4.13666 9.53424 4.28399L1.82023 12Z" />
+    </FillIcon>
+  );
+}
+
+/** 메뉴 행·링크의 › (세 자리 모두 같은 24×24를 쓴다 — 디자이너 확인) */
+export function ChevronRightIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path
+        d="M9 6.5L14.1464 11.6464C14.3417 11.8417 14.3417 12.1583 14.1464 12.3536L9 17.5"
+        strokeLinecap="round"
+      />
+    </StrokeIcon>
+  );
+}
+
+/** 컬렉션 앨범 펼치기 · 거래 상태 선택 */
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M18 9L12 15L6 9" strokeLinecap="round" strokeLinejoin="round" />
+    </StrokeIcon>
+  );
+}
+
+/** 교환 세트 더보기 ⋮ */
+export function MoreIcon({ className }: IconProps) {
+  return (
+    <FillIcon className={className}>
+      <path d="M12 16.5C12.3978 16.5 12.7794 16.658 13.0607 16.9393C13.342 17.2206 13.5 17.6022 13.5 18C13.5 18.3978 13.342 18.7794 13.0607 19.0607C12.7794 19.342 12.3978 19.5 12 19.5C11.6022 19.5 11.2206 19.342 10.9393 19.0607C10.658 18.7794 10.5 18.3978 10.5 18C10.5 17.6022 10.658 17.2206 10.9393 16.9393C11.2206 16.658 11.6022 16.5 12 16.5ZM12 10.5C12.3978 10.5 12.7794 10.658 13.0607 10.9393C13.342 11.2206 13.5 11.6022 13.5 12C13.5 12.3978 13.342 12.7794 13.0607 13.0607C12.7794 13.342 12.3978 13.5 12 13.5C11.6022 13.5 11.2206 13.342 10.9393 13.0607C10.658 12.7794 10.5 12.3978 10.5 12C10.5 11.6022 10.658 11.2206 10.9393 10.9393C11.2206 10.658 11.6022 10.5 12 10.5ZM12 4.5C12.3978 4.5 12.7794 4.65804 13.0607 4.93934C13.342 5.22064 13.5 5.60218 13.5 6C13.5 6.39782 13.342 6.77936 13.0607 7.06066C12.7794 7.34196 12.3978 7.5 12 7.5C11.6022 7.5 11.2206 7.34196 10.9393 7.06066C10.658 6.77936 10.5 6.39782 10.5 6C10.5 5.60218 10.658 5.22064 10.9393 4.93934C11.2206 4.65804 11.6022 4.5 12 4.5Z" />
+    </FillIcon>
+  );
+}
+
+/** FAB ＋ · 채팅 사진 첨부 ＋ · 관심그룹 추가 ＋ */
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M18 12H12M12 12H6M12 12V6M12 12V18" strokeLinecap="round" strokeLinejoin="round" />
+    </StrokeIcon>
+  );
+}
+
+/** 프로필 사진 변경 */
 export function CameraIcon({ className }: IconProps) {
   return (
-    <Icon className={className}>
-      <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
-      <circle cx="12" cy="13" r="3.1" />
-    </Icon>
+    <StrokeIcon className={className}>
+      <path
+        d="M6 7H5C4.46957 7 3.96086 7.21071 3.58579 7.58579C3.21071 7.96086 3 8.46957 3 9V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H19C19.5304 20 20.0391 19.7893 20.4142 19.4142C20.7893 19.0391 21 18.5304 21 18V9C21 8.46957 20.7893 7.96086 20.4142 7.58579C20.0391 7.21071 19.5304 7 19 7H18C17.4696 7 16.9609 6.78929 16.5858 6.41421C16.2107 6.03914 16 5.53043 16 5C16 4.73478 15.8946 4.48043 15.7071 4.29289C15.5196 4.10536 15.2652 4 15 4H9C8.73478 4 8.48043 4.10536 8.29289 4.29289C8.10536 4.48043 8 4.73478 8 5C8 5.53043 7.78929 6.03914 7.41421 6.41421C7.03914 6.78929 6.53043 7 6 7Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 13C9 13.7956 9.31607 14.5587 9.87868 15.1213C10.4413 15.6839 11.2044 16 12 16C12.7956 16 13.5587 15.6839 14.1213 15.1213C14.6839 14.5587 15 13.7956 15 13C15 12.2044 14.6839 11.4413 14.1213 10.8787C13.5587 10.3161 12.7956 10 12 10C11.2044 10 10.4413 10.3161 9.87868 10.8787C9.31607 11.4413 9 12.2044 9 13Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </StrokeIcon>
   );
 }
 
-/** 편집(연필) — COL-001 FAB '편집하기' */
+/** 컬렉션 FAB 편집하기 */
 export function PencilIcon({ className }: IconProps) {
   return (
-    <Icon className={className}>
-      <path d="M16.5 4.5a2.12 2.12 0 0 1 3 3L8 19l-4 1 1-4Z" />
-      <path d="m14.5 6.5 3 3" />
-    </Icon>
+    <StrokeIcon className={className}>
+      <path
+        d="M15 6.00019L18 9.00019M13 20.0002H21M5 16.0002L4 20.0002L8 19.0002L19.586 7.41419C19.9609 7.03913 20.1716 6.53051 20.1716 6.00019C20.1716 5.46986 19.9609 4.96124 19.586 4.58619L19.414 4.41419C19.0389 4.03924 18.5303 3.82861 18 3.82861C17.4697 3.82861 16.9611 4.03924 16.586 4.41419L5 16.0002Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </StrokeIcon>
   );
 }
 
+/** 관심 그룹 하트 배지 (색은 호출부에서 red-700) */
+export function HeartIcon({ className }: IconProps) {
+  return (
+    <FillIcon className={className}>
+      <path d="M21.1909 12.683C18.6909 18.093 12.5709 20.883 12.3109 21.003C12.1116 21.0811 11.8902 21.0811 11.6909 21.003C11.4409 20.883 5.31086 18.093 2.81086 12.683C1.26086 9.31301 2.12086 5.68302 3.81086 4.12302C4.40283 3.61574 5.10665 3.25608 5.86456 3.07355C6.62247 2.89103 7.41287 2.89084 8.17086 3.07302C9.72186 3.42558 11.0764 4.36442 11.9509 5.69302C12.827 4.36157 14.1858 3.42225 15.7409 3.07302C16.4989 2.89084 17.2893 2.89103 18.0472 3.07355C18.8051 3.25608 19.5089 3.61574 20.1009 4.12302C21.8809 5.68302 22.7509 9.31301 21.1909 12.683Z" />
+    </FillIcon>
+  );
+}
+
+/** 안내 문구 앞 ⓘ */
 export function InfoIcon({ className }: IconProps) {
   return (
-    <Icon className={className}>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v5" />
-      <path d="M12 8h.01" />
-    </Icon>
+    <StrokeIcon className={className} viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="7" />
+      <path d="M10 9V14" strokeLinecap="round" />
+      <circle cx="10" cy="6.75" r="0.75" fill="currentColor" stroke="none" />
+    </StrokeIcon>
+  );
+}
+
+/** 채팅 보내기 */
+export function SendIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path
+        d="M14.0008 10.0002L11.0008 13.0002M20.2888 3.03122C20.3837 2.99847 20.4859 2.99309 20.5837 3.01567C20.6815 3.03825 20.771 3.0879 20.8419 3.15893C20.9129 3.22996 20.9624 3.31952 20.9848 3.41736C21.0073 3.5152 21.0017 3.61738 20.9688 3.71222L15.0448 20.6422C15.0094 20.7434 14.9443 20.8316 14.8581 20.8954C14.772 20.9592 14.6686 20.9956 14.5614 20.9999C14.4543 21.0042 14.3483 20.9763 14.2573 20.9196C14.1662 20.863 14.0943 20.7802 14.0508 20.6822L10.8318 13.4402C10.7777 13.3198 10.6813 13.2234 10.5608 13.1692L3.31884 9.94922C3.22113 9.9056 3.13875 9.83368 3.08234 9.74275C3.02593 9.65183 2.99808 9.54608 3.00239 9.43917C3.00669 9.33225 3.04296 9.22909 3.1065 9.14299C3.17004 9.0569 3.25794 8.99184 3.35884 8.95622L20.2888 3.03122Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </StrokeIcon>
+  );
+}
+
+/**
+ * 프로필 사진이 없을 때의 기본 아바타 (`docs/designed/update/profile.svg`).
+ * 다른 아이콘과 달리 **원 전체를 채우는 그림**이라 currentColor를 쓰지 않고 색을 직접 지정한다.
+ * 부모가 `rounded-full overflow-hidden`이면 사각형이 원으로 잘린다.
+ */
+export function ProfileIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" aria-hidden="true">
+      <rect width="100" height="100" className="fill-secondary-500" />
+      <circle cx="49.5" cy="41.5" r="20.5" className="fill-secondary-50" />
+      <circle cx="49.5" cy="106.5" r="40.5" className="fill-secondary-50" />
+    </svg>
+  );
+}
+
+/** 완료 체크 — 디자인 목록에 없어 기존 것을 유지한다 */
+export function CheckIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
+    </StrokeIcon>
+  );
+}
+
+/** 닫기 ✕ — 디자인 목록에 없어 기존 것을 유지한다 */
+export function CloseIcon({ className }: IconProps) {
+  return (
+    <StrokeIcon className={className}>
+      <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+    </StrokeIcon>
   );
 }

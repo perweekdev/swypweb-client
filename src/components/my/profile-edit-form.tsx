@@ -168,9 +168,9 @@ export function ProfileEditForm() {
             setDraft(value);
             if (error) setError(null);
           }}
+          error={error}
           placeholder="닉네임을 입력하세요."
         />
-        {error && <p className="mt-2 px-1 text-body3 text-red-900">{error}</p>}
       </div>
     </>
   );

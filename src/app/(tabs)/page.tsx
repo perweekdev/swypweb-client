@@ -78,7 +78,9 @@ export default function HomePage() {
 
       <div className="pb-24">
         {posts.map((post, i) => {
-          const openDetail = requireAuth(() => router.push(POST_ROUTES.detail(post.id)));
+          // 교환글을 **보는 것**은 비회원도 된다(상세 API도 공개다) → 카드 클릭에는 로그인을 요구하지 않는다.
+          // 로그인은 '제안하기'를 눌렀을 때만 유도한다(디자인 home-flow: 포카 영역 → 상세, 팝업 없음).
+          const openDetail = () => router.push(POST_ROUTES.detail(post.id));
 
           return (
             <div key={post.id}>
@@ -93,7 +95,7 @@ export default function HomePage() {
                 isMine={myUserId !== null && post.author.id === myUserId}
                 // 내 글은 '제안하기'가 없으므로 카드 자체를 눌러 상세로 들어간다.
                 onClick={openDetail}
-                onOffer={openDetail}
+                onOffer={requireAuth(openDetail)}
               />
             </div>
           );

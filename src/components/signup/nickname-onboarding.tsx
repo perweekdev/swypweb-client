@@ -16,7 +16,7 @@ import { ROUTES } from '@constants/routes';
  *
  * 진입 전제: OAuth 콜백에서 받은 `signupToken`이 스토어에 있어야 한다(유효 10분).
  * 뒤로갈 화면이 없어 헤더(뒤로가기)를 두지 않는다(디자인).
- * 계측: 제목 20 semibold 2줄(줄 간격 24) · 설명 14 secondary-500 · 입력 필드 50 pill
+ * 계측: 제목 20 semibold 2줄(행간은 디자인시스템대로 1.5 — 시안의 24는 무시한다) · 설명 14 secondary-500 · 입력 필드 50 pill
  * · 하단 CTA 343×56 rounded-xl(비활성 primary-300).
  */
 export function NicknameOnboarding() {
@@ -88,7 +88,7 @@ export function NicknameOnboarding() {
 
   return (
     <div className="flex flex-1 flex-col px-4 pt-17">
-      <h1 className="whitespace-pre-line text-h1 leading-tight text-secondary-900">
+      <h1 className="whitespace-pre-line text-h1 text-secondary-900">
         {'사용할 닉네임을\n입력해주세요'}
       </h1>
       <p className="mt-2 text-body2 text-secondary-500">
@@ -102,11 +102,11 @@ export function NicknameOnboarding() {
           setNickname(value);
           if (error) setError(null);
         }}
+        error={error}
         placeholder="닉네임을 입력하세요."
         aria-label="닉네임"
         autoFocus
       />
-      {error && <p className="mt-2 px-1 text-body3 text-red-900">{error}</p>}
 
       <div className="sticky bottom-0 mt-auto bg-background pb-8 pt-3">
         <Button size="lg" disabled={nickname.trim().length === 0 || submitting} onClick={start}>

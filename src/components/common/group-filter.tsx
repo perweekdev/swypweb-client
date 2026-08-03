@@ -53,9 +53,11 @@ export function GroupFilter({
       className="flex w-14 shrink-0 flex-col items-center gap-1.5"
     >
       {node}
-      {/* 계측(HOME-001·EX-001): 라벨 12(body3).
-          break-keep: 한국어는 단어 중간에서 끊지 않는다 ('관심그룹 추가/하기' → '관심그룹/추가하기') */}
-      <span className="line-clamp-2 w-full break-keep text-center text-body3 text-secondary-900">
+      {/* 계측(HOME-001·EX-001): 라벨 12(body3), 최대 2줄.
+          `break-keep` — 한국어는 단어 중간에서 끊지 않는다 ('관심그룹 추가/하기' → '관심그룹/추가하기').
+          `break-words` — 다만 **한 단어가 폭보다 길면** 그때는 중간에서 끊는다.
+          이게 없으면 공백 없는 긴 이름(`Hearts2Hearts`)이 개행 자체를 못 해 한 줄에서 잘린다. */}
+      <span className="line-clamp-2 w-full break-keep break-words text-center text-body3 text-secondary-900">
         {label}
       </span>
     </button>
@@ -92,9 +94,9 @@ export function GroupFilter({
         item(
           'all',
           '전체',
-          <AllChip
-            className={`size-12 ${value === null ? 'ring-2 ring-primary-900 ring-offset-2 ring-offset-background' : ''}`}
-          />,
+          // 선택 링은 원 가장자리에 **붙는다** — offset을 주면 사이에 흰 여백이 생겨 디자인과 다르다
+          // (실측: 비선택 원 48, 선택 원 50 → 링이 바깥으로 1~2px만 나간다)
+          <AllChip className={`size-12 ${value === null ? 'ring-2 ring-primary-900' : ''}`} />,
           () => onChange(null)
         )}
       {otherGroups.map(renderGroup)}

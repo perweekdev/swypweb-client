@@ -16,11 +16,17 @@ type Variant = 'primary' | 'navy' | 'outline';
 type Size = 'lg' | 'md' | 'sm';
 type Shape = 'cta' | 'pill';
 
+/**
+ * pressed 색은 디자인 PNG(`docs/designed/update/button/`)를 픽셀 샘플링해 확정했다 — 전부 기존 토큰이다.
+ * `hover`는 Tailwind v4에서 `@media (hover:hover)`로 감싸지므로 터치 기기에서는 눌린 채로 남지 않는다.
+ * `disabled:`가 스타일시트에서 `hover`/`active`보다 뒤에 오므로 비활성 상태가 항상 이긴다.
+ */
 const COLOR: Record<Variant, string> = {
-  primary: 'bg-primary-900 text-white disabled:bg-primary-300',
-  navy: 'bg-secondary-900 text-white disabled:bg-secondary-100',
+  primary:
+    'bg-primary-900 text-white hover:bg-primary-500 active:bg-primary-500 disabled:bg-primary-300',
+  navy: 'bg-secondary-900 text-white hover:bg-secondary-500 active:bg-secondary-500 disabled:bg-secondary-100',
   outline:
-    'border border-secondary-100 bg-transparent text-secondary-900 disabled:text-secondary-300',
+    'border border-secondary-100 bg-transparent text-secondary-900 hover:bg-secondary-50 active:bg-secondary-50 disabled:bg-gray-100 disabled:text-secondary-300',
 };
 
 const SHAPE: Record<Shape, string> = {

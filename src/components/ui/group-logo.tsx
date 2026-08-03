@@ -7,7 +7,8 @@ import { HeartIcon, PlusIcon } from '@components/icons';
  * 계측: large 77 / small 50 (배지·링 여백 포함). state·favorited 조합:
  *   default  — 로고 원
  *   add      — 점선 원 + gray-500 ＋ (추가하기)
- *   selected — primary-900 링
+ *   selected — primary-900 링. **원 가장자리에 붙는다**(offset 없음).
+ *              실측: 비선택 원 48 · 선택 원 50 — 사이에 여백이 없다.
  *   favorited(❤) — 우상단 red-700 하트 배지 (관심 그룹 표시)
  */
 type State = 'default' | 'add' | 'selected';
@@ -55,7 +56,7 @@ export function GroupLogo({
       <span
         className={`relative flex size-full items-center justify-center overflow-hidden rounded-full text-body1 text-white ${
           color && !logoUrl ? '' : 'bg-secondary-50 text-secondary-500'
-        } ${state === 'selected' ? 'ring-2 ring-primary-900 ring-offset-2 ring-offset-background' : ''}`}
+        } ${state === 'selected' ? 'ring-2 ring-primary-900' : ''}`}
         style={color && !logoUrl ? { backgroundColor: color } : undefined}
       >
         {logoUrl ? (

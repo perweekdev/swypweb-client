@@ -21,6 +21,13 @@
   --font-sans:
     'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
 
+  /* ── Shadow ──────────────────────────────────────────────────
+     디자인 지정값(2차 요청 8·9번).
+       card  — 저장될 이미지 미리보기. 경계가 없어 크기를 가늠하기 어려웠다.
+       frame — 화면이 프레임 최대 폭(420)을 넘을 때 서비스 영역과 바깥을 구분한다. */
+  --shadow-card: 0 4px 8px rgb(6 21 58 / 0.1);
+  --shadow-frame: 0 0 15px rgb(0 0 0 / 0.1);
+
   /* ── Aspect ratio ────────────────────────────────────────────
      포토카드 한 장의 비율. 디자인 실측(HOME-001 피드 61×98)을 전 화면 공통으로 쓴다.
      → `aspect-card`. 화면마다 55/85·8/13로 갈려 있던 것을 이 토큰 하나로 통일했다. */
@@ -81,7 +88,11 @@
   --color-text-white: #ffffff;
 
   /* ── Typography scale (weight / size / line-height 1.5) ──────
-     사용 예: <h1 className="text-h1">, <span className="text-body2"> */
+     사용 예: <h1 className="text-h1">, <span className="text-body2">
+
+     ⚠️ **행간은 예외 없이 1.5다**(2026-08-03 디자이너 확정).
+     일부 시안에서 제목 20/24, 채팅 14/17처럼 더 좁게 그려진 곳이 있으나 시안 쪽 오류로 확인됐다.
+     `leading-*`로 덮어쓰지 않는다. */
   --text-h1: 20px;
   --text-h1--line-height: 1.5;
   --text-h1--font-weight: 600;
