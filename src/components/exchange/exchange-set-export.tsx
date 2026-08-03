@@ -88,15 +88,13 @@ export function ExchangeSetExport({
   return (
     <div className="bg-white px-8 pb-10 pt-7" style={{ width: EXPORT_WIDTH }}>
       <div className="flex h-8 justify-end">
-        {/* 워터마크 69×18, 투명도 50% */}
+        {/*
+          워터마크 69×18, 투명도 50%.
+          ⚠️ 크기는 **CSS로** 못 박는다. 부모가 `flex h-8`이라 기본 `align-items: stretch`가 걸리는데,
+          `<img>`의 width/height는 HTML 속성일 뿐이라 stretch를 막지 못해 세로로 늘어난다(69×32로 나왔었다).
+        */}
         {logoDataUrl ? (
-          <img
-            src={logoDataUrl}
-            alt="포카매치"
-            width={WATERMARK_SIZE.width}
-            height={WATERMARK_SIZE.height}
-            className="opacity-50"
-          />
+          <img src={logoDataUrl} alt="포카매치" className="h-[18px] w-[69px] opacity-50" />
         ) : (
           <AppLogo className="h-[18px] w-[69px] text-black opacity-50" />
         )}
