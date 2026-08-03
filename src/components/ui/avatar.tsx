@@ -43,10 +43,9 @@ export function Avatar({
     );
   }
 
+  // 기본 아바타는 원을 꽉 채우는 그림이다(profile.svg) — 배경색을 따로 두지 않는다.
   return (
-    <span
-      className={`inline-flex items-center justify-center overflow-hidden rounded-full bg-secondary-50 text-secondary-500 ${className}`}
-    >
+    <span className={`inline-block overflow-hidden rounded-full ${className}`}>
       <ProfileIcon className="size-full" />
     </span>
   );
