@@ -102,11 +102,11 @@ export function NicknameOnboarding() {
           setNickname(value);
           if (error) setError(null);
         }}
+        error={error}
         placeholder="닉네임을 입력하세요."
         aria-label="닉네임"
         autoFocus
       />
-      {error && <p className="mt-2 px-1 text-body3 text-red-900">{error}</p>}
 
       <div className="sticky bottom-0 mt-auto bg-background pb-8 pt-3">
         <Button size="lg" disabled={nickname.trim().length === 0 || submitting} onClick={start}>

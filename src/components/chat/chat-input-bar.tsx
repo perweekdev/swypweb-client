@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { CloseIcon, PlusIcon, SendIcon } from '@components/icons';
+import { PlusIcon, SendIcon } from '@components/icons';
 import { ActionSheet } from '@components/common/action-sheet';
+import { ChatInputField } from '@components/ui/chat-input-field';
 import { CHAT_IMAGE_ACCEPT } from '@lib/api/chat';
 
 /**
@@ -10,6 +11,9 @@ import { CHAT_IMAGE_ACCEPT } from '@lib/api/chat';
  * 입력이 있어야 보내기 버튼이 활성화된다(스토리보드).
  *
  * 전송은 WebSocket(STOMP)이라 **연결된 상태에서만** 가능하다 — 연결 전에는 버튼이 비활성이다.
+ *
+ * 계측(2차 요청 1번): 바 높이 77 = 상단 8 + 입력 37 + **하단 32**.
+ * 하단 여백이 없어 화면 끝에 붙어 있던 것을 띄웠다. ＋·보내기와 입력 사이 간격은 4다.
  */
 export function ChatInputBar({
   onSend,
@@ -34,7 +38,7 @@ export function ChatInputBar({
 
   return (
     <>
-      <div className="sticky bottom-0 flex items-center gap-2 bg-background px-4 pb-[env(safe-area-inset-bottom)] pt-2">
+      <div className="sticky bottom-0 flex items-center gap-1 bg-background px-4 pb-[calc(32px_+_env(safe-area-inset-bottom))] pt-2">
         <button
           type="button"
           aria-label="사진 첨부"
@@ -59,27 +63,14 @@ export function ChatInputBar({
           }}
         />
 
-        <div className="relative min-w-0 flex-1">
-          <input
+        <div className="min-w-0 flex-1">
+          <ChatInputField
             value={text}
-            onChange={(event) => setText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.nativeEvent.isComposing) send();
-            }}
+            onValueChange={setText}
+            onSubmit={send}
             placeholder="메시지 입력하기"
             aria-label="메시지 입력"
-            className="h-10 w-full rounded-full bg-secondary-10 pl-4 pr-9 text-body2 text-secondary-900 outline-none placeholder:text-secondary-300"
           />
-          {canSend && (
-            <button
-              type="button"
-              aria-label="입력 지우기"
-              onClick={() => setText('')}
-              className="absolute right-3 top-1/2 flex size-4 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 text-white"
-            >
-              <CloseIcon className="size-2.5" />
-            </button>
-          )}
         </div>
 
         <button
