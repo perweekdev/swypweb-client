@@ -92,9 +92,9 @@ export function GroupFilter({
         item(
           'all',
           '전체',
-          <AllChip
-            className={`size-12 ${value === null ? 'ring-2 ring-primary-900 ring-offset-2 ring-offset-background' : ''}`}
-          />,
+          // 선택 링은 원 가장자리에 **붙는다** — offset을 주면 사이에 흰 여백이 생겨 디자인과 다르다
+          // (실측: 비선택 원 48, 선택 원 50 → 링이 바깥으로 1~2px만 나간다)
+          <AllChip className={`size-12 ${value === null ? 'ring-2 ring-primary-900' : ''}`} />,
           () => onChange(null)
         )}
       {otherGroups.map(renderGroup)}

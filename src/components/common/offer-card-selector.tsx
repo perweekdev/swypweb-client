@@ -122,7 +122,7 @@ export function OfferCardSelector({
       />
 
       <div className="px-4 pb-8">
-        <p className="whitespace-pre-line text-h1 leading-tight text-black">
+        <p className="whitespace-pre-line text-h1 text-black">
           {'교환할 내 포카와\n상대방 포카를 선택하세요'}
         </p>
 

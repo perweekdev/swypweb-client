@@ -16,7 +16,7 @@ import { PLACEHOLDER_COLOR } from '@constants/colors';
 
 /**
  * EX-008 교환 세트 확인. 등록 직전 있어요/구해요를 3열로 훑어보고 등록한다.
- * 계측: 제목 20 semibold `#000000` 2줄(줄 간격 24) · 하단 CTA 343×56 rounded-xl primary-900.
+ * 계측: 제목 20 semibold `#000000` 2줄(행간은 디자인시스템대로 1.5 — 시안의 24는 무시한다) · 하단 CTA 343×56 rounded-xl primary-900.
  */
 export function ExchangeRegisterConfirm() {
   const router = useRouter();
@@ -95,7 +95,7 @@ export function ExchangeRegisterConfirm() {
       <Header title="교환 세트 확인" />
 
       <div className="flex-1 px-4 pb-6">
-        <p className="whitespace-pre-line text-h1 leading-tight text-black">
+        <p className="whitespace-pre-line text-h1 text-black">
           {editingId ? '수정될 교환 세트를\n확인해주세요' : '등록될 교환 세트를\n확인해주세요'}
         </p>
         <ExchangeCardSections className="mt-6" haveCards={haveCards} wantCards={wantCards} />

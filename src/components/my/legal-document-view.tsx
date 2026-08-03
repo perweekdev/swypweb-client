@@ -27,7 +27,7 @@ const MARKDOWN_COMPONENTS = {
     <h4 className="mt-4 text-body2 text-secondary-900">{props.children}</h4>
   ),
   p: (props: { children?: React.ReactNode }) => (
-    <p className="mt-2 text-body2 leading-relaxed text-secondary-700">{props.children}</p>
+    <p className="mt-2 text-body2 text-secondary-700">{props.children}</p>
   ),
   ul: (props: { children?: React.ReactNode }) => (
     <ul className="mt-2 list-disc space-y-1 pl-5">{props.children}</ul>
@@ -36,7 +36,7 @@ const MARKDOWN_COMPONENTS = {
     <ol className="mt-2 list-decimal space-y-1 pl-5">{props.children}</ol>
   ),
   li: (props: { children?: React.ReactNode }) => (
-    <li className="text-body2 leading-relaxed text-secondary-700">{props.children}</li>
+    <li className="text-body2 text-secondary-700">{props.children}</li>
   ),
   hr: () => <hr className="my-5 border-secondary-50" />,
   strong: (props: { children?: React.ReactNode }) => (
