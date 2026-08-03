@@ -21,6 +21,13 @@
   --font-sans:
     'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, ui-sans-serif, system-ui, sans-serif;
 
+  /* ── Shadow ──────────────────────────────────────────────────
+     디자인 지정값(2차 요청 8·9번).
+       card  — 저장될 이미지 미리보기. 경계가 없어 크기를 가늠하기 어려웠다.
+       frame — 화면이 프레임 최대 폭(420)을 넘을 때 서비스 영역과 바깥을 구분한다. */
+  --shadow-card: 0 4px 8px rgb(6 21 58 / 0.1);
+  --shadow-frame: 0 0 15px rgb(0 0 0 / 0.1);
+
   /* ── Aspect ratio ────────────────────────────────────────────
      포토카드 한 장의 비율. 디자인 실측(HOME-001 피드 61×98)을 전 화면 공통으로 쓴다.
      → `aspect-card`. 화면마다 55/85·8/13로 갈려 있던 것을 이 토큰 하나로 통일했다. */

@@ -119,7 +119,8 @@ export function SaveImageView() {
         )}
 
         {!isError && (
-          <div className="mt-10 overflow-hidden rounded-2xl bg-secondary-50">
+          // 쉐도우로 이미지 경계를 만든다 — 없으면 흰 배경에 묻혀 크기를 가늠하기 어렵다(디자인 지정)
+          <div className="mt-10 overflow-hidden rounded-2xl bg-secondary-50 shadow-card">
             {previewUrl ? (
               // 생성된 결과 이미지 — next/image 최적화 대상이 아니라 data URL이다.
               // eslint-disable-next-line @next/next/no-img-element
