@@ -53,9 +53,11 @@ export function GroupFilter({
       className="flex w-14 shrink-0 flex-col items-center gap-1.5"
     >
       {node}
-      {/* 계측(HOME-001·EX-001): 라벨 12(body3).
-          break-keep: 한국어는 단어 중간에서 끊지 않는다 ('관심그룹 추가/하기' → '관심그룹/추가하기') */}
-      <span className="line-clamp-2 w-full break-keep text-center text-body3 text-secondary-900">
+      {/* 계측(HOME-001·EX-001): 라벨 12(body3), 최대 2줄.
+          `break-keep` — 한국어는 단어 중간에서 끊지 않는다 ('관심그룹 추가/하기' → '관심그룹/추가하기').
+          `break-words` — 다만 **한 단어가 폭보다 길면** 그때는 중간에서 끊는다.
+          이게 없으면 공백 없는 긴 이름(`Hearts2Hearts`)이 개행 자체를 못 해 한 줄에서 잘린다. */}
+      <span className="line-clamp-2 w-full break-keep break-words text-center text-body3 text-secondary-900">
         {label}
       </span>
     </button>

@@ -78,8 +78,9 @@ export default function AddGroupPage() {
                     state={isSelected ? 'selected' : 'default'}
                     className={isAdded ? 'opacity-50' : ''}
                   />
+                  {/* 공백 없는 긴 이름(Hearts2Hearts)도 개행되도록 break-words를 함께 건다 */}
                   <span
-                    className={`break-keep text-center text-body3 ${
+                    className={`break-keep break-words text-center text-body3 ${
                       isAdded ? 'text-secondary-300' : 'text-secondary-900'
                     }`}
                   >
