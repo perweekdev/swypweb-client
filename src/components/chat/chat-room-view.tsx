@@ -3,14 +3,20 @@
 import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@components/layout/header';
+import { IconButton } from '@components/ui/icon-button';
+import { ConfirmDialog } from '@components/ui/confirm-dialog';
+import { MoreIcon } from '@components/icons';
+import { ActionSheet } from '@components/common/action-sheet';
 import { ChatInputBar } from '@components/chat/chat-input-bar';
 import { ChatMatchInfo } from '@components/chat/chat-match-info';
 import { ChatMessageList } from '@components/chat/chat-message-list';
+import { LEAVE_CHAT_CONFIRM } from '@components/chat/leave-chat-confirm';
 import {
   useChatHeader,
   useChatMessages,
   useChatPartnerAvatar,
   useChatProposal,
+  useLeaveChatRooms,
   useMarkChatRead,
 } from '@hooks/use-chat';
 import { useChatSocket } from '@hooks/use-chat-socket';
@@ -40,25 +46,41 @@ export function ChatRoomView() {
   const { data: messagePages, isPending, isError } = useChatMessages(chatId);
   useMarkChatRead(chatId);
   const { connected, sendMessage, sendImage } = useChatSocket(chatId);
-  const [imageError, setImageError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
+  const leaveRooms = useLeaveChatRooms();
+
+  // 나가기에 성공하면 이 방은 더 볼 수 없으므로 목록으로 돌려보낸다.
+  // 실패해도 화면을 유지한다 — 여기서 강제로 이동시키면 사용자가 상황을 알 수 없다.
+  const leave = async () => {
+    setLeaveOpen(false);
+    try {
+      await leaveRooms.mutateAsync([chatId]);
+      router.replace(ROUTES.chat);
+    } catch {
+      setErrorMessage('채팅방을 나가지 못했어요. 잠시 후 다시 시도해주세요.');
+    }
+  };
 
   // 사진 첨부: 업로드해서 받은 URL을 IMAGE 메시지로 보낸다(§8.7).
   const handlePickImage = async (file: File) => {
     const invalidReason = validateChatImage(file);
     if (invalidReason) {
-      setImageError(invalidReason);
+      setErrorMessage(invalidReason);
       return;
     }
 
-    setImageError(null);
+    setErrorMessage(null);
     try {
       const imageUrl = await uploadChatImage(chatId, file);
       // 업로드는 됐어도 소켓이 끊겨 있으면 전송이 실패한다 — 조용히 사라지지 않게 알린다.
       if (!sendImage(imageUrl)) {
-        setImageError('연결이 끊겨 사진을 보내지 못했어요. 잠시 후 다시 시도해주세요.');
+        setErrorMessage('연결이 끊겨 사진을 보내지 못했어요. 잠시 후 다시 시도해주세요.');
       }
     } catch (caught) {
-      setImageError(isApiError(caught) ? caught.message : '사진을 보내지 못했어요.');
+      setErrorMessage(isApiError(caught) ? caught.message : '사진을 보내지 못했어요.');
     }
   };
 
@@ -75,6 +97,11 @@ export function ChatRoomView() {
         <Header
           title={header?.partnerNickname ?? ''}
           onBack={isNewRoom ? () => router.replace(ROUTES.chat) : undefined}
+          right={
+            <IconButton aria-label="채팅방 메뉴" area={48} onClick={() => setMenuOpen(true)}>
+              <MoreIcon className="size-6" />
+            </IconButton>
+          }
         />
         {/* 제안 카드가 오기 전에는 렌더하지 않는다 — 요약이 대표 카드 1장을 직접 참조해서,
             빈 배열이면 undefined 접근으로 터진다. */}
@@ -106,11 +133,39 @@ export function ChatRoomView() {
         />
       )}
 
-      {imageError && <p className="px-4 pb-1 text-center text-body3 text-red-900">{imageError}</p>}
+      {errorMessage && (
+        <p className="px-4 pb-1 text-center text-body3 text-red-900">{errorMessage}</p>
+      )}
       <ChatInputBar
         onSend={sendMessage}
         onPickImage={(file) => void handlePickImage(file)}
         disabled={!connected}
+      />
+
+      {/* 시트·팝업은 sticky 컨테이너 **밖**에 둔다 — 안에 있으면 딤이 상단 헤더를 덮지 못한다 */}
+      <ActionSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        closeLabel="닫기"
+        actions={[
+          {
+            // 디자인 시트에는 옵션이 기본 색(navy)으로만 그려져 있어 destructive(빨강)를 쓰지 않는다.
+            label: '채팅방 나가기',
+            onClick: () => {
+              setMenuOpen(false);
+              setLeaveOpen(true);
+            },
+          },
+        ]}
+      />
+
+      <ConfirmDialog
+        open={leaveOpen}
+        title={LEAVE_CHAT_CONFIRM.title}
+        description={LEAVE_CHAT_CONFIRM.description}
+        confirmText={LEAVE_CHAT_CONFIRM.confirmText}
+        onCancel={() => setLeaveOpen(false)}
+        onConfirm={() => void leave()}
       />
     </>
   );

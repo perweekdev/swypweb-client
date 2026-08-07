@@ -155,6 +155,19 @@ export function markChatRead(chatId: string) {
 }
 
 /**
+ * 채팅방 나가기 (§8.10). "방 폭파"가 아니라 **참여자 단위 나가기**다.
+ *
+ * `roomDeleted`가 true면 상대도 이미 나가 있어 방·메시지가 DB에서 완전히 삭제된 것이고,
+ * false면 나만 나간 상태로 상대에게는 방이 그대로 남는다.
+ *
+ * ⚠️ **서버가 "나감"을 조회에 반영하지 않는다**(§8.10 결함) — 목록·헤더·메시지 어디에도
+ * `deleted_at` 필터가 없어 나간 방이 계속 보인다. 그래서 호출부가 나간 방을 로컬에 기억해 숨긴다.
+ */
+export function leaveChatRoom(chatId: string) {
+  return api.delete<{ chatRoomId: number; roomDeleted: boolean }>(`/chat-rooms/${chatId}`);
+}
+
+/**
  * 교환 완료 처리 (CHAT-004).
  *
  * 세 필드 모두 **필수**이고 카드 배열은 **비어 있으면 400**이다(2026-07-26 실측으로 확정 —

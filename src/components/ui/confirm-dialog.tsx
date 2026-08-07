@@ -34,18 +34,23 @@ export function ConfirmDialog({
         className="absolute inset-0 bg-black/50"
         onClick={onCancel}
       />
-      {/* 계측: 다이얼로그 폭 293(좌우 여백 41), 배경은 흰색이 아니라 background 토큰 */}
+      {/*
+        계측: 다이얼로그 폭 293(좌우 여백 41), 배경은 흰색이 아니라 background 토큰.
+        타이포는 **두 디자인(채팅 나가기 · EX-004 세트 삭제)에서 같은 값**이 나왔다.
+          제목 잉크 14~15 → 16 (h3, secondary-900)
+          설명 잉크 12    → **14 (body2, secondary-500)** — body3(12)로 두면 시안보다 작아 개행 위치가 달라진다
+          버튼 높이 41    → pill **md** (lg는 43)
+      */}
       <div className="relative z-10 w-full max-w-[295px] rounded-2xl bg-background px-5 py-6">
         <p className="whitespace-pre-line text-center text-h3 text-secondary-900">{title}</p>
         {description && (
-          <p className="mt-1.5 text-center text-body3 text-secondary-500">{description}</p>
+          <p className="mt-1.5 text-center text-body2 text-secondary-500">{description}</p>
         )}
-        {/* set-delete-popup 계측: 버튼은 pill(취소 outline / 확인 primary) */}
         <div className="mt-5 flex gap-2">
-          <Button variant="outline" size="lg" shape="pill" className="flex-1" onClick={onCancel}>
+          <Button variant="outline" size="md" shape="pill" className="flex-1" onClick={onCancel}>
             {cancelText}
           </Button>
-          <Button variant="primary" size="lg" shape="pill" className="flex-1" onClick={onConfirm}>
+          <Button variant="primary" size="md" shape="pill" className="flex-1" onClick={onConfirm}>
             {confirmText}
           </Button>
         </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyProfile } from '@hooks/use-my-profile';
 import { isApiError } from '@lib/api-error';
+import { logout as requestLogout } from '@lib/api/auth';
 import { withdraw } from '@lib/api/users';
 import { useAuthStore } from '@store/auth-store';
 import { Toggle } from '@components/ui/toggle';
@@ -29,6 +30,21 @@ export function MemberMyPage() {
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [withdrawError, setWithdrawError] = useState<string | null>(null);
 
+  /**
+   * 서버 세션 정리 + 로컬 토큰 폐기.
+   *
+   * 서버 호출이 실패해도 **로컬 삭제는 반드시 진행한다.** 네트워크 문제로 로그아웃이 막히면
+   * 사용자가 빠져나갈 방법이 없다. 서버는 쿠키가 없어도 200을 주므로 응답으로 분기할 것도 없다(§2.4).
+   */
+  const clearSession = async () => {
+    try {
+      await requestLogout();
+    } catch {
+      /* 서버 폐기 실패는 무시한다 — 아래 로컬 삭제가 사용자 입장에서의 로그아웃이다 */
+    }
+    logout();
+  };
+
   const confirmWithdraw = async () => {
     setWithdrawOpen(false);
     setWithdrawError(null);
@@ -46,8 +62,9 @@ export function MemberMyPage() {
       }
     }
 
-    // ⚠️ 서버가 토큰을 무효화하지 않는다(최대 1시간 유효) → 즉시 로컬 토큰을 폐기한다.
-    logout();
+    // ⚠️ 탈퇴는 리프레시 토큰을 폐기하지 않는다(§1.2) → 로그아웃을 함께 호출해 서버 세션도 끊는다.
+    //    accessToken도 서버에 블랙리스트가 없어 만료 전까지 유효하므로 로컬에서 즉시 폐기한다.
+    await clearSession();
     router.replace(ROUTES.home);
   };
 
@@ -115,7 +132,7 @@ export function MemberMyPage() {
         onCancel={() => setLogoutOpen(false)}
         onConfirm={() => {
           setLogoutOpen(false);
-          logout();
+          void clearSession();
         }}
       />
 

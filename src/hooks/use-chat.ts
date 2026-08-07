@@ -10,8 +10,11 @@ import {
   getChatMessages,
   getChatProposal,
   getChatRooms,
+  leaveChatRoom,
   markChatRead,
 } from '@lib/api/chat';
+import { isApiError } from '@lib/api-error';
+import { useLeftChatStore } from '@store/left-chat-store';
 import { getNextCursorParam } from '@lib/cursor';
 import { queryKeys } from '@lib/query-keys';
 import { useMyProfile } from '@hooks/use-my-profile';
@@ -154,6 +157,45 @@ export function useCompleteChatExchange(chatId: string) {
       // 세트 정리는 서버가 하므로 교환 세트·매칭 캐시도 새로 받는다.
       void queryClient.invalidateQueries({ queryKey: queryKeys.tradeSets.all });
       void queryClient.invalidateQueries({ queryKey: queryKeys.matches.all });
+    },
+  });
+}
+
+/**
+ * 채팅방 나가기 (CHAT-001 편집 / CHAT-002 ⋮).
+ *
+ * 벌크 API가 없어 **선택한 수만큼 DELETE를 호출**한다.
+ *
+ * **이미 끝난 상태는 성공으로 친다** — 409(이미 나간 방)·404(없는 방)는 "나가 있다"는 목표가
+ * 이미 달성된 것이므로 오류로 다루지 않고 숨김 처리한다. 하나가 그런 이유로 실패했다고
+ * 나머지까지 되돌릴 이유도 없다.
+ *
+ * 서버가 나간 방을 목록에서 빼주지 않으므로(§8.10 결함) 성공한 id를 로컬에 기억한다.
+ */
+export function useLeaveChatRooms() {
+  const queryClient = useQueryClient();
+  const markLeft = useLeftChatStore((s) => s.markLeft);
+
+  return useMutation({
+    mutationFn: async (chatIds: string[]) => {
+      const results = await Promise.all(
+        chatIds.map(async (chatId) => {
+          try {
+            await leaveChatRoom(chatId);
+            return { chatId, left: true };
+          } catch (caught) {
+            const alreadyGone =
+              isApiError(caught) && (caught.status === 409 || caught.status === 404);
+            if (alreadyGone) return { chatId, left: true };
+            throw caught;
+          }
+        })
+      );
+      return results.filter((result) => result.left).map((result) => result.chatId);
+    },
+    onSuccess: (leftIds) => {
+      markLeft(leftIds);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() });
     },
   });
 }
