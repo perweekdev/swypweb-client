@@ -26,6 +26,7 @@ import { useInfiniteScrollSentinel } from '@hooks/use-home-feed';
  *    **버튼은 제자리에 두고 목록만 스크롤**시킬 수 있다(문서 스크롤로는 불가능하다).
  */
 export default function ChatPage() {
+  const authReady = useAuthStore((s) => s.hydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useChatRooms();
@@ -91,7 +92,8 @@ export default function ChatPage() {
   );
 
   // 비회원은 채팅 내역이 없으므로 빈 상태를 보여준다.
-  if (!isAuthenticated) {
+  // 단, **세션 복구가 끝난 뒤**에 판단한다 — 복구 전에 비회원으로 그리면 직후 목록으로 바뀌며 깜빡인다.
+  if (authReady && !isAuthenticated) {
     return (
       <>
         <TabHeader title="채팅" />

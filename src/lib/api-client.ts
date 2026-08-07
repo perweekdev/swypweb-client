@@ -32,6 +32,11 @@ export interface RequestOptions {
    * 기본값이 false인 이유: 나머지 API는 Bearer 헤더로 인증하므로 쿠키를 실을 이유가 없다.
    */
   withCredentials?: boolean;
+  /**
+   * 401을 받아도 재발급을 시도하지 않는다.
+   * 재발급 요청 자신에게만 쓴다 — 안 그러면 401 → 재발급 → 401 → … 로 재귀한다.
+   */
+  skipTokenRefresh?: boolean;
   signal?: AbortSignal;
 }
 
@@ -86,14 +91,64 @@ let unauthorizedHandler: UnauthorizedHandler | null = null;
 
 /**
  * 401 발생 시 호출될 핸들러를 등록한다.
- * 리프레시 토큰이 없으므로(§1.2) 재로그인 유도가 유일한 복구 경로다. 등록은 I1에서 한다.
+ * **재발급까지 실패했을 때만** 불린다 — 재발급이 성공하면 원래 요청이 재시도되고 여기까지 오지 않는다.
  */
 export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
   unauthorizedHandler = handler;
 }
 
-async function request<T>(method: string, path: string, options: BodyOptions = {}): Promise<T> {
-  const { query, body, auth = true, withCredentials = false, signal } = options;
+/**
+ * 진행 중인 재발급. **동시에 두 번 이상 돌면 안 된다.**
+ *
+ * 서버는 리프레시 토큰을 회전시키면서, 이미 쓴 토큰이 다시 오면 **탈취로 간주해
+ * 그 사용자의 토큰을 전부 삭제**한다(§2.3). 401을 받은 요청이 여러 개면 각자 재발급을 시도하는데,
+ * 두 번째 요청이 이 판정에 걸려 **모든 기기에서 강제 로그아웃**된다.
+ * 그래서 첫 요청의 Promise를 공유하고 나머지는 그 결과를 기다린다.
+ */
+let refreshInFlight: Promise<boolean> | null = null;
+
+/**
+ * 새 accessToken을 받아 스토어에 넣는다. 성공 여부만 돌려준다.
+ *
+ * 두 곳에서 부른다 — **401을 받았을 때**(만료)와 **앱 시작 시**(탭을 닫아 토큰이 사라진 경우).
+ * 어느 쪽이든 위 `refreshInFlight`를 공유하므로 동시에 두 번 나가지 않는다.
+ */
+export function refreshAccessToken(): Promise<boolean> {
+  refreshInFlight ??= (async () => {
+    try {
+      // 인증은 `refresh_token` 쿠키로 한다 — Authorization 헤더도, 요청 바디도 없다(§2.3).
+      const data = await request<{ accessToken: string }>('POST', '/auth/refresh', {
+        auth: false,
+        withCredentials: true,
+        skipTokenRefresh: true,
+      });
+      useAuthStore.getState().setAccessToken(data.accessToken);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+
+  return refreshInFlight;
+}
+
+async function request<T>(
+  method: string,
+  path: string,
+  options: BodyOptions = {},
+  /** 재발급 후 한 번만 재시도한다. 무한 반복을 막는 표식 */
+  isRetry = false
+): Promise<T> {
+  const {
+    query,
+    body,
+    auth = true,
+    withCredentials = false,
+    skipTokenRefresh = false,
+    signal,
+  } = options;
 
   // multipart는 브라우저가 boundary를 포함해 Content-Type을 직접 붙여야 한다.
   // 여기서 지정하면 boundary가 빠져 서버가 파트를 파싱하지 못한다.
@@ -128,7 +183,19 @@ async function request<T>(method: string, path: string, options: BodyOptions = {
 
   if (!response.ok) {
     const apiError = toApiError(response.status, payload);
-    if (apiError.isUnauthorized) unauthorizedHandler?.(apiError);
+
+    if (apiError.isUnauthorized) {
+      // 토큰이 있었는데 거부당한 경우에만 재발급을 시도한다.
+      // 비로그인 상태의 401은 만료가 아니라 '원래 못 쓰는 API'라 재발급해도 소용없다.
+      const expired = auth && !isRetry && !skipTokenRefresh && accessToken !== null;
+
+      if (expired && (await refreshAccessToken())) {
+        // 새 토큰으로 원래 요청을 그대로 한 번 더 보낸다(헤더는 아래에서 다시 읽는다).
+        return request<T>(method, path, options, true);
+      }
+      unauthorizedHandler?.(apiError);
+    }
+
     throw apiError;
   }
 
