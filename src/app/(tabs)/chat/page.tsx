@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@store/auth-store';
-import { useLeftChatStore } from '@store/left-chat-store';
 import { TabHeader } from '@components/layout/tab-header';
 import { Button } from '@components/ui/button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
@@ -36,13 +35,8 @@ export default function ChatPage() {
     hasNextPage && !isFetchingNextPage
   );
 
-  // 나간 방은 서버가 목록에서 빼주지 않아 화면에서 직접 숨긴다(§8.10 결함 우회).
-  // 복구 전에는 숨길 대상을 모르므로 목록을 그리지 않는다 — 안 그러면 나간 방이 잠깐 보였다 사라진다.
-  const leftIds = useLeftChatStore((s) => s.ids);
-  const leftHydrated = useLeftChatStore((s) => s.hydrated);
-  const rooms = (data?.pages.flatMap((page) => page.items) ?? []).filter(
-    (room) => !leftIds.includes(room.id)
-  );
+  // 나간 방은 서버가 목록에서 빼 준다(2026-08-08 수정 확인) — 화면에서 따로 거를 게 없다.
+  const rooms = data?.pages.flatMap((page) => page.items) ?? [];
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -153,7 +147,7 @@ export default function ChatPage() {
     );
   }
 
-  const showList = !isPending && !isError && leftHydrated;
+  const showList = !isPending && !isError;
 
   return (
     <>

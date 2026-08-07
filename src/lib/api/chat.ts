@@ -160,8 +160,9 @@ export function markChatRead(chatId: string) {
  * `roomDeleted`가 true면 상대도 이미 나가 있어 방·메시지가 DB에서 완전히 삭제된 것이고,
  * false면 나만 나간 상태로 상대에게는 방이 그대로 남는다.
  *
- * ⚠️ **서버가 "나감"을 조회에 반영하지 않는다**(§8.10 결함) — 목록·헤더·메시지 어디에도
- * `deleted_at` 필터가 없어 나간 방이 계속 보인다. 그래서 호출부가 나간 방을 로컬에 기억해 숨긴다.
+ * **목록(8.2)은 나간 방을 걸러 준다**(2026-08-08 서버 수정, 실측 확인) → 목록만 다시 받으면 된다.
+ * 다만 헤더·제안·메시지는 아직 나간 방도 200으로 응답한다. 앱에서 채팅방으로 들어가는 경로가
+ * 목록뿐이라 실사용에는 닿지 않는다(뒤로가기로 예전 URL을 되짚는 경우만 해당).
  */
 export function leaveChatRoom(chatId: string) {
   return api.delete<{ chatRoomId: number; roomDeleted: boolean }>(`/chat-rooms/${chatId}`);
