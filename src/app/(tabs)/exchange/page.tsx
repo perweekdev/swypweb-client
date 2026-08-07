@@ -24,6 +24,7 @@ import { ROUTES, EXCHANGE_ROUTES } from '@constants/routes';
 /** EX-001 교환 메인 (내 교환 세트 + 교환 가능한 상대) */
 function ExchangeView() {
   const router = useRouter();
+  const authReady = useAuthStore((s) => s.hydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   // 상세(EX-004)에 다녀와도 보던 그룹·세트가 유지되도록 선택을 URL에 남긴다.
   // 화면이 다시 마운트되면서 컴포넌트 state는 사라지지만, 쿼리는 뒤로가기로 그대로 복원된다.
@@ -79,6 +80,9 @@ function ExchangeView() {
   const selectedSetId = mySets.find((set) => set.id === pickedSet)?.id ?? mySets[0]?.id ?? null;
   const { data: matchPages } = useMatches(selectedSetId);
   const matches = matchPages?.pages.flatMap((page) => page.items) ?? [];
+
+  // 세션 복구 전에는 판단하지 않는다 — 비회원으로 그렸다가 회원 화면으로 바뀌면 깜빡인다.
+  if (!authReady) return <TabHeader title="내 교환" />;
 
   if (groups.length === 0) {
     return (

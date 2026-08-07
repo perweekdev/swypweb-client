@@ -19,6 +19,7 @@ import { ROUTES, COLLECTION_ROUTES } from '@constants/routes';
 /** COL-001 컬렉션 메인 (그룹별 앨범 트리 + 보유 여부) */
 function CollectionView() {
   const router = useRouter();
+  const authReady = useAuthStore((s) => s.hydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   // 편집을 마치고 돌아오면 `?group=`으로 보던 그룹이 전달된다(COL-003 → COL-001).
   const groupFromQuery = useSearchParams().get('group');
@@ -51,6 +52,9 @@ function CollectionView() {
 
   // 비회원은 관심 그룹이 없는 상태로 본다 (memo: 비회원 기본 화면 = 관심 그룹 없음)
   const groups = isAuthenticated ? filterGroups : [];
+
+  // 세션 복구 전에는 판단하지 않는다 — 비회원으로 그렸다가 회원 화면으로 바뀌면 깜빡인다.
+  if (!authReady) return <TabHeader title="컬렉션" />;
 
   if (groups.length === 0) {
     return (

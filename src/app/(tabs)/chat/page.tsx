@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@store/auth-store';
-import { useLeftChatStore } from '@store/left-chat-store';
 import { TabHeader } from '@components/layout/tab-header';
 import { Button } from '@components/ui/button';
 import { ConfirmDialog } from '@components/ui/confirm-dialog';
@@ -27,6 +26,7 @@ import { useInfiniteScrollSentinel } from '@hooks/use-home-feed';
  *    **버튼은 제자리에 두고 목록만 스크롤**시킬 수 있다(문서 스크롤로는 불가능하다).
  */
 export default function ChatPage() {
+  const authReady = useAuthStore((s) => s.hydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useChatRooms();
@@ -36,13 +36,8 @@ export default function ChatPage() {
     hasNextPage && !isFetchingNextPage
   );
 
-  // 나간 방은 서버가 목록에서 빼주지 않아 화면에서 직접 숨긴다(§8.10 결함 우회).
-  // 복구 전에는 숨길 대상을 모르므로 목록을 그리지 않는다 — 안 그러면 나간 방이 잠깐 보였다 사라진다.
-  const leftIds = useLeftChatStore((s) => s.ids);
-  const leftHydrated = useLeftChatStore((s) => s.hydrated);
-  const rooms = (data?.pages.flatMap((page) => page.items) ?? []).filter(
-    (room) => !leftIds.includes(room.id)
-  );
+  // 나간 방은 서버가 목록에서 빼 준다(2026-08-08 수정 확인) — 화면에서 따로 거를 게 없다.
+  const rooms = data?.pages.flatMap((page) => page.items) ?? [];
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -97,7 +92,8 @@ export default function ChatPage() {
   );
 
   // 비회원은 채팅 내역이 없으므로 빈 상태를 보여준다.
-  if (!isAuthenticated) {
+  // 단, **세션 복구가 끝난 뒤**에 판단한다 — 복구 전에 비회원으로 그리면 직후 목록으로 바뀌며 깜빡인다.
+  if (authReady && !isAuthenticated) {
     return (
       <>
         <TabHeader title="채팅" />
@@ -153,7 +149,7 @@ export default function ChatPage() {
     );
   }
 
-  const showList = !isPending && !isError && leftHydrated;
+  const showList = !isPending && !isError;
 
   return (
     <>

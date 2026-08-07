@@ -14,7 +14,6 @@ import {
   markChatRead,
 } from '@lib/api/chat';
 import { isApiError } from '@lib/api-error';
-import { useLeftChatStore } from '@store/left-chat-store';
 import { getNextCursorParam } from '@lib/cursor';
 import { queryKeys } from '@lib/query-keys';
 import { useMyProfile } from '@hooks/use-my-profile';
@@ -167,36 +166,28 @@ export function useCompleteChatExchange(chatId: string) {
  * 벌크 API가 없어 **선택한 수만큼 DELETE를 호출**한다.
  *
  * **이미 끝난 상태는 성공으로 친다** — 409(이미 나간 방)·404(없는 방)는 "나가 있다"는 목표가
- * 이미 달성된 것이므로 오류로 다루지 않고 숨김 처리한다. 하나가 그런 이유로 실패했다고
- * 나머지까지 되돌릴 이유도 없다.
+ * 이미 달성된 것이므로 오류로 다루지 않는다. 하나가 그런 이유로 실패했다고 나머지까지 되돌릴 이유도 없다.
  *
- * 서버가 나간 방을 목록에서 빼주지 않으므로(§8.10 결함) 성공한 id를 로컬에 기억한다.
+ * 나간 방은 **서버가 목록에서 빼 준다**(2026-08-08 수정 확인). 목록만 다시 받으면 된다.
  */
 export function useLeaveChatRooms() {
   const queryClient = useQueryClient();
-  const markLeft = useLeftChatStore((s) => s.markLeft);
 
   return useMutation({
     mutationFn: async (chatIds: string[]) => {
-      const results = await Promise.all(
+      await Promise.all(
         chatIds.map(async (chatId) => {
           try {
             await leaveChatRoom(chatId);
-            return { chatId, left: true };
           } catch (caught) {
             const alreadyGone =
               isApiError(caught) && (caught.status === 409 || caught.status === 404);
-            if (alreadyGone) return { chatId, left: true };
-            throw caught;
+            if (!alreadyGone) throw caught;
           }
         })
       );
-      return results.filter((result) => result.left).map((result) => result.chatId);
     },
-    onSuccess: (leftIds) => {
-      markLeft(leftIds);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.chat.rooms() }),
   });
 }
 

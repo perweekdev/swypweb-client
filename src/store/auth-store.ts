@@ -49,6 +49,37 @@ function clearStorage(): void {
   }
 }
 
+/**
+ * "이 브라우저에서 로그인한 적이 있다"는 표시. **localStorage**라 탭을 닫아도 남는다.
+ *
+ * 리프레시 토큰 쿠키는 HttpOnly라 JS가 존재 여부를 알 수 없다. 그래서 앱 시작 시
+ * 무작정 재발급을 시도하면 **한 번도 로그인한 적 없는 방문자에게도 매번 401 요청**이 나가고,
+ * 그동안 화면 판단이 지연된다. 이 표시가 있을 때만 복구를 시도한다.
+ *
+ * 토큰 자체가 아니라 **불린 힌트**다 — 틀려도(쿠키가 이미 만료) 재발급이 401로 끝날 뿐이다.
+ */
+const SESSION_HINT_KEY = 'phocamatch.hasSession';
+
+function rememberSessionHint(exists: boolean): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (exists) window.localStorage.setItem(SESSION_HINT_KEY, '1');
+    else window.localStorage.removeItem(SESSION_HINT_KEY);
+  } catch {
+    /* 무시 */
+  }
+}
+
+/** 앱 시작 시 세션 복구를 시도할 가치가 있는지 */
+export function hadSessionBefore(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(SESSION_HINT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 interface AuthState extends PersistedAuth {
   isAuthenticated: boolean;
   /**
@@ -59,8 +90,14 @@ interface AuthState extends PersistedAuth {
    * 반드시 이 값이 true가 된 뒤에 판단해야 한다.
    */
   hydrated: boolean;
-  /** sessionStorage 값을 스토어로 올린다. 마운트 후 1회만 호출한다(AuthProvider). */
+  /**
+   * sessionStorage 값을 스토어로 올린다. 마운트 후 1회만 호출한다(AuthProvider).
+   * **`hydrated`를 켜지 않는다** — 토큰이 없으면 쿠키로 복구를 한 번 더 시도해야 하고,
+   * 그 전에 화면이 '비회원'으로 판단해버리면 로그인 상태가 잠깐 깜빡인다.
+   */
   hydrate: () => void;
+  /** 복구 시도가 모두 끝났음을 알린다. 이 시점부터 화면이 회원/비회원을 판단한다. */
+  markHydrated: () => void;
   setAccessToken: (token: string | null) => void;
   setSignupToken: (token: string | null) => void;
   setNickname: (nickname: string | null) => void;
@@ -87,13 +124,16 @@ export const useAuthStore = create<AuthState>((set, get) => {
         nickname: saved?.nickname ?? null,
         signupToken: saved?.signupToken ?? null,
         isAuthenticated: Boolean(saved?.accessToken),
-        hydrated: true,
       });
     },
+
+    markHydrated: () => set({ hydrated: true }),
 
     setAccessToken: (token) => {
       set({ accessToken: token, isAuthenticated: Boolean(token) });
       persist();
+      // 다음 방문 때 쿠키로 복구를 시도할지 판단할 힌트
+      rememberSessionHint(Boolean(token));
     },
 
     setSignupToken: (token) => {
@@ -110,6 +150,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
       // hydrated는 유지한다 — 복구는 이미 끝났고, 로그아웃이 그것을 되돌리지는 않는다.
       set({ ...EMPTY, isAuthenticated: false });
       clearStorage();
+      // 힌트도 지운다. 안 그러면 다음 방문 때 이미 폐기된 쿠키로 재발급을 시도한다.
+      rememberSessionHint(false);
     },
   };
 });
