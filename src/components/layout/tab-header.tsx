@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AppLogo } from '@components/icons/brand';
 
 /**
@@ -12,19 +13,25 @@ import { AppLogo } from '@components/icons/brand';
 export function TabHeader({
   title,
   logo = false,
+  right,
   sticky = true,
 }: {
   title: string;
   logo?: boolean;
+  /** 우측 끝 액션(CHAT-001 설정 ⚙). 없으면 자리도 차지하지 않는다 */
+  right?: ReactNode;
   /** 바깥에서 고정을 직접 제어할 때 끈다(HOME-001은 필터와 한 덩어리로 움직인다) */
   sticky?: boolean;
 }) {
   return (
     <header className={`bg-background px-4 pb-2 pt-4 ${sticky ? 'sticky top-0 z-20' : ''}`}>
-      <h1 className="text-h1 text-secondary-900">
-        {/* 계측(HOME-001): 로고 87×23. 워드마크는 검정이라 text-black을 명시한다 */}
-        {logo ? <AppLogo className="h-[23px] w-[87px] text-black" title={title} /> : title}
-      </h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-h1 text-secondary-900">
+          {/* 계측(HOME-001): 로고 87×23. 워드마크는 검정이라 text-black을 명시한다 */}
+          {logo ? <AppLogo className="h-[23px] w-[87px] text-black" title={title} /> : title}
+        </h1>
+        {right}
+      </div>
     </header>
   );
 }
