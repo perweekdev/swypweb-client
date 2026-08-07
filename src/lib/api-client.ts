@@ -26,6 +26,12 @@ export interface RequestOptions {
    * ⚠️ 기본값 true를 유지할 것 — `GET /trade-sets/**`는 문서상 공개지만 토큰이 없으면 500이 난다(§1.9).
    */
   auth?: boolean;
+  /**
+   * true면 쿠키를 함께 보낸다(`credentials: 'include'`).
+   * 리프레시 토큰이 HttpOnly 쿠키라 인증을 쿠키로 하는 API에만 켠다(§1.2 — 로그아웃·재발급).
+   * 기본값이 false인 이유: 나머지 API는 Bearer 헤더로 인증하므로 쿠키를 실을 이유가 없다.
+   */
+  withCredentials?: boolean;
   signal?: AbortSignal;
 }
 
@@ -87,7 +93,7 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
 }
 
 async function request<T>(method: string, path: string, options: BodyOptions = {}): Promise<T> {
-  const { query, body, auth = true, signal } = options;
+  const { query, body, auth = true, withCredentials = false, signal } = options;
 
   // multipart는 브라우저가 boundary를 포함해 Content-Type을 직접 붙여야 한다.
   // 여기서 지정하면 boundary가 빠져 서버가 파트를 파싱하지 못한다.
@@ -105,6 +111,7 @@ async function request<T>(method: string, path: string, options: BodyOptions = {
       method,
       headers,
       body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
+      credentials: withCredentials ? 'include' : 'same-origin',
       signal,
     });
   } catch (error) {
